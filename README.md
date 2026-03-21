@@ -1,1 +1,1 @@
-# quizlet-2.0
+# AIQuizlet
