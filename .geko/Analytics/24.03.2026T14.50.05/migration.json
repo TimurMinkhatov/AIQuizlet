@@ -1,1 +1,0 @@
-{"os_version":"26.3.1","is_error":false,"subcommand":"list-targets","is_ci":false,"duration_in_ms":8,"geko_version":"1.0.8","swift_version":"6.2.3","name":"migration","client_id":"51d978df88769dab773f3f83056b7f9c","machine_hardware_name":"arm64","params":{},"os":"macOS","command_arguments":["migration","list-targets","--xcodeproj-path","AIQuizlet.xcodeproj"]}
