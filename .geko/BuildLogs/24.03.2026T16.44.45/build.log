@@ -1,8 +1,0 @@
-[[36mAIQuizlet[0m] [1mRunning script[0m SwiftLint
-[[36mAIQuizlet[0m] [1mRunning script[0m SwiftGen
-[33m❌ AIQuizlet/Resources/Assets.xcassets[0m: [31mThe stickers icon set, app icon set, or icon stack named "AppIcon" did not have any applicable content.[0m
-
-[36m[0m
-⚠️  /Users/azamatzakirov/ITIS/MySwiftProjects/UniverWork/AIQuizlet/AIQuizlet/Resources/Assets.xcassets: [33mAccent color ‘AccentColor’ is not present in any asset catalogs.[0m
-
-[32m[0m

@@ -1,9 +1,0 @@
-[[36mAIQuizlet[0m] [1mRunning script[0m SwiftLint
-[[36mAIQuizlet[0m] [1mRunning script[0m SwiftGen
-⚠️  /Users/azamatzakirov/ITIS/MySwiftProjects/UniverWork/AIQuizlet/AIQuizlet/Resources/Assets.xcassets: [33mAccent color ‘AccentColor’ is not present in any asset catalogs.[0m
-
-[32m[0m
-[[36mAIQuizlet[0m] [1mProcessing[0m AIQuizlet-Info.plist
-[1mSigning[0m AIQuizlet.app (in target 'AIQuizlet' from project 'AIQuizlet')
-[[36mAIQuizlet[0m] [1mTouching[0m AIQuizlet.app
-[32;1mBuild Succeeded[0m

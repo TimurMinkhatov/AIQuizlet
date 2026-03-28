@@ -6,7 +6,7 @@ let project = Project(
     targets: [
         Target(
             name: "AIQuizlet",
-            destinations: [.iPhone],
+            destinations: .iOS,
             product: .app,
             bundleId: "com.aiquizlet.app",
             deploymentTargets: .iOS("17.0"),
@@ -42,54 +42,28 @@ let project = Project(
                     """,
                     name: "SwiftLint",
                     basedOnDependencyAnalysis: false
-                ),
-                .pre(
-                    script: """
-                    if test -f /usr/local/bin/swiftgen; then
-                        /usr/local/bin/swiftgen config run
-                    else
-                        echo "SwiftGen not installed"
-                    fi
-                    """,
-                    name: "SwiftGen",
-                    basedOnDependencyAnalysis: false
                 )
             ],
-            dependencies: [],
+            dependencies: [
+                .external(name: "Moya"),
+                .external(name: "SnapKit"),
+                .external(name: "FirebaseAuth")
+            ],
             settings: .settings(
-                base: [
-                    "SWIFT_VERSION": "5.0",
-                    "IPHONEOS_DEPLOYMENT_TARGET": "17.0"
-                ],
-                configurations: [
-                    .debug(name: "Debug"),
-                    .release(name: "Release")
-                ],
-                defaultSettings: .recommended
+                base: ["VALIDATE_WORKSPACE": "NO"]
             )
         ),
         Target(
             name: "AIQuizletTests",
-            destinations: [.iPhone],
+            destinations: .iOS,
             product: .unitTests,
-            bundleId: "com.azamat.AIQuizletTests",
+            bundleId: "com.aiquizlet.tests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["AIQuizletTests/**"],
             dependencies: [
                 .target(name: "AIQuizlet")
             ]
-        )
-    ],
-    schemes: [
-        Scheme(
-            name: "AIQuizlet",
-            shared: true,
-            buildAction: .buildAction(targets: ["AIQuizlet"]),
-            runAction: .runAction(
-                configuration: "Debug",
-                executable: "AIQuizlet"
-            )
         )
     ]
 )
