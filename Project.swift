@@ -2,7 +2,7 @@ import ProjectDescription
 
 let project = Project(
     name: "AIQuizlet",
-    organizationName: "t-bank team практика",
+    organizationName: "t-bank-team-practice",
     targets: [
         Target(
             name: "AIQuizlet",
