@@ -1,6 +1,0 @@
-[[36mAIQuizlet[0m] [1mProcessing[0m AIQuizlet-Info.plist
-[1mSigning[0m AIQuizlet.debug.dylib (in target 'AIQuizlet' from project 'AIQuizlet')
-[1mSigning[0m __preview.dylib (in target 'AIQuizlet' from project 'AIQuizlet')
-[1mSigning[0m AIQuizlet.app (in target 'AIQuizlet' from project 'AIQuizlet')
-[[36mAIQuizlet[0m] [1mTouching[0m AIQuizlet.app
-[32;1mBuild Succeeded[0m
