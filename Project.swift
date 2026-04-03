@@ -2,7 +2,7 @@ import ProjectDescription
 
 let project = Project(
     name: "AIQuizlet",
-    organizationName: "t-bank-team-practice",
+    organizationName: "t-bank-practice-team",
     targets: [
         Target(
             name: "AIQuizlet",
@@ -15,17 +15,6 @@ let project = Project(
                     "CFBundleShortVersionString": "1.0.0",
                     "CFBundleVersion": "1",
                     "UILaunchStoryboardName": "LaunchScreen",
-                    "UIApplicationSceneManifest": [
-                        "UIApplicationSupportsMultipleScenes": false,
-                        "UISceneConfigurations": [
-                            "UIWindowSceneSessionRoleApplication": [
-                                [
-                                    "UISceneConfigurationName": "Default Configuration",
-                                    "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
-                                ]
-                            ]
-                        ]
-                    ],
                     "FirebaseAppDelegateProxyEnabled": false
                 ]
             ),
