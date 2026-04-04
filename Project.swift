@@ -2,19 +2,20 @@ import ProjectDescription
 
 let project = Project(
     name: "AIQuizlet",
-    organizationName: "t-bank-team-practice",
+    organizationName: "t-bank-practice-team",
     targets: [
         Target(
             name: "AIQuizlet",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.aiquizlet.app",
+            bundleId: "timaza.aiquizlet.app",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "CFBundleShortVersionString": "1.0.0",
                     "CFBundleVersion": "1",
                     "UILaunchStoryboardName": "LaunchScreen",
+                    "FirebaseAppDelegateProxyEnabled": false,
                     "UIApplicationSceneManifest": [
                         "UIApplicationSupportsMultipleScenes": false,
                         "UISceneConfigurations": [
@@ -25,8 +26,7 @@ let project = Project(
                                 ]
                             ]
                         ]
-                    ],
-                    "FirebaseAppDelegateProxyEnabled": false
+                    ]
                 ]
             ),
             sources: ["AIQuizlet/Sources/**"],
@@ -57,7 +57,7 @@ let project = Project(
             name: "AIQuizletTests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "com.aiquizlet.tests",
+            bundleId: "timaza.aiquizlet.app.tests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["AIQuizletTests/**"],
