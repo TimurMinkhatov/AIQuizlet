@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeCoordinator: Coordinator {
+final class HomeCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
@@ -20,8 +20,7 @@ class HomeCoordinator: Coordinator {
     func start() {
         let vm = HomeViewModel()
         vm.coordinator = self
-        let vc = HomeViewController()
-        vc.viewModel = vm
+        let vc = HomeViewController(viewModel: vm)
         navigationController.setViewControllers([vc], animated: false)
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import FirebaseAuth
 
-class AppCoordinator: Coordinator {
+final class AppCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
@@ -18,12 +18,16 @@ class AppCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
+//    func start() {
+//        if Auth.auth().currentUser != nil {
+//            showHome()
+//        } else {
+//            showAuth()
+//        }
+//    }
+    
     func start() {
-        if Auth.auth().currentUser != nil {
-            showHome()
-        } else {
-            showAuth()
-        }
+        showAuth()
     }
 
     func showAuth() {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AuthCoordinator: Coordinator {
+final class AuthCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
@@ -18,22 +18,20 @@ class AuthCoordinator: Coordinator {
     }
 
     func start() {
-        showLogin()
+        showRegister()
     }
 
     func showLogin() {
         let vm = LoginViewModel()
         vm.coordinator = self
-        let vc = LoginViewController()
-        vc.viewModel = vm
+        let vc = LoginViewController(viewModel: vm)
         navigationController.setViewControllers([vc], animated: false)
     }
 
     func showRegister() {
         let vm = RegisterViewModel()
         vm.coordinator = self
-        let vc = RegisterViewController()
-        vc.viewModel = vm
+        let vc = RegisterViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
     }
 

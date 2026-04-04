@@ -8,14 +8,25 @@ let project = Project(
             name: "AIQuizlet",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.aiquizlet.app",
+            bundleId: "timaza.aiquizlet.app",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
                     "CFBundleShortVersionString": "1.0.0",
                     "CFBundleVersion": "1",
                     "UILaunchStoryboardName": "LaunchScreen",
-                    "FirebaseAppDelegateProxyEnabled": false
+                    "FirebaseAppDelegateProxyEnabled": false,
+                    "UIApplicationSceneManifest": [
+                        "UIApplicationSupportsMultipleScenes": false,
+                        "UISceneConfigurations": [
+                            "UIWindowSceneSessionRoleApplication": [
+                                [
+                                    "UISceneConfigurationName": "Default Configuration",
+                                    "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                                ]
+                            ]
+                        ]
+                    ]
                 ]
             ),
             sources: ["AIQuizlet/Sources/**"],
@@ -46,7 +57,7 @@ let project = Project(
             name: "AIQuizletTests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "com.aiquizlet.tests",
+            bundleId: "timaza.aiquizlet.app.tests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["AIQuizletTests/**"],
