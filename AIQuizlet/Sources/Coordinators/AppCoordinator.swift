@@ -18,16 +18,12 @@ final class AppCoordinator: Coordinator {
         self.navigationController = navigationController
     }
 
-//    func start() {
-//        if Auth.auth().currentUser != nil {
-//            showHome()
-//        } else {
-//            showAuth()
-//        }
-//    }
-    
     func start() {
-        showAuth()
+        if Auth.auth().currentUser != nil {
+            showHome()
+        } else {
+            showAuth()
+        }
     }
 
     func showAuth() {
