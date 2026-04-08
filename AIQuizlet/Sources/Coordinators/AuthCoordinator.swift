@@ -18,21 +18,14 @@ final class AuthCoordinator: Coordinator {
     }
 
     func start() {
-        showRegister()
+        showAuth()
     }
 
-    func showLogin() {
-        let vm = LoginViewModel()
+    func showAuth(state: AuthState = .login) {
+        let vm = AuthViewModel()
         vm.coordinator = self
-        let vc = LoginViewController(viewModel: vm)
+        let vc = AuthViewController(viewModel: vm)
         navigationController.setViewControllers([vc], animated: false)
-    }
-
-    func showRegister() {
-        let vm = RegisterViewModel()
-        vm.coordinator = self
-        let vc = RegisterViewController(viewModel: vm)
-        navigationController.pushViewController(vc, animated: true)
     }
 
     func didFinishAuth() {

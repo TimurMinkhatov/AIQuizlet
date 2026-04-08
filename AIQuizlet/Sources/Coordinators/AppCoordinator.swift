@@ -25,7 +25,7 @@ final class AppCoordinator: Coordinator {
             showAuth()
         }
     }
-
+    
     func showAuth() {
         let authCoordinator = AuthCoordinator(navigationController: navigationController)
         authCoordinator.parentCoordinator = self
