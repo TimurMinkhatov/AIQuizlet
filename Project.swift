@@ -50,7 +50,10 @@ let project = Project(
                 .external(name: "FirebaseAuth")
             ],
             settings: .settings(
-                base: ["VALIDATE_WORKSPACE": "NO"]
+                base: [
+                    "VALIDATE_WORKSPACE": "NO",
+                    "SWIFT_INCLUDE_PATHS": "$(PODS_ROOT)/Moya/Sources/Moya"
+                ]
             )
         ),
         Target(

@@ -1,0 +1,17 @@
+included: # Что проверять
+  - AIQuizlet/Sources
+
+excluded: # Что ИГНОРИРОВАТЬ (Критически важно!)
+  - Geko
+  - Pods
+  - AIQuizlet/DerivedData
+  - AIQuizletTests
+
+disabled_rules: # Правила, которые мы отключаем
+  - line_length
+  - trailing_whitespace
+  - force_cast
+  - force_try
+  - function_body_length
+  - type_body_length
+  - file_length
