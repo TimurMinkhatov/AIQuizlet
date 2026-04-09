@@ -16,15 +16,8 @@ class AuthViewController: UIViewController {
         didSet { updateUI() }
     }
     
-    init(viewModel: AuthViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Инициализатор не реализован")
-    }
-    
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let gradientLayer = CAGradientLayer()
     private let cardView = UIView()
     private let iconContainerView = UIView()
@@ -39,7 +32,18 @@ class AuthViewController: UIViewController {
     private let confirmPasswordTextField = UITextField()
     private let actionButton = UIButton()
     private let switchButton = UIButton()
-    private var cardBottomConstraint: Constraint?
+    
+    init(viewModel: AuthViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Инициализатор не реализован")
+    }
+}
+
+extension AuthViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,35 +54,34 @@ class AuthViewController: UIViewController {
         updateUI()
         
         viewModel.onError = { [weak self] error in
+            guard let self else { return }
             let alert = UIAlertController(title: "Ошибка", message: error, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
-            self?.present(alert, animated: true)
+            present(alert, animated: true)
         }
-        
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillShow),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillHide),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         gradientLayer.frame = view.bounds
     }
+}
+
+private extension AuthViewController {
     
-    private func setupGradient() {
+    enum Constants {
+        static let cardHorizontalInset: CGFloat = 20
+        static let cardVerticalInset: CGFloat = 60
+        static let iconSize: CGFloat = 80
+        static let iconImageSize: CGFloat = 40
+        static let iconCornerRadius: CGFloat = 40
+        static let cardCornerRadius: CGFloat = 20
+        static let buttonCornerRadius: CGFloat = 12
+        static let textFieldHeight: CGFloat = 50
+        static let buttonHeight: CGFloat = 50
+    }
+    
+    func setupGradient() {
         gradientLayer.colors = [
             UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
             UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
@@ -89,12 +92,15 @@ class AuthViewController: UIViewController {
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
     
-    private func setupUI() {
+    func setupUI() {
+        scrollView.keyboardDismissMode = .onDrag
+        scrollView.showsVerticalScrollIndicator = false
+        
         cardView.backgroundColor = .white
-        cardView.layer.cornerRadius = 20
+        cardView.layer.cornerRadius = Constants.cardCornerRadius
         
         iconContainerView.backgroundColor = UIColor(red: 0.9, green: 0.93, blue: 1.0, alpha: 1.0)
-        iconContainerView.layer.cornerRadius = 40
+        iconContainerView.layer.cornerRadius = Constants.iconCornerRadius
         
         iconImageView.image = UIImage(systemName: "book")
         iconImageView.tintColor = .systemBlue
@@ -112,7 +118,7 @@ class AuthViewController: UIViewController {
         
         emailTextField.placeholder = "example@email.com"
         emailTextField.borderStyle = .roundedRect
-        emailTextField.keyboardType = .default
+        emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
         emailTextField.leftView = makeIconView(systemName: "envelope")
         emailTextField.leftViewMode = .always
@@ -135,7 +141,7 @@ class AuthViewController: UIViewController {
         confirmPasswordTextField.leftViewMode = .always
         
         actionButton.backgroundColor = .systemGray4
-        actionButton.layer.cornerRadius = 12
+        actionButton.layer.cornerRadius = Constants.buttonCornerRadius
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
         
@@ -143,7 +149,7 @@ class AuthViewController: UIViewController {
         switchButton.titleLabel?.font = .systemFont(ofSize: 14)
     }
     
-    private func makeIconView(systemName: String) -> UIView {
+    func makeIconView(systemName: String) -> UIView {
         let container = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 50))
         let imageView = UIImageView(image: UIImage(systemName: systemName))
         imageView.tintColor = .systemGray
@@ -153,8 +159,10 @@ class AuthViewController: UIViewController {
         return container
     }
     
-    private func setupLayout() {
-        view.addSubview(cardView)
+    func setupLayout() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(cardView)
         cardView.addSubview(iconContainerView)
         iconContainerView.addSubview(iconImageView)
         cardView.addSubview(titleLabel)
@@ -168,85 +176,96 @@ class AuthViewController: UIViewController {
         cardView.addSubview(actionButton)
         cardView.addSubview(switchButton)
         
-        cardView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.top.greaterThanOrEqualToSuperview().offset(60)
-            cardBottomConstraint = make.bottom.equalToSuperview().inset(120).constraint
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
-        iconContainerView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
-            make.centerX.equalToSuperview()
-            make.width.height.equalTo(80)
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+            $0.height.greaterThanOrEqualToSuperview()
         }
         
-        iconImageView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.height.equalTo(40)
+        cardView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
+            $0.centerY.equalToSuperview()
+            $0.top.greaterThanOrEqualToSuperview().offset(Constants.cardVerticalInset)
+            $0.bottom.lessThanOrEqualToSuperview().inset(Constants.cardVerticalInset)
         }
         
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(iconContainerView.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(20)
+        iconContainerView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.centerX.equalToSuperview()
+            $0.width.height.equalTo(Constants.iconSize)
         }
         
-        subtitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
+        iconImageView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.width.height.equalTo(Constants.iconImageSize)
         }
         
-        emailLabel.snp.makeConstraints { make in
-            make.top.equalTo(subtitleLabel.snp.bottom).offset(24)
-            make.leading.trailing.equalToSuperview().inset(20)
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(iconContainerView.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        emailTextField.snp.makeConstraints { make in
-            make.top.equalTo(emailLabel.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+        subtitleLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        passwordLabel.snp.makeConstraints { make in
-            make.top.equalTo(emailTextField.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(20)
+        emailLabel.snp.makeConstraints {
+            $0.top.equalTo(subtitleLabel.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        passwordTextField.snp.makeConstraints { make in
-            make.top.equalTo(passwordLabel.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+        emailTextField.snp.makeConstraints {
+            $0.top.equalTo(emailLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(Constants.textFieldHeight)
         }
         
-        confirmPasswordLabel.snp.makeConstraints { make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(20)
+        passwordLabel.snp.makeConstraints {
+            $0.top.equalTo(emailTextField.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        confirmPasswordTextField.snp.makeConstraints { make in
-            make.top.equalTo(confirmPasswordLabel.snp.bottom).offset(8)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+        passwordTextField.snp.makeConstraints {
+            $0.top.equalTo(passwordLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(Constants.textFieldHeight)
         }
         
-        actionButton.snp.makeConstraints { make in
-            make.top.equalTo(confirmPasswordTextField.snp.bottom).offset(24)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+        confirmPasswordLabel.snp.makeConstraints {
+            $0.top.equalTo(passwordTextField.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        switchButton.snp.makeConstraints { make in
-            make.top.equalTo(actionButton.snp.bottom).offset(16)
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(24)
+        confirmPasswordTextField.snp.makeConstraints {
+            $0.top.equalTo(confirmPasswordLabel.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(Constants.textFieldHeight)
+        }
+        
+        actionButton.snp.makeConstraints {
+            $0.top.equalTo(confirmPasswordTextField.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(Constants.buttonHeight)
+        }
+        
+        switchButton.snp.makeConstraints {
+            $0.top.equalTo(actionButton.snp.bottom).offset(16)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(24)
         }
     }
     
-    private func setupActions() {
+    func setupActions() {
         actionButton.addTarget(self, action: #selector(actionTapped), for: .touchUpInside)
         switchButton.addTarget(self, action: #selector(switchTapped), for: .touchUpInside)
     }
     
-    private func updateUI() {
+    func updateUI() {
         switch state {
         case .login:
             titleLabel.text = "Добро пожаловать!"
@@ -268,7 +287,7 @@ class AuthViewController: UIViewController {
         }
     }
     
-    @objc private func actionTapped() {
+    @objc func actionTapped() {
         guard let email = emailTextField.text,
               let password = passwordTextField.text else { return }
         viewModel.email = email
@@ -284,32 +303,7 @@ class AuthViewController: UIViewController {
         }
     }
     
-    @objc private func switchTapped() {
+    @objc func switchTapped() {
         state = (state == .login) ? .register : .login
-    }
-
-    @objc private func keyboardWillHide(_ notification: Notification) {
-        guard let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-        else { return }
-        
-        UIView.animate(withDuration: duration) {
-            self.cardBottomConstraint?.update(inset: 120)
-            self.view.layoutIfNeeded()
-        }
-    }
-
-    @objc private func keyboardWillShow(_ notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
-              let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
-        else { return }
-        
-        UIView.animate(withDuration: duration) {
-            self.cardBottomConstraint?.update(inset: keyboardFrame.height + 20)
-            self.view.layoutIfNeeded()
-        }
-    }
-
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
