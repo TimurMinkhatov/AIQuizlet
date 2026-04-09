@@ -7,41 +7,59 @@
 //
 import Foundation
 
-final class QuizService {
-    private let networkManager: NetworkManagerProtocol
+enum QuizServiceError: Error, LocalizedError {
+    case invalidAIResponse
+    case decodingFailed
+    case networkError(Error)
     
-    init(networkManager: NetworkManagerProtocol = NetworkManager()) {
+    var errorDescription: String? {
+        switch self {
+        case .invalidAIResponse:
+            return "Нейросеть прислала пустой или некорректный ответ."
+        case .decodingFailed:
+            return "Нейросеть не распознала текст, попробуйте еще раз."
+        case .networkError(let error):
+            return "Ошибка cети: \(error.localizedDescription)."
+        }
+    }
+    
+    
+}
+
+final class QuizService: QuizServiceProtocol {
+    private let networkManager: NetworkManagerProtocol
+
+    init(networkManager: NetworkManagerProtocol) {
         self.networkManager = networkManager
     }
-    
-    func fetchSavedQuizzes() async throws -> [Quiz] {
-        return try await networkManager.request(target: .getQuizzes)
+
+    func getQuizzes() async throws -> [Quiz] {
+        do {
+            return try await networkManager.request(target: QuizAPI.getQuizzes)
+        } catch {
+            throw QuizServiceError.networkError(error)
+        }
     }
-    
+
     func generateQuiz(for text: String) async throws -> Quiz {
-        let prompt = """
-            На основе следующего текста создай тест. 
-            Верни ответ СТРОГО в формате JSON без лишних слов, заголовков и Markdown-разметки.
-            Структура JSON:
-            {
-              "title": "Название теста",
-              "questions": [
-                {
-                  "text": "Вопрос",
-                  "answers": ["Вариант 1", "Вариант 2", "Вариант 3", "Вариант 4"],
-                  "correctAnswer": 0
-                }
-              ]
-            }
-            Текст: \(text)
-            """
-        let response: QuizResponse = try await networkManager.request(target: .generateQuiz(prompt: prompt))
+        let prompt = QuizPrompt.generateQuiz(for: text)
+        let response: QuizResponse
+        do {
+            response = try await networkManager.request(target: QuizAPI.generateQuiz(prompt: prompt))
+        } catch {
+            throw QuizServiceError.networkError(error)
+        }
         
         guard let jsonString = response.choices.first?.message.content,
               let jsonData = jsonString.data(using: .utf8) else {
-            throw NSError(domain: "QuizService",code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse AI response"])
-            
+            throw QuizServiceError.invalidAIResponse
+
         }
-        return try JSONDecoder().decode(Quiz.self, from: jsonData)
+        
+        do {
+            return try JSONDecoder().decode(Quiz.self, from: jsonData)
+        } catch {
+            throw QuizServiceError.decodingFailed
+        }
     }
 }
