@@ -42,7 +42,14 @@ final class HomeViewController: UIViewController {
     }
 
     private func setupConstraints() {
+        welcomeLabel.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+            make.leading.equalToSuperview().offset(20)
+        }
 
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalTo(welcomeLabel.snp.bottom).offset(30)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
     }
-
 }
