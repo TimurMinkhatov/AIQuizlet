@@ -9,6 +9,20 @@
 import UIKit
 import SnapKit
 
+private extension AuthViewController {
+    enum Constants {
+        static let cardCornerRadius: CGFloat = 20
+        static let iconCornerRadius: CGFloat = 40
+        static let buttonCornerRadius: CGFloat = 12
+        static let cardHorizontalInset: CGFloat = 20
+        static let cardVerticalInset: CGFloat = 60
+        static let iconSize: CGFloat = 80
+        static let iconImageSize: CGFloat = 40
+        static let textFieldHeight: CGFloat = 50
+        static let buttonHeight: CGFloat = 50
+    }
+}
+
 class AuthViewController: UIViewController {
     
     private let viewModel: AuthViewModel
@@ -16,22 +30,129 @@ class AuthViewController: UIViewController {
         didSet { updateUI() }
     }
     
-    private let scrollView = UIScrollView()
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.keyboardDismissMode = .onDrag
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
+    
     private let contentView = UIView()
-    private let gradientLayer = CAGradientLayer()
-    private let cardView = UIView()
-    private let iconContainerView = UIView()
-    private let iconImageView = UIImageView()
-    private let titleLabel = UILabel()
-    private let subtitleLabel = UILabel()
-    private let emailLabel = UILabel()
-    private let emailTextField = UITextField()
-    private let passwordLabel = UILabel()
-    private let passwordTextField = UITextField()
-    private let confirmPasswordLabel = UILabel()
-    private let confirmPasswordTextField = UITextField()
-    private let actionButton = UIButton()
-    private let switchButton = UIButton()
+    
+    private let gradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [
+            UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
+            UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
+        ]
+        layer.startPoint = CGPoint(x: 0.5, y: 0)
+        layer.endPoint = CGPoint(x: 0.5, y: 1)
+        return layer
+    }()
+    
+    private let cardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = Constants.cardCornerRadius
+        return view
+    }()
+    
+    private let iconContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 0.9, green: 0.93, blue: 1.0, alpha: 1.0)
+        view.layer.cornerRadius = Constants.iconCornerRadius
+        return view
+    }()
+    
+    private let iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "book")
+        imageView.tintColor = .systemBlue
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 28)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .gray
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let emailLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Email"
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        return label
+    }()
+    
+    private let emailTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "example@email.com"
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .emailAddress
+        textField.autocapitalizationType = .none
+        textField.leftView = AuthViewController.makeIconView(systemName: "envelope")
+        textField.leftViewMode = .always
+        return textField
+    }()
+    
+    private let passwordLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Пароль"
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        return label
+    }()
+    
+    private let passwordTextField: UITextField = {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = true
+        textField.leftView = AuthViewController.makeIconView(systemName: "lock")
+        textField.leftViewMode = .always
+        return textField
+    }()
+    
+    private let confirmPasswordLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Подтвердите пароль"
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        return label
+    }()
+    
+    private let confirmPasswordTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Повторите пароль"
+        textField.borderStyle = .roundedRect
+        textField.isSecureTextEntry = true
+        textField.leftView = AuthViewController.makeIconView(systemName: "lock")
+        textField.leftViewMode = .always
+        return textField
+    }()
+    
+    private let actionButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .systemGray4
+        button.layer.cornerRadius = Constants.buttonCornerRadius
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        return button
+    }()
+    
+    private let switchButton: UIButton = {
+        let button = UIButton()
+        button.setTitleColor(.systemBlue, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        return button
+    }()
     
     init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
@@ -43,12 +164,12 @@ class AuthViewController: UIViewController {
     }
 }
 
+// MARK: - Lifecycle
 extension AuthViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupGradient()
-        setupUI()
+        view.layer.insertSublayer(gradientLayer, at: 0)
         setupLayout()
         setupActions()
         updateUI()
@@ -67,89 +188,10 @@ extension AuthViewController {
     }
 }
 
+// MARK: - Private
 private extension AuthViewController {
     
-    enum Constants {
-        static let cardHorizontalInset: CGFloat = 20
-        static let cardVerticalInset: CGFloat = 60
-        static let iconSize: CGFloat = 80
-        static let iconImageSize: CGFloat = 40
-        static let iconCornerRadius: CGFloat = 40
-        static let cardCornerRadius: CGFloat = 20
-        static let buttonCornerRadius: CGFloat = 12
-        static let textFieldHeight: CGFloat = 50
-        static let buttonHeight: CGFloat = 50
-    }
-    
-    func setupGradient() {
-        gradientLayer.colors = [
-            UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
-        gradientLayer.frame = view.bounds
-        view.layer.insertSublayer(gradientLayer, at: 0)
-    }
-    
-    func setupUI() {
-        scrollView.keyboardDismissMode = .onDrag
-        scrollView.showsVerticalScrollIndicator = false
-        
-        cardView.backgroundColor = .white
-        cardView.layer.cornerRadius = Constants.cardCornerRadius
-        
-        iconContainerView.backgroundColor = UIColor(red: 0.9, green: 0.93, blue: 1.0, alpha: 1.0)
-        iconContainerView.layer.cornerRadius = Constants.iconCornerRadius
-        
-        iconImageView.image = UIImage(systemName: "book")
-        iconImageView.tintColor = .systemBlue
-        iconImageView.contentMode = .scaleAspectFit
-        
-        titleLabel.font = .boldSystemFont(ofSize: 28)
-        titleLabel.textAlignment = .center
-        
-        subtitleLabel.font = .systemFont(ofSize: 14)
-        subtitleLabel.textColor = .gray
-        subtitleLabel.textAlignment = .center
-        
-        emailLabel.text = "Email"
-        emailLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        
-        emailTextField.placeholder = "example@email.com"
-        emailTextField.borderStyle = .roundedRect
-        emailTextField.keyboardType = .emailAddress
-        emailTextField.autocapitalizationType = .none
-        emailTextField.leftView = makeIconView(systemName: "envelope")
-        emailTextField.leftViewMode = .always
-        
-        passwordLabel.text = "Пароль"
-        passwordLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        
-        passwordTextField.borderStyle = .roundedRect
-        passwordTextField.isSecureTextEntry = true
-        passwordTextField.leftView = makeIconView(systemName: "lock")
-        passwordTextField.leftViewMode = .always
-        
-        confirmPasswordLabel.text = "Подтвердите пароль"
-        confirmPasswordLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        
-        confirmPasswordTextField.placeholder = "Повторите пароль"
-        confirmPasswordTextField.borderStyle = .roundedRect
-        confirmPasswordTextField.isSecureTextEntry = true
-        confirmPasswordTextField.leftView = makeIconView(systemName: "lock")
-        confirmPasswordTextField.leftViewMode = .always
-        
-        actionButton.backgroundColor = .systemGray4
-        actionButton.layer.cornerRadius = Constants.buttonCornerRadius
-        actionButton.setTitleColor(.white, for: .normal)
-        actionButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        
-        switchButton.setTitleColor(.systemBlue, for: .normal)
-        switchButton.titleLabel?.font = .systemFont(ofSize: 14)
-    }
-    
-    func makeIconView(systemName: String) -> UIView {
+    static func makeIconView(systemName: String) -> UIView {
         let container = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 50))
         let imageView = UIImageView(image: UIImage(systemName: systemName))
         imageView.tintColor = .systemGray
