@@ -9,7 +9,7 @@
 enum QuizPrompt {
     static func generateQuiz(for text: String) -> String {
         return """
-            На основе следующего текста создай тест. 
+            На основе следующего текста создай тест.
                         Верни ответ СТРОГО в формате JSON без лишних слов, заголовков и Markdown-разметки.
                         Структура JSON:
                         {
@@ -26,4 +26,3 @@ enum QuizPrompt {
             """
     }
 }
-

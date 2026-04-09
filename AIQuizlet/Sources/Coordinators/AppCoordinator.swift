@@ -25,7 +25,7 @@ final class AppCoordinator: Coordinator {
 //            showAuth()
 //        }
 //    }
-    
+
     func start() {
         showAuth()
     }

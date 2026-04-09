@@ -1,1 +1,5 @@
-
+"home_greating" = "Привет!";
+"home_create_by_photo" = "Создать по фото";
+"home_create_by_text" = "Создать по тексту";
+"home_recent_tests" = "Недавние тесты";
+"home_empty_tests" = "У вас пока нету тестов";

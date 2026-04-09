@@ -10,21 +10,22 @@ import Foundation
 import Moya
 
 protocol NetworkManagerProtocol {
-    func request<T: Decodable>(target: API) async throws -> T
+    func request<T: TargetType, D: Decodable>(target: T) async throws -> D
 }
 
 final class NetworkManager: NetworkManagerProtocol {
-    private let provider = MoyaProvider<API>()
-    
-    func request<T: Decodable>(target: API) async throws -> T {
+
+    func request<T: TargetType, D: Decodable>(target: T) async throws -> D {
+        let provider = MoyaProvider<T>()
+
         return try await withCheckedThrowingContinuation { continuation in
             provider.request(target) { result in
                 switch result {
                 case .success(let response):
                     do {
                         let filteredResponse = try response.filterSuccessfulStatusCodes()
-                        
-                        let decodeData = try JSONDecoder().decode(T.self, from: filteredResponse.data)
+
+                        let decodeData = try JSONDecoder().decode(D.self, from: filteredResponse.data)
                         continuation.resume(returning: decodeData)
                     } catch {
                         continuation.resume(throwing: error)

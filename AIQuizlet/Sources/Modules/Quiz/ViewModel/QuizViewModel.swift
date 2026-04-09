@@ -8,7 +8,7 @@
 import Foundation
 
 final class QuizViewModel {
-    
+
     enum GenerationState {
         case idle
         case generating
@@ -16,9 +16,9 @@ final class QuizViewModel {
         case success(Quiz)
         case error(String)
     }
-    
+
     var onStateChange: ((GenerationState) -> Void)?
-    
+
     private(set) var state: GenerationState = .idle {
         didSet {
             DispatchQueue.main.async {
@@ -27,19 +27,19 @@ final class QuizViewModel {
         }
     }
     private let quizService: QuizService
-    
+
     init(quizService: QuizService) {
         self.quizService = quizService
     }
-    
+
     func generateQuiz(from text: String) {
         state = .readingText
-        
+
         Task {
             do {
                 try await Task.sleep(nanoseconds: 1 * 1_000_000_000)
                 state = .generating
-                
+
                 let quiz = try await quizService.generateQuiz(for: text)
                 state = .success(quiz)
             } catch {
