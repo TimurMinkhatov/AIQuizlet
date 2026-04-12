@@ -20,9 +20,7 @@ private extension AuthViewController {
         static let cardVerticalInset: CGFloat = 60
         static let iconSize: CGFloat = 80
         static let iconImageSize: CGFloat = 40
-        static let textFieldHeight: CGFloat = 50
         static let buttonHeight: CGFloat = 50
-        static let fieldSpacing: CGFloat = 8
 
         enum Strings {
             static let loginTitle = "Добро пожаловать!"
@@ -62,16 +60,16 @@ final class AuthViewController: UIViewController {
 
     // MARK: - UI Components
 
-    private let scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.keyboardDismissMode = .onDrag
         scrollView.showsVerticalScrollIndicator = false
         return scrollView
     }()
 
-    private let contentView = UIView()
+    private lazy var contentView = UIView()
 
-    private let gradientLayer: CAGradientLayer = {
+    private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
         layer.colors = [
             UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
@@ -82,21 +80,21 @@ final class AuthViewController: UIViewController {
         return layer
     }()
 
-    private let cardView: UIView = {
+    private lazy var cardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = Constants.cardCornerRadius
         return view
     }()
 
-    private let iconContainerView: UIView = {
+    private lazy var iconContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 0.9, green: 0.93, blue: 1.0, alpha: 1.0)
         view.layer.cornerRadius = Constants.iconCornerRadius
         return view
     }()
 
-    private let iconImageView: UIImageView = {
+    private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "book")
         imageView.tintColor = .systemBlue
@@ -104,14 +102,14 @@ final class AuthViewController: UIViewController {
         return imageView
     }()
 
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 28)
         label.textAlignment = .center
         return label
     }()
 
-    private let subtitleLabel: UILabel = {
+    private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
@@ -119,7 +117,28 @@ final class AuthViewController: UIViewController {
         return label
     }()
 
-    private let actionButton: UIButton = {
+    private lazy var emailField = FormFieldView(
+        labelText: Constants.Strings.emailLabel,
+        placeholder: Constants.Strings.emailPlaceholder,
+        keyboardType: .emailAddress,
+        iconName: "envelope"
+    )
+
+    private lazy var passwordField = FormFieldView(
+        labelText: Constants.Strings.passwordLabel,
+        placeholder: Constants.Strings.loginPasswordPlaceholder,
+        isSecure: true,
+        iconName: "lock"
+    )
+
+    private lazy var confirmPasswordField = FormFieldView(
+        labelText: Constants.Strings.confirmPasswordLabel,
+        placeholder: Constants.Strings.confirmPasswordPlaceholder,
+        isSecure: true,
+        iconName: "lock"
+    )
+
+    private lazy var actionButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .systemGray4
         button.layer.cornerRadius = Constants.buttonCornerRadius
@@ -128,53 +147,17 @@ final class AuthViewController: UIViewController {
         return button
     }()
 
-    private let switchButton: UIButton = {
+    private lazy var switchButton: UIButton = {
         let button = UIButton()
         button.setTitleColor(.systemBlue, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14)
         return button
     }()
 
-    private let emailTextField: UITextField
-    private let passwordTextField: UITextField
-    private let confirmPasswordTextField: UITextField
-
-    private let emailStack: UIStackView
-    private let passwordStack: UIStackView
-    private let confirmPasswordStack: UIStackView
-
     // MARK: - Init
 
     init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
-
-        let emailField = AuthViewController.makeFieldStack(
-            labelText: Constants.Strings.emailLabel,
-            placeholder: Constants.Strings.emailPlaceholder,
-            keyboardType: .emailAddress,
-            iconName: "envelope"
-        )
-        let passwordField = AuthViewController.makeFieldStack(
-            labelText: Constants.Strings.passwordLabel,
-            placeholder: Constants.Strings.loginPasswordPlaceholder,
-            isSecure: true,
-            iconName: "lock"
-        )
-        let confirmPasswordField = AuthViewController.makeFieldStack(
-            labelText: Constants.Strings.confirmPasswordLabel,
-            placeholder: Constants.Strings.confirmPasswordPlaceholder,
-            isSecure: true,
-            iconName: "lock"
-        )
-
-        emailTextField = emailField.textField
-        passwordTextField = passwordField.textField
-        confirmPasswordTextField = confirmPasswordField.textField
-
-        emailStack = emailField.stack
-        passwordStack = passwordField.stack
-        confirmPasswordStack = confirmPasswordField.stack
-
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -206,43 +189,6 @@ extension AuthViewController {
 
 private extension AuthViewController {
 
-    static func makeFieldStack(
-        labelText: String,
-        placeholder: String,
-        isSecure: Bool = false,
-        keyboardType: UIKeyboardType = .default,
-        iconName: String
-    ) -> (stack: UIStackView, textField: UITextField) {
-        let label = UILabel()
-        label.text = labelText
-        label.font = .systemFont(ofSize: 14, weight: .medium)
-
-        let textField = UITextField()
-        textField.placeholder = placeholder
-        textField.borderStyle = .roundedRect
-        textField.isSecureTextEntry = isSecure
-        textField.keyboardType = keyboardType
-        textField.autocapitalizationType = .none
-        textField.leftView = makeIconView(systemName: iconName)
-        textField.leftViewMode = .always
-
-        let stack = UIStackView(arrangedSubviews: [label, textField])
-        stack.axis = .vertical
-        stack.spacing = Constants.fieldSpacing
-
-        return (stack, textField)
-    }
-
-    static func makeIconView(systemName: String) -> UIView {
-        let container = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 50))
-        let imageView = UIImageView(image: UIImage(systemName: systemName))
-        imageView.tintColor = .systemGray
-        imageView.contentMode = .scaleAspectFit
-        imageView.frame = CGRect(x: 10, y: 15, width: 20, height: 20)
-        container.addSubview(imageView)
-        return container
-    }
-
     func bindViewModel() {
         viewModel.onError = { [weak self] error in
             guard let self else { return }
@@ -264,9 +210,9 @@ private extension AuthViewController {
         iconContainerView.addSubview(iconImageView)
         cardView.addSubview(titleLabel)
         cardView.addSubview(subtitleLabel)
-        cardView.addSubview(emailStack)
-        cardView.addSubview(passwordStack)
-        cardView.addSubview(confirmPasswordStack)
+        cardView.addSubview(emailField)
+        cardView.addSubview(passwordField)
+        cardView.addSubview(confirmPasswordField)
         cardView.addSubview(actionButton)
         cardView.addSubview(switchButton)
 
@@ -308,35 +254,23 @@ private extension AuthViewController {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
-        emailStack.snp.makeConstraints {
+        emailField.snp.makeConstraints {
             $0.top.equalTo(subtitleLabel.snp.bottom).offset(24)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
-        emailTextField.snp.makeConstraints {
-            $0.height.equalTo(Constants.textFieldHeight)
-        }
-
-        passwordStack.snp.makeConstraints {
-            $0.top.equalTo(emailStack.snp.bottom).offset(16)
+        passwordField.snp.makeConstraints {
+            $0.top.equalTo(emailField.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
-        passwordTextField.snp.makeConstraints {
-            $0.height.equalTo(Constants.textFieldHeight)
-        }
-
-        confirmPasswordStack.snp.makeConstraints {
-            $0.top.equalTo(passwordStack.snp.bottom).offset(16)
+        confirmPasswordField.snp.makeConstraints {
+            $0.top.equalTo(passwordField.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(20)
-        }
-
-        confirmPasswordTextField.snp.makeConstraints {
-            $0.height.equalTo(Constants.textFieldHeight)
         }
 
         actionButton.snp.makeConstraints {
-            $0.top.equalTo(confirmPasswordStack.snp.bottom).offset(24)
+            $0.top.equalTo(confirmPasswordField.snp.bottom).offset(24)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(Constants.buttonHeight)
         }
@@ -358,30 +292,30 @@ private extension AuthViewController {
         case .login:
             titleLabel.text = Constants.Strings.loginTitle
             subtitleLabel.text = Constants.Strings.loginSubtitle
-            passwordTextField.placeholder = Constants.Strings.loginPasswordPlaceholder
-            confirmPasswordStack.isHidden = true
+            passwordField.setPlaceholder(Constants.Strings.loginPasswordPlaceholder)
+            confirmPasswordField.isHidden = true
             actionButton.setTitle(Constants.Strings.loginAction, for: .normal)
             switchButton.setTitle(Constants.Strings.loginSwitch, for: .normal)
 
         case .register:
             titleLabel.text = Constants.Strings.registerTitle
             subtitleLabel.text = Constants.Strings.registerSubtitle
-            passwordTextField.placeholder = Constants.Strings.registerPasswordPlaceholder
-            confirmPasswordStack.isHidden = false
+            passwordField.setPlaceholder(Constants.Strings.registerPasswordPlaceholder)
+            confirmPasswordField.isHidden = false
             actionButton.setTitle(Constants.Strings.registerAction, for: .normal)
             switchButton.setTitle(Constants.Strings.registerSwitch, for: .normal)
         }
     }
 
     @objc func actionTapped() {
-        guard let email = emailTextField.text,
-              let password = passwordTextField.text else { return }
+        guard let email = emailField.text,
+              let password = passwordField.text else { return }
 
         switch state {
         case .login:
             viewModel.signIn(email: email, password: password)
         case .register:
-            guard let confirmPassword = confirmPasswordTextField.text else { return }
+            guard let confirmPassword = confirmPasswordField.text else { return }
             viewModel.register(email: email, password: password, confirmPassword: confirmPassword)
         }
     }
