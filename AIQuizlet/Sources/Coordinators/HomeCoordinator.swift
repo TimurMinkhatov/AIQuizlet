@@ -9,15 +9,31 @@
 import UIKit
 
 final class HomeCoordinator: Coordinator {
+
+    // MARK: - Properties
+
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+
+    // MARK: - Init
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
 
+    // MARK: - Coordinator
+
     func start() {
+        showHome()
+    }
+}
+
+// MARK: - Private Methods
+
+private extension HomeCoordinator {
+
+    func showHome() {
         let vm = HomeViewModel()
         vm.coordinator = self
         let vc = HomeViewController(viewModel: vm)

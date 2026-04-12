@@ -13,16 +13,24 @@ enum AuthState {
     case register
 }
 
-class AuthViewModel {
+final class AuthViewModel {
+
+    // MARK: - Properties
+
     weak var coordinator: AuthCoordinator?
-    private let authService = AuthService.shared
-    
-    var email: String = ""
-    var password: String = ""
-    var confirmPassword: String = ""
     var onError: ((String) -> Void)?
-    
-    func signIn() {
+
+    private var email: String = ""
+    private var password: String = ""
+    private var confirmPassword: String = ""
+
+    private let authService = AuthService.shared
+
+    // MARK: - Public Methods
+
+    func signIn(email: String, password: String) {
+        self.email = email
+        self.password = password
         guard validateLoginForm() else { return }
         authService.signIn(email: email, password: password) { [weak self] result in
             switch result {
@@ -33,8 +41,11 @@ class AuthViewModel {
             }
         }
     }
-    
-    func register() {
+
+    func register(email: String, password: String, confirmPassword: String) {
+        self.email = email
+        self.password = password
+        self.confirmPassword = confirmPassword
         guard validateRegisterForm() else { return }
         authService.register(email: email, password: password) { [weak self] result in
             switch result {
@@ -45,16 +56,21 @@ class AuthViewModel {
             }
         }
     }
-    
-    private func validateLoginForm() -> Bool {
+}
+
+// MARK: - Private Methods
+
+private extension AuthViewModel {
+
+    func validateLoginForm() -> Bool {
         let emailValid = !email.isEmpty && email.contains("@") && email.contains(".")
         let passwordValid = !password.isEmpty
         if !emailValid { onError?("Введите корректный email"); return false }
         if !passwordValid { onError?("Введите пароль"); return false }
         return true
     }
-    
-    private func validateRegisterForm() -> Bool {
+
+    func validateRegisterForm() -> Bool {
         let emailValid = !email.isEmpty && email.contains("@") && email.contains(".")
         let passwordValid = !password.isEmpty && password.count >= 6
         if !emailValid { onError?("Введите корректный email"); return false }
