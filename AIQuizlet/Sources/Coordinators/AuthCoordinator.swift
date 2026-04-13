@@ -9,35 +9,42 @@
 import UIKit
 
 final class AuthCoordinator: Coordinator {
+
+    // MARK: - Properties
+
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+
+    // MARK: - Init
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
 
+    // MARK: - Coordinator
+
     func start() {
-        showRegister()
+        showAuth()
     }
 
-    func showLogin() {
-        let vm = LoginViewModel()
-        vm.coordinator = self
-        let vc = LoginViewController(viewModel: vm)
-        navigationController.setViewControllers([vc], animated: false)
-    }
-
-    func showRegister() {
-        let vm = RegisterViewModel()
-        vm.coordinator = self
-        let vc = RegisterViewController(viewModel: vm)
-        navigationController.pushViewController(vc, animated: true)
-    }
+    // MARK: - Public Methods
 
     func didFinishAuth() {
         guard let appCoordinator = parentCoordinator as? AppCoordinator else { return }
         appCoordinator.children.removeAll { $0 === self }
         appCoordinator.showHome()
+    }
+}
+
+// MARK: - Private Methods
+
+private extension AuthCoordinator {
+
+    func showAuth(state: AuthState = .login) {
+        let vm = AuthViewModel()
+        vm.coordinator = self
+        let vc = AuthViewController(viewModel: vm)
+        navigationController.setViewControllers([vc], animated: false)
     }
 }

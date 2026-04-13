@@ -10,37 +10,47 @@ import UIKit
 import FirebaseAuth
 
 final class AppCoordinator: Coordinator {
+
+    // MARK: - Properties
+
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+
+    // MARK: - Init
 
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
 
-//    func start() {
-//        if Auth.auth().currentUser != nil {
-//            showHome()
-//        } else {
-//            showAuth()
-//        }
-//    }
+    // MARK: - Coordinator
 
     func start() {
-        showAuth()
+        if Auth.auth().currentUser != nil {
+            showHome()
+        } else {
+            showAuth()
+        }
     }
 
-    func showAuth() {
-        let authCoordinator = AuthCoordinator(navigationController: navigationController)
-        authCoordinator.parentCoordinator = self
-        children.append(authCoordinator)
-        authCoordinator.start()
-    }
+    // MARK: - Public Methods
 
     func showHome() {
         let homeCoordinator = HomeCoordinator(navigationController: navigationController)
         homeCoordinator.parentCoordinator = self
         children.append(homeCoordinator)
         homeCoordinator.start()
+    }
+}
+
+// MARK: - Private Methods
+
+private extension AppCoordinator {
+
+    func showAuth() {
+        let authCoordinator = AuthCoordinator(navigationController: navigationController)
+        authCoordinator.parentCoordinator = self
+        children.append(authCoordinator)
+        authCoordinator.start()
     }
 }

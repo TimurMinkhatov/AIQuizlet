@@ -2,57 +2,44 @@
 //  AuthService.swift
 //  AIQuizlet
 //
-//  Created by Azamat Zakirov on 07.04.2026.
+//  Created by Timur Minkhatov on 03/04/2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
-enum AuthError: Error {
-    case loginFailed
-    case registerFailed
-    case unknown(String)
 
-    var localizedDescription: String {
-        switch self {
-            case .loginFailed: return "Неверный логин или пароль"
-        case .registerFailed: return "Ошибка регистрации"
-        case .unknown(let message): return message
+import FirebaseAuth
+
+final class AuthService {
+    
+    static let shared = AuthService()
+    
+    private init() {}
+    
+    func register(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            completion(.success(()))
         }
     }
-}
-
-final class AuthService: AuthServiceProtocol {
-    private let networkManager: NetworkManagerProtocol
-
-    init(networkManager: NetworkManagerProtocol) {
-        self.networkManager = networkManager
-    }
-
-    func login(email: String, password: String) async throws -> AuthResponse {
-        let request = LoginRequest(email: email, password: password)
-
-        do {
-            let response: AuthResponse = try await networkManager.request(target: AuthAPI.login(request: request))
-            print("Успешный вход, токен: \(response.token)")
-            return response
-
-        } catch {
-            print("Ошибка входа: \(error.localizedDescription)")
-            throw AuthError.loginFailed
-
+    
+    func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            completion(.success(()))
         }
-
     }
-
-    func register(email: String, password: String) async throws -> AuthResponse {
-        let request = RegisterRequest(email: email, password: password)
-
+    
+    func signOut() {
+        let firebaseAuth = Auth.auth()
         do {
-            let response: AuthResponse = try await networkManager.request(target: AuthAPI.register(request: request))
-            print("Успешная регистрация, токен: \(response.token)")
-            return response
-        } catch {
-            print("Ошибка регистрации: \(error.localizedDescription)")
-            throw AuthError.registerFailed
-
+            try firebaseAuth.signOut()
+        } catch let signOutError as NSError {
+            print("Ошибка выхода из аккаунта: %@", (signOutError))
         }
     }
 }
