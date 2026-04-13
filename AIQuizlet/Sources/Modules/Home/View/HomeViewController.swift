@@ -3,21 +3,8 @@ import SnapKit
 
 final class HomeViewController: UIViewController {
 
-    private let welcomeLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 24, weight: .bold)
-        return label
-    }()
-
-    private let mainStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 20
-        return stack
-    }()
-
     var viewModel: HomeViewModel!
-
+    
     init(viewModel: HomeViewModel) {
             self.viewModel = viewModel
             super.init(nibName: nil, bundle: nil)
@@ -26,30 +13,66 @@ final class HomeViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
+    private var homeView: HomeView { return view as! HomeView }
+    
+    private func setupGradient() {
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
+            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
+        ]
+        gradient.frame = view.bounds
+        view.layer.insertSublayer(gradient, at: 0)
+    }
+    
+    private func renderRecentTests() {
+        let tests = viewModel.recentTests
+        
+        let isEmpty = tests.isEmpty
+        homeView.updateEmptyState(isEmpty: isEmpty)
+        
+        if !isEmpty {
+            tests.prefix(3).forEach { test in
+                homeView.addTestResult(test)
+            }
+        }
+    }
+    
+    override func loadView() {
+        self.view = HomeView()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-        setupConstraints()
-        view.backgroundColor = .white
+        setupActions()
+        renderRecentTests()
+        
     }
-
-    private func setupUI() {
-        view.backgroundColor = UIColor(named: "Background")
-
-        view.addSubview(welcomeLabel)
-        view.addSubview(mainStackView)
-    }
-
-    private func setupConstraints() {
-        welcomeLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
-            make.leading.equalToSuperview().offset(20)
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if view.layer.sublayers?.first( where: { $0 is CAGradientLayer }) == nil {
+            setupGradient()
         }
-
-        mainStackView.snp.makeConstraints { make in
-            make.top.equalTo(welcomeLabel.snp.bottom).offset(30)
-            make.leading.trailing.equalToSuperview().inset(20)
-        }
+        
     }
+
+    private func setupActions() {
+        homeView.photoCard.action = { [weak self] in
+            print("Нажал на фото")
+        
+        }
+        homeView.textCard.action = { [weak self] in
+            print("Нажал на текст")
+        }
+        
+        homeView.onProfileTap(target: self, action: #selector(profileTapped))
+    }
+    
+    @objc private func profileTapped() {
+        print("Переходим в профиль")
+        viewModel.profileSelected()
+    }
+    
 }

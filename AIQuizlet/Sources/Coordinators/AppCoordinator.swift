@@ -26,20 +26,24 @@ final class AppCoordinator: Coordinator {
     // MARK: - Coordinator
 
     func start() {
+<<<<<<< HEAD
         if Auth.auth().currentUser != nil {
             showHome()
         } else {
             showAuth()
         }
+=======
+        showMainFlow()
+>>>>>>> dd4b73d (add homeview and add navigation tollbar in app)
     }
 
     // MARK: - Public Methods
 
-    func showHome() {
-        let homeCoordinator = HomeCoordinator(navigationController: navigationController)
-        homeCoordinator.parentCoordinator = self
-        children.append(homeCoordinator)
-        homeCoordinator.start()
+    func showMainFlow() {
+        let tabBarCoordinator = TabBarCoordinator(navigationController: navigationController)
+        tabBarCoordinator.parentCoordinator = self
+        children.append(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 }
 

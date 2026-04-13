@@ -25,6 +25,7 @@ final class HomeCoordinator: Coordinator {
     // MARK: - Coordinator
 
     func start() {
+<<<<<<< HEAD
         showHome()
     }
 }
@@ -38,5 +39,17 @@ private extension HomeCoordinator {
         vm.coordinator = self
         let vc = HomeViewController(viewModel: vm)
         navigationController.setViewControllers([vc], animated: false)
+=======
+        let viewModel = HomeViewModel()
+        viewModel.coordinator = self
+        let viewController = HomeViewController(viewModel: viewModel)
+        navigationController.setViewControllers([viewController], animated: false)
+    }
+    
+    func showProfile() {
+        if let tabBarController = navigationController.tabBarController {
+            tabBarController.selectedIndex = 2
+        }
+>>>>>>> dd4b73d (add homeview and add navigation tollbar in app)
     }
 }
