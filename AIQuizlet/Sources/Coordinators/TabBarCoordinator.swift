@@ -10,24 +10,41 @@ import UIKit
 
 
 final class TabBarCoordinator: Coordinator {
+    
+    // MARK: - Properties
+    
     var navigationController: UINavigationController
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
+    
+    // MARK: - Init
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
     }
     
+    // MARK: - Public Methods
+    
     func start() {
-        
+        let pages = TabBarPage.allCases.sorted { $0.rawValue < $1.rawValue }
         let controllers = TabBarPage.allCases.map { getTabController($0)}
         
         prepareTabBarController(with: controllers)
     }
     
-    private func prepareTabBarController(with controllers: [UIViewController]) {
+    func showProfileTab() {
+        tabBarController.selectedIndex = TabBarPage.profile.rawValue
+    }
+}
+
+
+    // MARK: - Private Methods
+
+private extension TabBarCoordinator {
+    
+    func prepareTabBarController(with controllers: [UIViewController]) {
         tabBarController.setViewControllers(controllers, animated: false)
         tabBarController.selectedIndex = TabBarPage.home.rawValue
         
@@ -35,11 +52,9 @@ final class TabBarCoordinator: Coordinator {
         
         tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
         
-        navigationController.viewControllers = [tabBarController]
-        navigationController.setNavigationBarHidden(true, animated: false)
     }
     
-    private func getTabController(_ page: TabBarPage) -> UINavigationController {
+    func getTabController(_ page: TabBarPage) -> UINavigationController {
         let navigationController = UINavigationController()
         navigationController.tabBarItem = UITabBarItem(
             title: page.pageTitle,
@@ -67,7 +82,6 @@ final class TabBarCoordinator: Coordinator {
         }
         
         return navigationController
-        
-        
+
     }
 }

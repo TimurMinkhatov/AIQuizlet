@@ -5,7 +5,9 @@
 //  Created by Azamat Zakirov on 09.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
+
 import Moya
+import Foundation
 
 enum QuizAPI {
     case getQuizzes
@@ -13,7 +15,6 @@ enum QuizAPI {
 }
 
 extension QuizAPI: Moya.TargetType {
-
     var baseURL: URL {
         return URL(string: "https://openrouter.ai/api/v1")!
     }

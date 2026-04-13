@@ -10,6 +10,8 @@ import SnapKit
 
 final class EmptyStateView: UIView {
     
+    // MARK: - UI Elements
+    
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -52,14 +54,22 @@ final class EmptyStateView: UIView {
         return label
     }()
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+// MARK: - Private Methods
+
+private extension EmptyStateView {
     
     private func setupUI() {
         addSubview(containerView)
@@ -67,6 +77,9 @@ final class EmptyStateView: UIView {
         iconContainerView.addSubview(iconImageView)
         containerView.addSubview(titleLabel)
         containerView.addSubview(subtitleLabel)
+    }
+    
+    func setupConstraints() {
         
         containerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

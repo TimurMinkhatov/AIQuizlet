@@ -6,6 +6,7 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 import Moya
+import Foundation
 
 enum AuthAPI {
     case login(request: LoginRequest)

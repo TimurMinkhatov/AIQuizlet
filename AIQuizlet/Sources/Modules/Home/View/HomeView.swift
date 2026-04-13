@@ -11,6 +11,8 @@ import SnapKit
 
 final class HomeView: UIView {
     
+    // MARK: - UI Elements
+    
     private let scrollView = UIScrollView()
     private let emptyStateView = EmptyStateView()
     
@@ -67,6 +69,8 @@ final class HomeView: UIView {
         return stack
     }()
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: .zero)
         setupUI()
@@ -76,6 +80,9 @@ final class HomeView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Public Methods
+    
     
     func addTestResult(_ test: RecentTest) {
         let card = RecentTestCardView(test: test)
@@ -90,9 +97,14 @@ final class HomeView: UIView {
     func updateEmptyState(isEmpty: Bool) {
         emptyStateView.isHidden = !isEmpty
     }
-    
+}
 
-    private func setupUI() {
+// MARK: - Private Methods
+
+private extension HomeView {
+    
+    func setupUI() {
+        backgroundColor = .clear
         addSubview(scrollView)
         scrollView.addSubview(mainStackView)
         
@@ -101,7 +113,6 @@ final class HomeView: UIView {
         headerStackView.addArrangedSubview(welcomeLabel)
         headerStackView.addArrangedSubview(profileButton)
         
-        mainStackView.addArrangedSubview(headerStackView)
 //        mainStackView.setCustomSpacing(60, after: headerStackView)
         
         mainStackView.addArrangedSubview(photoCard)
@@ -111,22 +122,27 @@ final class HomeView: UIView {
         
     }
 
-    private func setupConstraints() {
+    func setupConstraints() {
+        
+        headerStackView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).offset(-10)
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(50)
+        }
+        
         scrollView.snp.makeConstraints { make in
-//            make.edges.equalTo(safeAreaLayoutGuide)\
-            make.top.equalToSuperview()
-            make.leading.trailing.bottom.equalToSuperview()
+            make.edges.equalToSuperview()
+        }
+
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(80)
+            make.bottom.equalToSuperview().inset(20)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(scrollView.snp.width).offset(-40)
         }
         
         profileButton.snp.makeConstraints { make in
             make.size.equalTo(44)
-        }
-
-        mainStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(-15)
-            make.bottom.equalToSuperview().inset(20)
-            make.width.equalTo(scrollView.snp.width).offset(-40)
-            make.centerX.equalToSuperview()
         }
     }
 }
