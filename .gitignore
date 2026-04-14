@@ -26,6 +26,3 @@ Package.resolved
 # Secrets
 GoogleService-Info.plist
 Secrets.swift
-
-.setup.sh
-.install.sh

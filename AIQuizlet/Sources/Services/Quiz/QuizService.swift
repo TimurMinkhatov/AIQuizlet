@@ -23,7 +23,6 @@ enum QuizServiceError: Error, LocalizedError {
         }
     }
     
-    
 }
 
 final class QuizService: QuizServiceProtocol {

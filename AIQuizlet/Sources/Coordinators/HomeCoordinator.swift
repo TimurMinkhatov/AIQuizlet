@@ -9,42 +9,43 @@
 import UIKit
 
 final class HomeCoordinator: Coordinator {
-
+    
     // MARK: - Properties
-
+    
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-
+    
     // MARK: - Init
-
+    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
-
-    // MARK: - Coordinator
-
+    
+    // MARK: - Public Methods
+  
     func start() {
-        showHome()
+        let viewModel = HomeViewModel()
+        viewModel.coordinator = self
+        let viewController = HomeViewController(viewModel: viewModel)
+        navigationController.setViewControllers([viewController], animated: false)
     }
 
 }
 
-// MARK: - Private Methods
 
-private extension HomeCoordinator {
+// MARK: - Navigation
 
+extension HomeCoordinator {
+    
+    func showProfile() {
+        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
+            tabBarCoordinator.showProfileTab()
+        }
     func showTextInput() {
         let quizCoordinator = QuizCoordinator(navigationController: navigationController)
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.start()
-    }
-
-    func showHome() {
-        let vm = HomeViewModel()
-        vm.coordinator = self
-        let vc = HomeViewController(viewModel: vm)
-        navigationController.setViewControllers([vc], animated: false)
     }
 }

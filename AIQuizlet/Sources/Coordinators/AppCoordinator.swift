@@ -12,45 +12,48 @@ import FirebaseAuth
 final class AppCoordinator: Coordinator {
 
     // MARK: - Properties
-
+    
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-
+    var window: UIWindow?
+    
     // MARK: - Init
+    
+    init(navigationController: UINavigationController, window: UIWindow?) {
 
-    init(navigationController: UINavigationController) {
         self.navigationController = navigationController
+        self.window = window
     }
 
-    // MARK: - Coordinator
-
-    func start() {
-        if Auth.auth().currentUser != nil {
-            showHome()
-        } else {
-            showAuth()
-        }
-    }
-
+    
     // MARK: - Public Methods
-
-    func showHome() {
-        let homeCoordinator = HomeCoordinator(navigationController: navigationController)
-        homeCoordinator.parentCoordinator = self
-        children.append(homeCoordinator)
-        homeCoordinator.start()
+    
+    func start() {
+        showMainFlow()
     }
-}
-
-// MARK: - Private Methods
-
-private extension AppCoordinator {
-
+    
     func showAuth() {
+        children.removeAll()
         let authCoordinator = AuthCoordinator(navigationController: navigationController)
         authCoordinator.parentCoordinator = self
         children.append(authCoordinator)
         authCoordinator.start()
+        
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
+    }
+    
+    func showMainFlow() {
+        children.removeAll()
+        let tabBarCoordinator = TabBarCoordinator(navigationController: navigationController)
+        tabBarCoordinator.parentCoordinator = self
+        children.append(tabBarCoordinator)
+        tabBarCoordinator.start()
+        
+        window?.rootViewController = tabBarCoordinator.tabBarController
+        window?.makeKeyAndVisible()
     }
 }
+
+
