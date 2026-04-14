@@ -29,11 +29,11 @@ final class AuthCoordinator: Coordinator {
     }
 
     // MARK: - Public Methods
-
+    
     func didFinishAuth() {
         guard let appCoordinator = parentCoordinator as? AppCoordinator else { return }
         appCoordinator.children.removeAll { $0 === self }
-        appCoordinator.showHome()
+        appCoordinator.showMainFlow()
     }
 }
 
