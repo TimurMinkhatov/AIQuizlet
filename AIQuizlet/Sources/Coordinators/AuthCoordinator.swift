@@ -28,24 +28,8 @@ final class AuthCoordinator: Coordinator {
         showAuth()
     }
 
-<<<<<<< HEAD
     // MARK: - Public Methods
-=======
-    func showLogin() {
-        let viewModel = LoginViewModel()
-        viewModel.coordinator = self
-        let viewController = LoginViewController(viewModel: viewModel)
-        navigationController.setViewControllers([viewController], animated: false)
-    }
-
-    func showRegister() {
-        let viewModel = RegisterViewModel()
-        viewModel.coordinator = self
-        let viewController = RegisterViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
-    }
->>>>>>> dd4b73d (add homeview and add navigation tollbar in app)
-
+    
     func didFinishAuth() {
         guard let appCoordinator = parentCoordinator as? AppCoordinator else { return }
         appCoordinator.children.removeAll { $0 === self }

@@ -42,6 +42,8 @@ extension HomeCoordinator {
         if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
             tabBarCoordinator.showProfileTab()
         }
+    }
+    
     func showTextInput() {
         let quizCoordinator = QuizCoordinator(navigationController: navigationController)
         quizCoordinator.parentCoordinator = self
