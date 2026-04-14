@@ -26,9 +26,11 @@ final class AppCoordinator: Coordinator {
     // MARK: - Coordinator
 
     func start() {
-
-        showMainFlow()
-
+        if Auth.auth().currentUser != nil {
+            showMainFlow()
+       } else {
+           showAuth()
+       }
     }
 
     // MARK: - Public Methods
