@@ -289,6 +289,9 @@ private extension TextInputViewController {
     func setupActions() {
         pasteButton.addTarget(self, action: #selector(pasteTapped), for: .touchUpInside)
         generateButton.addTarget(self, action: #selector(generateTapped), for: .touchUpInside)
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
     }
 
     func bindViewModel() {
@@ -354,4 +357,9 @@ private extension TextInputViewController {
     @objc func generateTapped() {
         viewModel.generateQuiz()
     }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+
 }
