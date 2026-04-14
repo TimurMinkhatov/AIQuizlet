@@ -27,11 +27,19 @@ final class HomeCoordinator: Coordinator {
     func start() {
         showHome()
     }
+
 }
 
 // MARK: - Private Methods
 
 private extension HomeCoordinator {
+
+    func showTextInput() {
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.start()
+    }
 
     func showHome() {
         let vm = HomeViewModel()

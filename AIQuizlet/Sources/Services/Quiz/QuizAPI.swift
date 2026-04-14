@@ -5,7 +5,9 @@
 //  Created by Azamat Zakirov on 09.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
+
 import Moya
+import Foundation
 
 enum QuizAPI {
     case getQuizzes
@@ -51,7 +53,7 @@ extension QuizAPI: Moya.TargetType {
     var headers: [String: String]? {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer api_key"
+            "Authorization": "Bearer \(Secrets.openRouterAPIKey)"
         ]
     }
 }

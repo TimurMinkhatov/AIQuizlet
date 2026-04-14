@@ -140,7 +140,7 @@ final class AuthViewController: UIViewController {
 
     private lazy var actionButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .systemGray4
+        button.backgroundColor = .systemBlue
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
