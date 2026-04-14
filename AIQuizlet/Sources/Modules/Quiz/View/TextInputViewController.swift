@@ -188,23 +188,7 @@ extension TextInputViewController {
 extension TextInputViewController: UITextViewDelegate {
 
     func textViewDidChange(_ textView: UITextView) {
-        let text = textView.text ?? ""
-        let count = text.count
-
-        placeholderLabel.isHidden = !text.isEmpty
-        characterCountLabel.text = "\(count) / \(Constants.maxCharacters) символов"
-
-        let isValid = count >= 50 && count <= Constants.maxCharacters
-        generateButton.isEnabled = isValid
-        var config = generateButton.configuration
-        config?.background.backgroundColor = isValid ? .systemIndigo : .systemGray3
-        generateButton.configuration = config
-
-        if count > Constants.maxCharacters {
-            textView.text = String(text.prefix(Constants.maxCharacters))
-        }
-
-        viewModel.update(text: textView.text)
+        updateTextInput(with: textView.text ?? "")
     }
 }
 
@@ -314,17 +298,40 @@ private extension TextInputViewController {
             case .success(let quiz):
                 self.viewModel.coordinator?.didGenerateQuiz(quiz)
             case .error(let message):
-                let alert = UIAlertController(
-                    title: Constants.Strings.errorTitle,
-                    message: message,
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
-                present(alert, animated: true)
+                self.showError(message: message)
             default:
                 break
             }
         }
+    }
+
+    func updateTextInput(with text: String) {
+        let count = text.count
+
+        placeholderLabel.isHidden = !text.isEmpty
+        characterCountLabel.text = "\(count) / \(Constants.maxCharacters) символов"
+
+        let isValid = count >= 50 && count <= Constants.maxCharacters
+        generateButton.isEnabled = isValid
+        var config = generateButton.configuration
+        config?.background.backgroundColor = isValid ? .systemIndigo : .systemGray3
+        generateButton.configuration = config
+
+        if count > Constants.maxCharacters {
+            textView.text = String(text.prefix(Constants.maxCharacters))
+        }
+
+        viewModel.update(text: textView.text)
+    }
+
+    func showError(message: String) {
+        let alert = UIAlertController(
+            title: Constants.Strings.errorTitle,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
+        present(alert, animated: true)
     }
 
     @objc func questionCountTapped(_ sender: UIButton) {
@@ -340,7 +347,7 @@ private extension TextInputViewController {
     @objc func pasteTapped() {
         if let string = UIPasteboard.general.string {
             textView.text = string
-            textViewDidChange(textView)
+            updateTextInput(with: string)
         }
     }
 
