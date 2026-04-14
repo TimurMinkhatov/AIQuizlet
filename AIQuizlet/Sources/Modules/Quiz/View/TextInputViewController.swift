@@ -311,6 +311,8 @@ private extension TextInputViewController {
         viewModel.onStateChange = { [weak self] state in
             guard let self else { return }
             switch state {
+            case .success(let quiz):
+                self.viewModel.coordinator?.didGenerateQuiz(quiz)
             case .error(let message):
                 let alert = UIAlertController(
                     title: Constants.Strings.errorTitle,
