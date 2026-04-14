@@ -15,6 +15,7 @@ enum QuizAPI {
 }
 
 extension QuizAPI: Moya.TargetType {
+
     var baseURL: URL {
         return URL(string: "https://openrouter.ai/api/v1")!
     }
