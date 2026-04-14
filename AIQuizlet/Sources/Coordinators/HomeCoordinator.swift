@@ -23,13 +23,14 @@ final class HomeCoordinator: Coordinator {
     }
     
     // MARK: - Public Methods
-    
+  
     func start() {
         let viewModel = HomeViewModel()
         viewModel.coordinator = self
         let viewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: false)
     }
+
 }
 
 
@@ -41,5 +42,10 @@ extension HomeCoordinator {
         if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
             tabBarCoordinator.showProfileTab()
         }
+    func showTextInput() {
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.start()
     }
 }

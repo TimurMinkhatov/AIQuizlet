@@ -8,7 +8,7 @@ let project = Project(
             name: "AIQuizlet",
             destinations: .iOS,
             product: .app,
-            bundleId: "timaza.aiquizlet.app",
+            bundleId: "com.aiquizlet.app",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
