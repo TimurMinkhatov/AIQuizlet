@@ -28,6 +28,8 @@ final class AuthCoordinator: Coordinator {
         showAuth()
     }
 
+    // MARK: - Public Methods
+    
     func didFinishAuth() {
         guard let appCoordinator = parentCoordinator as? AppCoordinator else { return }
         appCoordinator.children.removeAll { $0 === self }
@@ -38,7 +40,8 @@ final class AuthCoordinator: Coordinator {
 // MARK: - Private Methods
 
 private extension AuthCoordinator {
-    func showAuth() {
+
+    func showAuth(state: AuthState = .login) {
         let vm = AuthViewModel()
         vm.coordinator = self
         let vc = AuthViewController(viewModel: vm)
