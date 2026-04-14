@@ -27,6 +27,15 @@ final class HomeCoordinator: Coordinator {
     func start() {
         showHome()
     }
+
+    // MARK: - Public Methods
+
+    func showTextInput() {
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.start()
+    }
 }
 
 // MARK: - Private Methods

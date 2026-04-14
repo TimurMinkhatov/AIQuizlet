@@ -31,7 +31,7 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        view.backgroundColor = .white
+        view.backgroundColor = .purple
     }
 
     private func setupUI() {
