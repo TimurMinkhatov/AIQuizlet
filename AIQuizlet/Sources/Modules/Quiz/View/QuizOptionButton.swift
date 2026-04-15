@@ -21,7 +21,7 @@ final class QuizOptionButton: UIControl {
     
     // MARK: - UI Elements
     
-    private let label: UILabel = {
+    private lazy var label: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .black
@@ -29,7 +29,7 @@ final class QuizOptionButton: UIControl {
         return label
     }()
     
-    private let iconImageView: UIImageView = {
+    private lazy var  iconImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         iv.isHidden = true
