@@ -25,7 +25,7 @@ final class QuizViewController: UIViewController {
         return progress
     }()
     
-    private let progressLabel: UILabel = {
+    private lazy var progressLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
         label.font = .systemFont(ofSize: 14)
@@ -33,7 +33,7 @@ final class QuizViewController: UIViewController {
         return label
     }()
     
-    private let cardView: UIView = {
+    private lazy var cardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 24
@@ -44,14 +44,14 @@ final class QuizViewController: UIViewController {
         return view
     }()
     
-    private let cardScrollView: UIScrollView = {
+    private lazy var cardScrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.showsVerticalScrollIndicator = false
         scroll.alwaysBounceVertical = true
         return scroll
     }()
     
-    private let questionLabel: UILabel = {
+    private lazy var questionLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 18, weight: .bold)
@@ -59,14 +59,14 @@ final class QuizViewController: UIViewController {
         return label
     }()
     
-    private let optionsStack: UIStackView = {
+    private lazy var optionsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 12
         return stack
     }()
     
-    private let explanationView: UIView = {
+    private lazy var explanationView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 12
@@ -76,7 +76,7 @@ final class QuizViewController: UIViewController {
         return view
     }()
     
-    private let explanationTitleLabel: UILabel = {
+    private lazy var explanationTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Объяснение:"
         label.font = .systemFont(ofSize: 16, weight: .bold)
@@ -84,7 +84,7 @@ final class QuizViewController: UIViewController {
         return label
     }()
     
-    private let explanationLabel: UILabel = {
+    private lazy var explanationLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 15, weight: .medium)
@@ -92,7 +92,7 @@ final class QuizViewController: UIViewController {
         return label
     }()
     
-    private let bulbIconImageView: UIImageView = {
+    private lazy var bulbIconImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(systemName: "info.circle")
         iv.tintColor = .blue
@@ -100,7 +100,7 @@ final class QuizViewController: UIViewController {
         return iv
     }()
     
-    private let nextButton: UIButton = {
+    private lazy var nextButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Далее", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
@@ -143,12 +143,17 @@ final class QuizViewController: UIViewController {
 private extension QuizViewController {
     
     @objc func optionTapped(_ sender: QuizOptionButton) {
-        viewModel.selectAnswer(index: sender.tag)
-    }
-    
-    @objc func nextTapped() {
-        viewModel.nextQuestion()
-    }
+            optionsStack.arrangedSubviews.forEach {
+                ($0 as? QuizOptionButton)?.updateState(.normal)
+            }
+            sender.updateState(.selected)
+            
+            viewModel.selectAnswer(index: sender.tag)
+        }
+        
+        @objc func nextTapped() {
+            viewModel.nextQuestion()
+        }
 }
 
 // MARK: - Setup Logic
@@ -261,7 +266,7 @@ private extension QuizViewController {
                 case .showingResult(_, let correctIndex, let question):
                     self.showResultUI(correctIndex: correctIndex, question: question)
                 case .finished(let score, let total):
-                    print("Финиш: \(score)/\(total)")
+                    break
                 case .idle: break
                 }
             }
@@ -316,8 +321,8 @@ private extension QuizViewController {
         optionsStack.arrangedSubviews.enumerated().forEach { index, view in
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
-            button.updateState(isCorrect: index == correctIndex)
-        }
+            button.updateState(index == correctIndex ? .correct : .wrong)
+    }
         
         explanationLabel.text = question.explanation ?? "Правильный ответ на основе предоставленного текста."
         explanationView.isHidden = false

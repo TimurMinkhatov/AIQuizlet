@@ -10,6 +10,15 @@ import SnapKit
 
 final class QuizOptionButton: UIControl {
     
+    // MARK: enum State
+    
+    enum State {
+        case normal
+        case selected
+        case correct
+        case wrong
+    }
+    
     // MARK: - UI Elements
     
     private let label: UILabel = {
@@ -50,16 +59,30 @@ final class QuizOptionButton: UIControl {
     
     // MARK: - Public Methods
     
-    func updateState(isCorrect: Bool) {
-        iconImageView.isHidden = false
-        if isCorrect {
+    func updateState(_ state: State) {
+        iconImageView.isHidden = (state == .normal || state == .selected)
+        label.textColor = .label
+        backgroundColor = .white
+        
+        switch state {
+        case .normal:
+            layer.borderColor = UIColor.systemGray4.cgColor
+            layer.borderWidth = 1
+            
+        case .selected:
+            layer.borderColor = UIColor.systemBlue.cgColor
+            layer.borderWidth = 2
+            backgroundColor = UIColor.systemBlue.withAlphaComponent(0.05)
+            
+        case .correct:
             backgroundColor = UIColor(red: 232/255, green: 255/255, blue: 238/255, alpha: 1)
             layer.borderColor = UIColor.systemGreen.cgColor
             iconImageView.image = UIImage(systemName: "checkmark.circle.fill")
             iconImageView.tintColor = .systemGreen
-        } else {
-            layer.borderColor = UIColor.systemGray4.cgColor
-            label.textColor = .systemGray
+            
+        case .wrong:
+            backgroundColor = UIColor(red: 255/255, green: 232/255, blue: 232/255, alpha: 1)
+            layer.borderColor = UIColor.systemRed.cgColor
             iconImageView.image = UIImage(systemName: "xmark.circle.fill")
             iconImageView.tintColor = .systemRed
         }
