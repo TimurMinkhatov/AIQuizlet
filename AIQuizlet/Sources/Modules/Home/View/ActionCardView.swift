@@ -8,9 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ActionCardView: UIView {
-    
-    // MARK: - Properties
+class ActionCardView: UIView {
     
     var action: (() -> Void)?
     private let gradientLayer = CAGradientLayer()
@@ -45,8 +43,6 @@ final class ActionCardView: UIView {
         return label
     }()
     
-    // MARK: - Init
-    
     init(title: String, subtitle: String, iconName: String, gradientColors: [UIColor]) {
         super.init(frame: .zero)
         textLabel.text = title
@@ -64,30 +60,18 @@ final class ActionCardView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         iconContainerView.layer.cornerRadius = iconContainerView.frame.height / 2
         gradientLayer.frame = iconContainerView.bounds
     }
-}
-
-// MARK: - Actions
-
-private extension ActionCardView {
     
-    @objc func handleTup() {
+    @objc private func handleTup() {
         action?()
         
     }
-}
-
-// MARK: - Private Methods
-
-private extension ActionCardView {
-
-    func setupView() {
+    
+    private func setupView() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTup))
         self.addGestureRecognizer(tap)
         self.isUserInteractionEnabled = true
@@ -112,7 +96,7 @@ private extension ActionCardView {
         
     }
     
-    func setupConstraints() {
+    private func setupConstraints() {
         
         iconContainerView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(24)
@@ -135,5 +119,7 @@ private extension ActionCardView {
             make.leading.trailing.equalToSuperview().inset(24)
             make.bottom.equalToSuperview().offset(-24)
         }
+        
     }
+    
 }

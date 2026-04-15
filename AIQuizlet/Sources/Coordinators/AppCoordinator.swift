@@ -11,17 +11,15 @@ import FirebaseAuth
 final class AppCoordinator: Coordinator {
 
     // MARK: - Properties
-    
+
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    var window: UIWindow?
-    
+
     // MARK: - Init
     
     init(navigationController: UINavigationController, window: UIWindow?) {
         self.navigationController = navigationController
-        self.window = window
     }
 
     // MARK: - Public Methods
@@ -53,8 +51,5 @@ final class AppCoordinator: Coordinator {
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
         tabBarCoordinator.start()
-        
-        window?.rootViewController = tabBarCoordinator.tabBarController
-        window?.makeKeyAndVisible()
     }
 }

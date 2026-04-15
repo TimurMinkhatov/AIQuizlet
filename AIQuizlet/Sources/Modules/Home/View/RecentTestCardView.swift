@@ -8,30 +8,20 @@
 import UIKit
 
 final class RecentTestCardView: UIView {
-    
-    // MARK: - UI Elements
-    
     private let titleLabel = UILabel()
-    private let scoreLabel = UILabel()
     
-    // MARK: - Init
+    private let scoreLabel = UILabel()
     
     init(test: RecentTest) {
         super.init(frame: .zero)
         setupView(test: test)
-        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
-
-// MARK: - Private Methods
-
-private extension RecentTestCardView {
-        
-    func setupView(test: RecentTest) {
+    
+    private func setupView(test: RecentTest) {
         backgroundColor = .white
         layer.cornerRadius = 16
         
@@ -41,9 +31,7 @@ private extension RecentTestCardView {
         
         addSubview(titleLabel)
         addSubview(scoreLabel)
-    }
         
-    func setupConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.leading.centerY.equalToSuperview().inset(16)
         }

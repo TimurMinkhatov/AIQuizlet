@@ -8,22 +8,15 @@
 import UIKit
 
 final class TabBarCoordinator: Coordinator {
-    
-    // MARK: - Properties
-    
     var navigationController: UINavigationController
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
     
-    // MARK: - Init
-    
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
     }
-    
-    // MARK: - Public Methods
     
     func start() {
         let pages = TabBarPage.allCases.sorted { $0.rawValue < $1.rawValue }
@@ -78,8 +71,9 @@ private extension TabBarCoordinator {
         tabBarController.setViewControllers(controllers, animated: false)
         tabBarController.selectedIndex = TabBarPage.home.rawValue
         tabBarController.tabBar.backgroundColor = .white
-        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
-        
+        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1) 
+        navigationController.viewControllers = [tabBarController]
+        navigationController.setNavigationBarHidden(true, animated: false)
         setupAppearance()
     }
     

@@ -200,6 +200,7 @@ extension TextInputViewController: UITextViewDelegate {
 // MARK: - Actions
 
 private extension TextInputViewController {
+    
     @objc func questionCountTapped(_ sender: UIButton) {
         questionButtons.forEach {
             $0.backgroundColor = .white
@@ -221,14 +222,16 @@ private extension TextInputViewController {
     @objc func generateTapped() {
         viewModel.generateQuiz()
     }
+    
     @objc func dismissKeyboard() {
-            view.endEditing(true)
-        }
+        view.endEditing(true)
+    }
 }
 
 // MARK: - Setup Logic
 
 private extension TextInputViewController {
+    
     func setupLayout() {
         title = Constants.Strings.title
         view.backgroundColor = UIColor.systemGroupedBackground
@@ -325,8 +328,8 @@ private extension TextInputViewController {
         pasteButton.addTarget(self, action: #selector(pasteTapped), for: .touchUpInside)
         generateButton.addTarget(self, action: #selector(generateTapped), for: .touchUpInside)
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-                tap.cancelsTouchesInView = false
-                view.addGestureRecognizer(tap)
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
     }
 
     func bindViewModel() {

@@ -1,11 +1,16 @@
-//  Created by Azamat Zakirov on 14.04.2026.
+//
+//  HomeViewModel.swift
+//  AIQuizlet
+//
+//  Created by Timur Minkhatov on 07/04/2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
-
 import Foundation
 
-// MARK: - Model
+
+
+    // MARK: - Properties
 
 struct RecentTest {
     let title: String
@@ -13,9 +18,6 @@ struct RecentTest {
 }
 
 final class HomeViewModel {
-    
-    // MARK: - Properties
-    
     weak var coordinator: HomeCoordinator?
     
     let recentTests: [RecentTest] = [
@@ -27,12 +29,6 @@ final class HomeViewModel {
 //        RecentTest(title: "Test 6", score: "80%"),
 //        RecentTest(title: "Test 7", score: "80%"),
         ]
-}
-
-// MARK: - Navigation
-
-extension HomeViewModel {
-    
     func profileSelected() {
         coordinator?.showProfile()
     }
