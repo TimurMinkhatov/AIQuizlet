@@ -8,9 +8,9 @@
 import UIKit
 
 final class RecentTestCardView: UIView {
-    private let titleLabel = UILabel()
+    private lazy var titleLabel = UILabel()
     
-    private let scoreLabel = UILabel()
+    private lazy var scoreLabel = UILabel()
     
     init(test: RecentTest) {
         super.init(frame: .zero)

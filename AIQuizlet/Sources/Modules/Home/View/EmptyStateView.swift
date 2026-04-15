@@ -10,14 +10,14 @@ import SnapKit
 
 final class EmptyStateView: UIView {
     
-    private let containerView: UIView = {
+    private lazy var containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 24
         return view
     }()
     
-    private let iconContainerView: UIView = {
+    private lazy var iconContainerView: UIView = {
         let view = UIView()
         
         view.backgroundColor = UIColor.systemGray5
@@ -26,7 +26,7 @@ final class EmptyStateView: UIView {
         return view
     }()
     
-    private let iconImageView: UIImageView = {
+    private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "book")
         imageView.tintColor = .systemGray
@@ -34,7 +34,7 @@ final class EmptyStateView: UIView {
         return imageView
     }()
     
-    private let titleLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "У вас пока нет тестов"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -43,7 +43,7 @@ final class EmptyStateView: UIView {
         return label
     }()
     
-    private let subtitleLabel: UILabel = {
+    private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Создайте первый тест!"
         label.font = .systemFont(ofSize: 14)

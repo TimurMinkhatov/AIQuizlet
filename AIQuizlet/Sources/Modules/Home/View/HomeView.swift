@@ -12,10 +12,10 @@ final class HomeView: UIView {
     
     // MARK: - UI Elements
     
-    private let scrollView = UIScrollView()
-    private let emptyStateView = EmptyStateView()
+    private lazy var scrollView = UIScrollView()
+    private lazy var emptyStateView = EmptyStateView()
     
-    private let welcomeLabel: UILabel = {
+    private lazy var welcomeLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.text = "Привет!"
@@ -23,7 +23,7 @@ final class HomeView: UIView {
         return label
     }()
     
-    private let recentTitleLabel: UILabel = {
+    private lazy var recentTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Недавние тесты"
         label.font = .systemFont(ofSize: 20, weight: .semibold)
@@ -31,7 +31,7 @@ final class HomeView: UIView {
         return label
     }()
     
-    private let profileButton: UIButton = {
+    private lazy var profileButton: UIButton = {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
         let image = UIImage(systemName: "person.crop.circle", withConfiguration: config)
@@ -40,7 +40,7 @@ final class HomeView: UIView {
         return button
     }()
     
-    private let headerStackView: UIStackView = {
+    private lazy var headerStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.distribution = .equalSpacing
@@ -48,7 +48,7 @@ final class HomeView: UIView {
         return stack
     }()
     
-    private let mainStackView: UIStackView = {
+    private lazy var mainStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.distribution = .fill

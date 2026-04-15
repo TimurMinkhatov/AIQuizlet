@@ -15,7 +15,7 @@ final class HomeViewController: UIViewController {
     
     var viewModel: HomeViewModel!
     private var homeView: HomeView { return view as! HomeView }
-    private let gradient = CAGradientLayer()
+    private lazy var gradient = CAGradientLayer()
     
     // MARK: - Init
     
