@@ -42,9 +42,6 @@ final class TextInputViewController: UIViewController {
     // MARK: - Properties
 
     private let viewModel: TextInputViewModel
-    private let generateButtonGradient = CAGradientLayer()
-    private let activeQuestionGradient = CAGradientLayer()
-    private var questionButtons: [UIButton] = []
 
     // MARK: - UI Components
 
@@ -129,7 +126,6 @@ final class TextInputViewController: UIViewController {
     private lazy var pasteButton: UIButton = {
         var config = UIButton.Configuration.bordered()
         config.title = Constants.Strings.pasteButton
-        config.image = UIImage(systemName: "clipboard")
         config.imagePadding = 8
         config.baseForegroundColor = .label
         config.background.cornerRadius = Constants.buttonCornerRadius
@@ -160,6 +156,8 @@ final class TextInputViewController: UIViewController {
         return stack
     }()
 
+    private var questionButtons: [UIButton] = []
+
     // MARK: - Init
 
     init(viewModel: TextInputViewModel) {
@@ -170,8 +168,11 @@ final class TextInputViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("Инициализатор не реализован")
     }
+}
 
-    // MARK: - Lifecycle
+// MARK: - Lifecycle
+
+extension TextInputViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -179,80 +180,41 @@ final class TextInputViewController: UIViewController {
         setupQuestionButtons()
         setupActions()
         bindViewModel()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        questionCountStackView.layoutIfNeeded()
-        updateGradients()
     }
 }
 
 // MARK: - UITextViewDelegate
 
 extension TextInputViewController: UITextViewDelegate {
+
     func textViewDidChange(_ textView: UITextView) {
         updateTextInput(with: textView.text ?? "")
     }
 }
 
-// MARK: - Actions
+// MARK: - Private Methods
 
 private extension TextInputViewController {
-    
-    @objc func questionCountTapped(_ sender: UIButton) {
-        questionButtons.forEach {
-            $0.backgroundColor = .white
-            $0.setTitleColor(.label, for: .normal)
-        }
-        activeQuestionGradient.removeFromSuperlayer()
-        viewModel.update(questionCount: sender.tag)
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
-    }
 
-    @objc func pasteTapped() {
-        if let string = UIPasteboard.general.string {
-            textView.text = string
-            updateTextInput(with: string)
-        }
-    }
-
-    @objc func generateTapped() {
-        viewModel.generateQuiz()
-    }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-}
-
-// MARK: - Setup Logic
-
-private extension TextInputViewController {
-    
     func setupLayout() {
         title = Constants.Strings.title
         view.backgroundColor = UIColor.systemGroupedBackground
-        navigationController?.navigationBar.tintColor = .black
 
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+
         textContainerView.addSubview(textView)
         textContainerView.addSubview(placeholderLabel)
+
         contentView.addSubview(textContainerView)
         contentView.addSubview(questionCountTitleLabel)
         contentView.addSubview(questionCountStackView)
         contentView.addSubview(characterCountLabel)
+
         bottomStackView.addArrangedSubview(pasteButton)
         bottomStackView.addArrangedSubview(generateButton)
         view.addSubview(bottomStackView)
 
-        setupConstraints()
-    }
-
-    func setupConstraints() {
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(bottomStackView.snp.top).offset(-12)
@@ -334,82 +296,70 @@ private extension TextInputViewController {
 
     func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                switch state {
-                case .loading:
-                    self.generateButton.isEnabled = false
-                    self.generateButton.configuration?.showsActivityIndicator = true
-                    self.generateButton.configuration?.title = "Генерация..."
-                case .idle:
-                    self.generateButton.isEnabled = true
-                    self.generateButton.configuration?.showsActivityIndicator = false
-                    self.generateButton.configuration?.title = Constants.Strings.generateButton
-                case .error(let message):
-                    self.generateButton.isEnabled = true
-                    self.generateButton.configuration?.showsActivityIndicator = false
-                    self.generateButton.configuration?.title = Constants.Strings.generateButton
-                    self.showError(message: message)
-                }
-            }
-        }
-    }
-
-    func updateGradients() {
-        let colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
-
-        generateButtonGradient.colors = colors
-        generateButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
-        generateButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
-        generateButtonGradient.frame = generateButton.bounds
-        generateButtonGradient.cornerRadius = Constants.buttonCornerRadius
-
-        if generateButton.isEnabled {
-            generateButton.configuration?.background.backgroundColor = .clear
-            if generateButtonGradient.superlayer == nil {
-                generateButton.layer.insertSublayer(generateButtonGradient, at: 0)
-            }
-            generateButtonGradient.opacity = 1.0
-        } else {
-            generateButtonGradient.opacity = 0.0
-            generateButton.configuration?.background.backgroundColor = .systemGray3
-        }
-
-        if let activeButton = questionButtons.first(where: { $0.tag == viewModel.questionCount }) {
-            activeQuestionGradient.colors = colors
-            activeQuestionGradient.startPoint = CGPoint(x: 0, y: 0.5)
-            activeQuestionGradient.endPoint = CGPoint(x: 1, y: 0.5)
-            activeQuestionGradient.frame = activeButton.bounds
-            activeQuestionGradient.cornerRadius = Constants.questionButtonCornerRadius
-            activeButton.backgroundColor = .clear
-            activeButton.setTitleColor(.white, for: .normal)
-            if activeQuestionGradient.superlayer == nil {
-                activeButton.layer.insertSublayer(activeQuestionGradient, at: 0)
+            guard let self else { return }
+            switch state {
+            case .success(let quiz):
+                self.viewModel.coordinator?.didGenerateQuiz(quiz)
+            case .error(let message):
+                self.showError(message: message)
+            default:
+                break
             }
         }
     }
 
     func updateTextInput(with text: String) {
         let count = text.count
+
         placeholderLabel.isHidden = !text.isEmpty
         characterCountLabel.text = "\(count) / \(Constants.maxCharacters) символов"
-        generateButton.isEnabled = count >= 50 && count <= Constants.maxCharacters
-        view.setNeedsLayout()
-        view.layoutIfNeeded()
+
+        let isValid = count >= 50 && count <= Constants.maxCharacters
+        generateButton.isEnabled = isValid
+        var config = generateButton.configuration
+        config?.background.backgroundColor = isValid ? .systemIndigo : .systemGray3
+        generateButton.configuration = config
+
         if count > Constants.maxCharacters {
             textView.text = String(text.prefix(Constants.maxCharacters))
         }
+
         viewModel.update(text: textView.text)
     }
 
     func showError(message: String) {
-        guard presentedViewController == nil else { return }
-        let alert = UIAlertController(title: Constants.Strings.errorTitle, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: Constants.Strings.errorTitle,
+            message: message,
+            preferredStyle: .alert
+        )
         alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
         present(alert, animated: true)
     }
+
+    @objc func questionCountTapped(_ sender: UIButton) {
+        questionButtons.forEach {
+            $0.backgroundColor = .white
+            $0.setTitleColor(.label, for: .normal)
+        }
+        sender.backgroundColor = .systemIndigo
+        sender.setTitleColor(.white, for: .normal)
+        viewModel.update(questionCount: sender.tag)
+    }
+
+    @objc func pasteTapped() {
+        if let string = UIPasteboard.general.string {
+            textView.text = string
+            updateTextInput(with: string)
+        }
+    }
+
+    @objc func generateTapped() {
+        viewModel.generateQuiz()
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+
 }

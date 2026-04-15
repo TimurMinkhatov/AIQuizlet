@@ -11,22 +11,22 @@ import SnapKit
 class ActionCardView: UIView {
     
     var action: (() -> Void)?
-    private lazy var gradientLayer = CAGradientLayer()
+    private let gradientLayer = CAGradientLayer()
     
-    private lazy var iconContainerView: UIView = {
+    private let iconContainerView: UIView = {
         let view = UIView()
         view.clipsToBounds = true
         return view
     }()
     
-    private lazy var imageView: UIImageView = {
+    private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .white
         return imageView
     }()
     
-    private lazy var textLabel: UILabel = {
+    private let textLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 2
         label.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -34,7 +34,7 @@ class ActionCardView: UIView {
         return label
     }()
     
-    private lazy var subtitleLabel: UILabel = {
+    private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textAlignment = .center

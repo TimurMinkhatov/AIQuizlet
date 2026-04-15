@@ -1,79 +1,23 @@
-//
-//  HomeViewController.swift
-//  AIQuizlet
-//
-//  Created by Azamat Zakirov on 07.04.2026.
-//  Copyright © 2026 t-bank-practice-team. All rights reserved.
-//
-
 import UIKit
 import SnapKit
 
 final class HomeViewController: UIViewController {
-    
-    // MARK: - Properties
-    
+
     var viewModel: HomeViewModel!
-    private var homeView: HomeView { return view as! HomeView }
-    private lazy var gradient = CAGradientLayer()
-    
-    // MARK: - Init
     
     init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+            self.viewModel = viewModel
+            super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
+    private var homeView: HomeView { return view as! HomeView }
     
-    override func loadView() {
-        self.view = HomeView()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = true
-        setupActions()
-        renderRecentTests()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        if view.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
-            setupGradient()
-        }
-    }
-}
-
-// MARK: - Actions
-
-private extension HomeViewController {
-    
-    @objc func profileTapped() {
-        viewModel.profileSelected()
-    }
-}
-
-// MARK: - Setup Logic
-
-private extension HomeViewController {
-    
-    func setupActions() {
-        homeView.photoCard.action = { [weak self] in
-            // Здесь будет логика для фото
-        }
-        homeView.textCard.action = { [weak self] in
-            self?.viewModel.textInputSelected()
-        }
-        homeView.onProfileTap(target: self, action: #selector(profileTapped))
-    }
-    
-    func setupGradient() {
+    private func setupGradient() {
+        let gradient = CAGradientLayer()
         gradient.colors = [
             UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
             UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
@@ -83,8 +27,9 @@ private extension HomeViewController {
         view.layer.insertSublayer(gradient, at: 0)
     }
     
-    func renderRecentTests() {
+    private func renderRecentTests() {
         let tests = viewModel.recentTests
+        
         let isEmpty = tests.isEmpty
         homeView.updateEmptyState(isEmpty: isEmpty)
         
@@ -94,4 +39,42 @@ private extension HomeViewController {
             }
         }
     }
+    
+    override func loadView() {
+        self.view = HomeView()
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        extendedLayoutIncludesOpaqueBars = true
+        setupActions()
+        renderRecentTests()
+        
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if view.layer.sublayers?.first( where: { $0 is CAGradientLayer }) == nil {
+            setupGradient()
+        }
+        
+    }
+
+    private func setupActions() {
+        homeView.photoCard.action = { [weak self] in
+            print("Нажал на фото")
+        
+        }
+        homeView.textCard.action = { [weak self] in
+            print("Нажал на текст")
+        }
+        
+        homeView.onProfileTap(target: self, action: #selector(profileTapped))
+    }
+    
+    @objc private func profileTapped() {
+        print("Переходим в профиль")
+        viewModel.profileSelected()
+    }
+    
 }

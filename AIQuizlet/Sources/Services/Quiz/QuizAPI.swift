@@ -9,24 +9,23 @@
 import Moya
 import Foundation
 
-// MARK: - QuizAPI
-
 enum QuizAPI {
     case getQuizzes
     case generateQuiz(prompt: String)
 }
 
-// MARK: - TargetType Implementation
+extension QuizAPI: Moya.TargetType {
 
-extension QuizAPI: TargetType {
     var baseURL: URL {
-        URL(string: "https://openrouter.ai/api/v1")!
+        return URL(string: "https://openrouter.ai/api/v1")!
     }
 
     var path: String {
         switch self {
         case .getQuizzes: return "quizzes"
+
         case .generateQuiz: return "/chat/completions"
+
         }
     }
 
@@ -37,21 +36,22 @@ extension QuizAPI: TargetType {
         }
     }
 
-    var task: Task {
+    var task: Moya.Task {
         switch self {
         case .getQuizzes:
             return .requestPlain
+
         case .generateQuiz(let prompt):
             let params: [String: Any] = [
                 "model": "openai/gpt-oss-120b:free",
                 "messages": [["role": "user", "content": prompt]]
             ]
             return .requestParameters(parameters: params, encoding: JSONEncoding.default)
+
         }
     }
-
     var headers: [String: String]? {
-        [
+        return [
             "Content-Type": "application/json",
             "Authorization": "Bearer \(Secrets.openRouterAPIKey)"
         ]

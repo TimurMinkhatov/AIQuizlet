@@ -9,13 +9,9 @@
 import Foundation
 import Moya
 
-// MARK: - NetworkManagerProtocol
-
 protocol NetworkManagerProtocol {
     func request<T: TargetType, D: Decodable>(target: T) async throws -> D
 }
-
-// MARK: - NetworkManager
 
 final class NetworkManager: NetworkManagerProtocol {
 
@@ -28,8 +24,9 @@ final class NetworkManager: NetworkManagerProtocol {
                 case .success(let response):
                     do {
                         let filteredResponse = try response.filterSuccessfulStatusCodes()
-                        let decodedData = try JSONDecoder().decode(D.self, from: filteredResponse.data)
-                        continuation.resume(returning: decodedData)
+
+                        let decodeData = try JSONDecoder().decode(D.self, from: filteredResponse.data)
+                        continuation.resume(returning: decodeData)
                     } catch {
                         continuation.resume(throwing: error)
                     }
