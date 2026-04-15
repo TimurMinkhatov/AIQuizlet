@@ -10,12 +10,18 @@ import FirebaseAuth
 
 final class AuthService {
     
+    // MARK: - Properties
+    
     static let shared = AuthService()
+    
+    // MARK: - Init
     
     private init() {}
     
+    // MARK: - Public Methods
+    
     func register(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+        Auth.auth().createUser(withEmail: email, password: password) { _, error in
             if let error = error {
                 completion(.failure(error))
                 return
@@ -25,7 +31,7 @@ final class AuthService {
     }
     
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        Auth.auth().signIn(withEmail: email, password: password) { _, error in
             if let error = error {
                 completion(.failure(error))
                 return

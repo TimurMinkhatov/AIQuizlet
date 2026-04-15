@@ -9,41 +9,41 @@
 import Moya
 import Foundation
 
+// MARK: - AuthAPI
+
 enum AuthAPI {
     case login(request: LoginRequest)
     case register(request: RegisterRequest)
 }
 
+// MARK: - TargetType Implementation
+
 extension AuthAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "https://aiquizlet.com")!
+        URL(string: "https://aiquizlet.com")!
     }
 
     var path: String {
         switch self {
         case .login: return "auth/login"
-
         case .register: return "auth/register"
-
         }
     }
 
     var method: Moya.Method {
-        return .post
+        .post
     }
 
     var task: Task {
-            switch self {
-            case .login(request: let request):
-                return .requestJSONEncodable(request)
-
-            case .register(request: let request):
-                return .requestJSONEncodable(request)
-            }
+        switch self {
+        case .login(let request):
+            return .requestJSONEncodable(request)
+        case .register(let request):
+            return .requestJSONEncodable(request)
         }
+    }
 
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
-
+        ["Content-Type": "application/json"]
     }
 }

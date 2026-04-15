@@ -5,9 +5,7 @@
 //  Created by Azamat Zakirov on 13.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
-
 import UIKit
-
 
 final class TabBarCoordinator: Coordinator {
     
@@ -29,9 +27,10 @@ final class TabBarCoordinator: Coordinator {
     
     func start() {
         let pages = TabBarPage.allCases.sorted { $0.rawValue < $1.rawValue }
-        let controllers = TabBarPage.allCases.map { getTabController($0)}
+        let controllers = pages.map { createNavViewController(for: $0) }
         
         prepareTabBarController(with: controllers)
+        pages.forEach { launchCoordinator(for: $0) }
     }
     
     func showProfileTab() {
@@ -39,49 +38,58 @@ final class TabBarCoordinator: Coordinator {
     }
 }
 
-
-    // MARK: - Private Methods
+// MARK: - Private Methods
 
 private extension TabBarCoordinator {
     
-    func prepareTabBarController(with controllers: [UIViewController]) {
-        tabBarController.setViewControllers(controllers, animated: false)
-        tabBarController.selectedIndex = TabBarPage.home.rawValue
-        
-        tabBarController.tabBar.backgroundColor = .white
-        
-        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
-        
-    }
-    
-    func getTabController(_ page: TabBarPage) -> UINavigationController {
-        let navigationController = UINavigationController()
-        navigationController.tabBarItem = UITabBarItem(
+    func createNavViewController(for page: TabBarPage) -> UINavigationController {
+        let nav = UINavigationController()
+        nav.tabBarItem = UITabBarItem(
             title: page.pageTitle,
             image: UIImage(systemName: page.pageIconName),
             tag: page.rawValue
         )
+        return nav
+    }
+    
+    func launchCoordinator(for page: TabBarPage) {
+        guard let nav = tabBarController.viewControllers?[page.rawValue] as? UINavigationController else { return }
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: navigationController)
+            let homeCoordinator = HomeCoordinator(navigationController: nav)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()
-            
         case .history:
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .white
-            viewController.title = "История"
-            navigationController.pushViewController(viewController, animated: false)
+            let vc = UIViewController()
+            vc.view.backgroundColor = .white
+            vc.title = "История"
+            nav.setViewControllers([vc], animated: false)
         case .profile:
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .white
-            viewController.title = "Профиль"
-            navigationController.pushViewController(viewController, animated: false)
+            let vc = UIViewController()
+            vc.view.backgroundColor = .white
+            vc.title = "Профиль"
+            nav.setViewControllers([vc], animated: false)
         }
+    }
+    
+    func prepareTabBarController(with controllers: [UIViewController]) {
+        tabBarController.setViewControllers(controllers, animated: false)
+        tabBarController.selectedIndex = TabBarPage.home.rawValue
+        tabBarController.tabBar.backgroundColor = .white
+        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
         
-        return navigationController
-
+        setupAppearance()
+    }
+    
+    func setupAppearance() {
+        if #available(iOS 15.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .white
+            tabBarController.tabBar.standardAppearance = appearance
+            tabBarController.tabBar.scrollEdgeAppearance = appearance
+        }
     }
 }

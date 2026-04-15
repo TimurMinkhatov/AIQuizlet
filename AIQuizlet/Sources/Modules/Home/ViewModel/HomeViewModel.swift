@@ -36,5 +36,9 @@ extension HomeViewModel {
     func profileSelected() {
         coordinator?.showProfile()
     }
+    
+    func textInputSelected() {
+        coordinator?.showTextInput()
+        }
 }
 

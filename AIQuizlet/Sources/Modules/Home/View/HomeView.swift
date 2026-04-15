@@ -2,7 +2,7 @@
 //  HomeView.swift
 //  AIQuizlet
 //
-//  Created by Azamat Zakirov on 12.04.2026.
+//  Created by Azamat Zakirov on 07.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
@@ -15,16 +15,6 @@ final class HomeView: UIView {
     
     private let scrollView = UIScrollView()
     private let emptyStateView = EmptyStateView()
-    
-    lazy var photoCard = ActionCardView(title: "Создать тест по конспекту", subtitle: "Сфотографируйте конспект и получите готовый тест", iconName: "camera", gradientColors: [
-        UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
-        UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
-    ])
-    
-    lazy var textCard = ActionCardView(title: "Создать из текста", subtitle: "Вставьте или введите текст лекции", iconName: "text.document", gradientColors: [
-        UIColor(red: 173/255, green: 70/255, blue: 255/255, alpha: 1),
-        UIColor(red: 230/255, green: 0/255, blue: 118/255, alpha: 1)
-    ])
     
     private let welcomeLabel: UILabel = {
         let label = UILabel()
@@ -44,7 +34,6 @@ final class HomeView: UIView {
     
     private let profileButton: UIButton = {
         let button = UIButton(type: .system)
-        
         let config = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
         let image = UIImage(systemName: "person.crop.circle", withConfiguration: config)
         button.setImage(image, for: .normal)
@@ -69,6 +58,26 @@ final class HomeView: UIView {
         return stack
     }()
     
+    lazy var photoCard = ActionCardView(
+        title: "Создать тест по конспекту",
+        subtitle: "Сфотографируйте конспект и получите готовый тест",
+        iconName: "camera",
+        gradientColors: [
+            UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+        ]
+    )
+    
+    lazy var textCard = ActionCardView(
+        title: "Создать из текста",
+        subtitle: "Вставьте или введите текст лекции",
+        iconName: "text.document",
+        gradientColors: [
+            UIColor(red: 173/255, green: 70/255, blue: 255/255, alpha: 1),
+            UIColor(red: 230/255, green: 0/255, blue: 118/255, alpha: 1)
+        ]
+    )
+    
     // MARK: - Init
     
     override init(frame: CGRect) {
@@ -83,11 +92,9 @@ final class HomeView: UIView {
     
     // MARK: - Public Methods
     
-    
     func addTestResult(_ test: RecentTest) {
         let card = RecentTestCardView(test: test)
         mainStackView.addArrangedSubview(card)
-        
     }
     
     func onProfileTap(target: Any, action: Selector) {
@@ -99,33 +106,30 @@ final class HomeView: UIView {
     }
 }
 
-// MARK: - Private Methods
+// MARK: - Setup Logic
 
 private extension HomeView {
     
     func setupUI() {
         backgroundColor = .clear
-        addSubview(scrollView)
-        scrollView.addSubview(mainStackView)
         
+        addSubview(scrollView)
         addSubview(headerStackView)
+        
+        scrollView.addSubview(mainStackView)
         
         headerStackView.addArrangedSubview(welcomeLabel)
         headerStackView.addArrangedSubview(profileButton)
-        
-//        mainStackView.setCustomSpacing(60, after: headerStackView)
         
         mainStackView.addArrangedSubview(photoCard)
         mainStackView.addArrangedSubview(textCard)
         mainStackView.addArrangedSubview(recentTitleLabel)
         mainStackView.addArrangedSubview(emptyStateView)
-        
     }
 
     func setupConstraints() {
-        
         headerStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(-10)
+            make.top.equalTo(safeAreaLayoutGuide).offset(-5)
             make.leading.trailing.equalToSuperview().inset(20)
             make.height.equalTo(50)
         }

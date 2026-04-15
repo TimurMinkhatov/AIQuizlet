@@ -1,3 +1,11 @@
+//
+//  HomeViewController.swift
+//  AIQuizlet
+//
+//  Created by Azamat Zakirov on 07.04.2026.
+//  Copyright © 2026 t-bank-practice-team. All rights reserved.
+//
+
 import UIKit
 import SnapKit
 
@@ -8,8 +16,6 @@ final class HomeViewController: UIViewController {
     var viewModel: HomeViewModel!
     private var homeView: HomeView { return view as! HomeView }
     private let gradient = CAGradientLayer()
-
-    
     
     // MARK: - Init
     
@@ -33,12 +39,12 @@ final class HomeViewController: UIViewController {
         extendedLayoutIncludesOpaqueBars = true
         setupActions()
         renderRecentTests()
-        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if view.layer.sublayers?.first( where: { $0 is CAGradientLayer }) == nil {
+        if view.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
             setupGradient()
         }
     }
@@ -49,11 +55,9 @@ final class HomeViewController: UIViewController {
 private extension HomeViewController {
     
     @objc func profileTapped() {
-        print("Переходим в профиль")
         viewModel.profileSelected()
     }
 }
-
 
 // MARK: - Setup Logic
 
@@ -61,13 +65,11 @@ private extension HomeViewController {
     
     func setupActions() {
         homeView.photoCard.action = { [weak self] in
-            print("Нажал на фото")
-        
+            // Здесь будет логика для фото
         }
         homeView.textCard.action = { [weak self] in
-            print("Нажал на текст")
+            self?.viewModel.textInputSelected()
         }
-        
         homeView.onProfileTap(target: self, action: #selector(profileTapped))
     }
     
@@ -83,7 +85,6 @@ private extension HomeViewController {
     
     func renderRecentTests() {
         let tests = viewModel.recentTests
-        
         let isEmpty = tests.isEmpty
         homeView.updateEmptyState(isEmpty: isEmpty)
         

@@ -1,11 +1,3 @@
-//
-//  QuizCoordinator.swift
-//  AIQuizlet
-//
-//  Created by Timur Minkhatov on 13/04/2026.
-//  Copyright © 2026 t-bank-practice-team. All rights reserved.
-//
-
 import UIKit
 
 final class QuizCoordinator: Coordinator {
@@ -33,7 +25,6 @@ final class QuizCoordinator: Coordinator {
     func didGenerateQuiz(_ quiz: Quiz) {
         showQuiz(quiz: quiz)
     }
-
 }
 
 // MARK: - Private Methods
@@ -45,12 +36,13 @@ private extension QuizCoordinator {
         let vm = TextInputViewModel(quizService: quizService)
         vm.coordinator = self
         let vc = TextInputViewController(viewModel: vm)
-        navigationController.setViewControllers([vc], animated: false)
+        navigationController.pushViewController(vc, animated: true)
     }
 
     func showQuiz(quiz: Quiz) {
         let quizService = QuizService(networkManager: NetworkManager())
         let vm = QuizViewModel(quizService: quizService)
+        vm.setQuiz(quiz)
         let vc = QuizViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
     }
