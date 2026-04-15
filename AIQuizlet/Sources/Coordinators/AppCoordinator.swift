@@ -15,11 +15,13 @@ final class AppCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+    private var window: UIWindow?
 
     // MARK: - Init
     
     init(navigationController: UINavigationController, window: UIWindow?) {
         self.navigationController = navigationController
+        self.window = window
     }
 
     // MARK: - Public Methods
