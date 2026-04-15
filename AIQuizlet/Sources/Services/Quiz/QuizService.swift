@@ -65,9 +65,6 @@ final class QuizService: QuizServiceProtocol {
             throw QuizServiceError.invalidAIResponse
         }
         
-        print("Ответ нейронки")
-        print(rawJsonString)
-        
         let cleanedString = rawJsonString
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "```json", with: "")
@@ -75,16 +72,13 @@ final class QuizService: QuizServiceProtocol {
             .replacingOccurrences(of: "\n", with: "")
         
         guard let jsonData = cleanedString.data(using: .utf8) else {
-            print("Не удалось преобразовать строку в Data")
             throw QuizServiceError.decodingFailed
         }
         
         do {
             let quiz = try JSONDecoder().decode(Quiz.self, from: jsonData)
-            print(" Успешно распарсили квиз: \(quiz.title)")
             return quiz
         } catch {
-            print(" Ошибка парсинга JSON: \(error)")
             throw QuizServiceError.decodingFailed
         }
     }

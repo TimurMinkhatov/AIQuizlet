@@ -55,15 +55,15 @@ private extension TabBarCoordinator {
             children.append(homeCoordinator)
             homeCoordinator.start()
         case .history:
-            let vc = UIViewController()
-            vc.view.backgroundColor = .white
-            vc.title = "История"
-            nav.setViewControllers([vc], animated: false)
+            let historyViewController = UIViewController()
+            historyViewController.view.backgroundColor = .white
+            historyViewController.title = "История"
+            nav.setViewControllers([historyViewController], animated: false)
         case .profile:
-            let vc = UIViewController()
-            vc.view.backgroundColor = .white
-            vc.title = "Профиль"
-            nav.setViewControllers([vc], animated: false)
+            let profileViewController = UIViewController()
+            profileViewController.view.backgroundColor = .white
+            profileViewController.title = "Профиль"
+            nav.setViewControllers([profileViewController], animated: false)
         }
     }
     

@@ -19,7 +19,7 @@ final class QuizViewController: UIViewController {
     
     // MARK: - UI Elements
     
-    private let progressView: UIProgressView = {
+    private lazy var progressView: UIProgressView = {
         let progress = UIProgressView(progressViewStyle: .default)
         progress.trackTintColor = .systemGray6
         return progress
