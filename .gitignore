@@ -25,7 +25,7 @@ Package.resolved
 
 # Secrets
 GoogleService-Info.plist
-AIQuizlet/Sources/Services/Secrets.swift
+**/Secrets.swift
 Secrets.swift
 
 .setup.sh
