@@ -10,45 +10,54 @@ import Foundation
 
 final class TextInputViewModel {
 
-    // MARK: - Properties
+    // MARK: - State Enum
 
+    enum State {
+        case idle
+        case loading
+        case error(String)
+    }
+
+    // MARK: - Properties
+    
     weak var coordinator: QuizCoordinator?
-    var onStateChange: ((QuizViewModel.GenerationState) -> Void)?
+    var onStateChange: ((State) -> Void)?
 
     private(set) var questionCount: Int = 5
     private(set) var text: String = ""
-
     private let quizService: QuizServiceProtocol
 
     // MARK: - Init
-
+    
     init(quizService: QuizServiceProtocol) {
         self.quizService = quizService
     }
 
     // MARK: - Public Methods
-
+    
     func update(text: String) {
         self.text = text
     }
-
+    
     func update(questionCount: Int) {
         self.questionCount = questionCount
     }
 
     func generateQuiz() {
         guard !text.isEmpty else { return }
-        onStateChange?(.generating)
+        
+        onStateChange?(.loading)
 
         Task {
             do {
-                let quiz = try await quizService.generateQuiz(for: text)
+                let quiz = try await quizService.generateQuiz(for: text, count: questionCount)
                 await MainActor.run {
-                    onStateChange?(.success(quiz))
+                    self.onStateChange?(.idle)
+                    self.coordinator?.didGenerateQuiz(quiz)
                 }
             } catch {
                 await MainActor.run {
-                    onStateChange?(.error(error.localizedDescription))
+                    self.onStateChange?(.error(error.localizedDescription))
                 }
             }
         }

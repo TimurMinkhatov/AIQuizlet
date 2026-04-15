@@ -6,6 +6,8 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
+// MARK: - AuthServiceProtocol
+
 protocol AuthServiceProtocol {
     func login(email: String, password: String) async throws -> AuthResponse
     func register(email: String, password: String) async throws -> AuthResponse

@@ -32,5 +32,9 @@ final class HomeViewModel {
     func profileSelected() {
         coordinator?.showProfile()
     }
+    
+    func textInputSelected() {
+        coordinator?.showTextInput()
+        }
 }
 

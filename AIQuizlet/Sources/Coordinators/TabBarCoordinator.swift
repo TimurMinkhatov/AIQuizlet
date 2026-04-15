@@ -5,9 +5,7 @@
 //  Created by Azamat Zakirov on 13.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
-
 import UIKit
-
 
 final class TabBarCoordinator: Coordinator {
     var navigationController: UINavigationController
@@ -21,57 +19,71 @@ final class TabBarCoordinator: Coordinator {
     }
     
     func start() {
-        
-        let controllers = TabBarPage.allCases.map { getTabController($0)}
+        let pages = TabBarPage.allCases.sorted { $0.rawValue < $1.rawValue }
+        let controllers = pages.map { createNavViewController(for: $0) }
         
         prepareTabBarController(with: controllers)
+        pages.forEach { launchCoordinator(for: $0) }
     }
     
-    private func prepareTabBarController(with controllers: [UIViewController]) {
-        tabBarController.setViewControllers(controllers, animated: false)
-        tabBarController.selectedIndex = TabBarPage.home.rawValue
-        
-        tabBarController.tabBar.backgroundColor = .white
-        
-        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
-        
-        navigationController.viewControllers = [tabBarController]
-        navigationController.setNavigationBarHidden(true, animated: false)
+    func showProfileTab() {
+        tabBarController.selectedIndex = TabBarPage.profile.rawValue
     }
+}
+
+// MARK: - Private Methods
+
+private extension TabBarCoordinator {
     
-    private func getTabController(_ page: TabBarPage) -> UINavigationController {
-        let navigationController = UINavigationController()
-        navigationController.tabBarItem = UITabBarItem(
+    func createNavViewController(for page: TabBarPage) -> UINavigationController {
+        let nav = UINavigationController()
+        nav.tabBarItem = UITabBarItem(
             title: page.pageTitle,
             image: UIImage(systemName: page.pageIconName),
             tag: page.rawValue
         )
+        return nav
+    }
+    
+    func launchCoordinator(for page: TabBarPage) {
+        guard let nav = tabBarController.viewControllers?[page.rawValue] as? UINavigationController else { return }
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: navigationController)
+            let homeCoordinator = HomeCoordinator(navigationController: nav)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()
-            
         case .history:
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .white
-            viewController.title = "История"
-            navigationController.pushViewController(viewController, animated: false)
+            let historyViewController = UIViewController()
+            historyViewController.view.backgroundColor = .white
+            historyViewController.title = "История"
+            nav.setViewControllers([historyViewController], animated: false)
         case .profile:
-            let viewController = UIViewController()
-            viewController.view.backgroundColor = .white
-            viewController.title = "Профиль"
-            navigationController.pushViewController(viewController, animated: false)
+            let profileViewController = UIViewController()
+            profileViewController.view.backgroundColor = .white
+            profileViewController.title = "Профиль"
+            nav.setViewControllers([profileViewController], animated: false)
         }
-        
-        return navigationController
-        
-        
     }
     
-    func showProfileTab() {
-        tabBarController.selectedIndex = 2
+    func prepareTabBarController(with controllers: [UIViewController]) {
+        tabBarController.setViewControllers(controllers, animated: false)
+        tabBarController.selectedIndex = TabBarPage.home.rawValue
+        tabBarController.tabBar.backgroundColor = .white
+        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1) 
+        navigationController.viewControllers = [tabBarController]
+        navigationController.setNavigationBarHidden(true, animated: false)
+        setupAppearance()
+    }
+    
+    func setupAppearance() {
+        if #available(iOS 15.0, *) {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .white
+            tabBarController.tabBar.standardAppearance = appearance
+            tabBarController.tabBar.scrollEdgeAppearance = appearance
+        }
     }
 }
