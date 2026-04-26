@@ -7,6 +7,7 @@
 //
 import UIKit
 import FirebaseAuth
+import SwiftData
 
 final class AppCoordinator: Coordinator {
 
@@ -15,13 +16,15 @@ final class AppCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+    let modelContainer: ModelContainer
     private var window: UIWindow?
 
     // MARK: - Init
     
-    init(navigationController: UINavigationController, window: UIWindow?) {
+    init(navigationController: UINavigationController, window: UIWindow?, modelContainer: ModelContainer) {
         self.navigationController = navigationController
         self.window = window
+        self.modelContainer = modelContainer
     }
 
     // MARK: - Public Methods
@@ -49,7 +52,10 @@ final class AppCoordinator: Coordinator {
     func showMainFlow() {
         children.removeAll()
         
-        let tabBarCoordinator = TabBarCoordinator(navigationController: navigationController)
+        let tabBarCoordinator = TabBarCoordinator(
+            navigationController: navigationController,
+            modelContainer: modelContainer
+        )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
         tabBarCoordinator.start()
