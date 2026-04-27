@@ -359,7 +359,6 @@ private extension TextInputViewController {
         let colors = [
             UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
             UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
         ]
 
         generateButtonGradient.colors = colors

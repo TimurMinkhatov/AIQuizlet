@@ -143,17 +143,16 @@ final class QuizViewController: UIViewController {
 private extension QuizViewController {
     
     @objc func optionTapped(_ sender: QuizOptionButton) {
-            optionsStack.arrangedSubviews.forEach {
-                ($0 as? QuizOptionButton)?.updateState(.normal)
-            }
-            sender.updateState(.selected)
-            
-            viewModel.selectAnswer(index: sender.tag)
+        optionsStack.arrangedSubviews.forEach {
+            ($0 as? QuizOptionButton)?.updateState(.normal)
         }
+        sender.updateState(.selected)
+        viewModel.selectAnswer(index: sender.tag)
+    }
         
-        @objc func nextTapped() {
-            viewModel.nextQuestion()
-        }
+    @objc func nextTapped() {
+        viewModel.nextQuestion()
+    }
 }
 
 // MARK: - Setup Logic
@@ -253,7 +252,12 @@ private extension QuizViewController {
             make.bottom.equalToSuperview().inset(16)
         }
     }
-    
+}
+
+// MARK: - Private Methods
+
+private extension QuizViewController {
+
     func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self = self else { return }
@@ -265,7 +269,7 @@ private extension QuizViewController {
                     self.render(question: question, number: current)
                 case .showingResult(_, let correctIndex, let question):
                     self.showResultUI(correctIndex: correctIndex, question: question)
-                case .finished(let score, let total):
+                case .finished(_, _):
                     break
                 case .idle: break
                 }
@@ -322,7 +326,7 @@ private extension QuizViewController {
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
             button.updateState(index == correctIndex ? .correct : .wrong)
-    }
+        }
         
         explanationLabel.text = question.explanation ?? "Правильный ответ на основе предоставленного текста."
         explanationView.isHidden = false
@@ -344,7 +348,6 @@ private extension QuizViewController {
         nextButtonGradient.colors = [
             UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
             UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
         ]
         nextButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
         nextButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
