@@ -30,9 +30,7 @@ final class HomeCoordinator: Coordinator {
         let viewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: false)
     }
-
 }
-
 
 // MARK: - Navigation
 
@@ -49,5 +47,12 @@ extension HomeCoordinator {
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.start()
+    }
+    
+    func showPhotoInput() {
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.showPhotoFlow()
     }
 }

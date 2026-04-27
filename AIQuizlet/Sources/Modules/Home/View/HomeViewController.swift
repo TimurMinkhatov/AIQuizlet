@@ -65,7 +65,7 @@ private extension HomeViewController {
     
     func setupActions() {
         homeView.photoCard.action = { [weak self] in
-            // Здесь будет логика для фото
+            self?.viewModel.photoInputSelected()
         }
         homeView.textCard.action = { [weak self] in
             self?.viewModel.textInputSelected()
