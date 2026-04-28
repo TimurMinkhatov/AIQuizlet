@@ -52,6 +52,8 @@ let project = Project(
             settings: .settings(
                 base: [
                     "VALIDATE_WORKSPACE": "NO",
+		    "CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER": "NO",
+		    "GCC_WARN_INHIBIT_ALL_WARNINGS": "YES"
                 ]
             )
         ),

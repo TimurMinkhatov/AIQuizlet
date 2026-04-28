@@ -9,6 +9,6 @@
 // MARK: - AuthServiceProtocol
 
 protocol AuthServiceProtocol {
-    func login(email: String, password: String) async throws -> AuthResponse
-    func register(email: String, password: String) async throws -> AuthResponse
+    func login(email: String, password: String)
+    func register(email: String, password: String)
 }
