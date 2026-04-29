@@ -18,45 +18,23 @@ final class CameraService: NSObject {
     private let sessionQueue = DispatchQueue(label: "com.aiquizlet.camera.sessionQueue")
     
     var onPhotoCaptured: ((UIImage) -> Void)?
-    let prewiewLayer: AVCaptureVideoPreviewLayer
+    var onError: ((String) -> Void)?
+    let previewLayer: AVCaptureVideoPreviewLayer
     
     // MARK: - Init
     
     override init() {
-        self.prewiewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        self.prewiewLayer.videoGravity = .resizeAspectFill
+        self.previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        self.previewLayer.videoGravity = .resizeAspectFill
         super.init()
     }
     
     // MARK: - Public Methods
     
     func setupCamera(on view: UIView) {
-        self.prewiewLayer.frame = view.bounds
+        self.previewLayer.frame = view.bounds
+        checkPermission()
         
-        sessionQueue.async {
-            guard let captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-                return
-            }
-            
-            do {
-                let input = try AVCaptureDeviceInput(device: captureDevice)
-                
-                self.captureSession.beginConfiguration()
-                
-                if self.captureSession.canAddInput(input) {
-                    self.captureSession.addInput(input)
-                }
-                
-                if self.captureSession.canAddOutput(self.photoOutput) {
-                    self.captureSession.addOutput(self.photoOutput)
-                }
-                
-                self.captureSession.commitConfiguration()
-                self.captureSession.startRunning()
-            } catch {
-                print("Ошибка инициализации камеры: \(error)")
-            }
-        }
     }
     
     func start() {
@@ -78,6 +56,71 @@ final class CameraService: NSObject {
     func capturePhoto() {
         let settings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: settings, delegate: self)
+    }
+    
+    func updatePreviewFrame(_ bounds: CGRect) {
+        previewLayer.frame = bounds
+    }
+}
+
+// MARK: - Private Methods
+
+private extension CameraService {
+    
+    func checkPermission() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            configureSession()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self]  granted  in
+                if granted {
+                    self?.configureSession()
+                } else {
+                    self?.onError?("Доступ к камере отклонен")
+                }
+            }
+        case .denied, .restricted:
+            onError?("Камера недоступна. Пожалуйста, разрешите доступ в настройках устройства.")
+        @unknown default:
+            break
+        }
+    }
+    
+    func configureSession() {
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            guard let captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+                DispatchQueue.main.async {
+                    self.onError?("Не удалось найти камеру")
+                }
+                return
+            }
+            
+            do {
+                let input = try AVCaptureDeviceInput(device: captureDevice)
+                
+                self.captureSession.beginConfiguration()
+                
+                self.captureSession.inputs.forEach { self.captureSession.removeInput($0) }
+                self.captureSession.outputs.forEach { self.captureSession.removeOutput($0) }
+                
+                if self.captureSession.canAddInput(input) {
+                    self.captureSession.addInput(input)
+                }
+                
+                if self.captureSession.canAddOutput(self.photoOutput) {
+                    self.captureSession.addOutput(self.photoOutput)
+                }
+                
+                self.captureSession.commitConfiguration()
+                self.captureSession.startRunning()
+            } catch {
+                DispatchQueue.main.async {
+                    self.onError?("Ошибка инициализации камеры: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }
 

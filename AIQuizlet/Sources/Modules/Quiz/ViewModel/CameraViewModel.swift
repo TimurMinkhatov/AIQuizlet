@@ -15,8 +15,10 @@ final class CameraViewModel {
     weak var coordinator: QuizCoordinator?
     private let cameraService: CameraService
     
+    var onErrorMessage: ((String) -> Void)?
+    
     var previewLayer: CALayer {
-        return cameraService.prewiewLayer
+        return cameraService.previewLayer
     }
 
     // MARK: - Init
@@ -51,6 +53,10 @@ final class CameraViewModel {
     func handleSelectedPhoto(_ image: UIImage) {
         coordinator?.didCapturePhoto(image)
     }
+    
+    func updatePreviewFrame(_ bounds: CGRect) {
+        cameraService.updatePreviewFrame(bounds)
+    }
 }
 
 // MARK: - Private Methods
@@ -61,6 +67,12 @@ private extension CameraViewModel {
         cameraService.onPhotoCaptured = { [weak self] image in
             DispatchQueue.main.async {
                 self?.coordinator?.didCapturePhoto(image)
+            }
+        }
+        
+        cameraService.onError = { [weak self] message in
+            DispatchQueue.main.async {
+                self?.onErrorMessage?(message)
             }
         }
     }

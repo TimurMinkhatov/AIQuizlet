@@ -68,32 +68,50 @@ extension QuizCoordinator {
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
     }
+    
+    func didRequestRetake() {
+        navigationController.popViewController(animated: true)
+    }
 }
 
 // MARK: - Private Methods
 
 private extension QuizCoordinator {
+    
 
     func showPhotoPreview(with image: UIImage) {
-        let vc = PhotoPreviewViewController(image: image)
-
-        vc.onContinue = { [weak self] selectedCount in
-            self?.proccessImageToQuiz(image, count: selectedCount)
-        }
-
-        vc.onRetake = { [weak self] in
-            self?.navigationController.popViewController(animated: true)
-        }
-
+        let vm = PhotoPreviewViewModel(image: image)
+        let vc = PhotoPreviewViewController(viewModel: vm)
+        vc.coordinator = self
+        
+        vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
+        
+    }
+    
+    
+    
+    func handlePhotoGeneration(image: UIImage, count: Int, for vc: PhotoPreviewViewController) {
+        self.processImageToQuiz(image, count: count) { [weak vc] result in
+            DispatchQueue.main.async {
+                vc?.stopLoading()
+                
+                if case .failure(let error) = result {
+                    vc?.showError(error.localizedDescription)
+                }
+            }
+        }
     }
 
-    func proccessImageToQuiz(_ image: UIImage, count: Int) {
+    func processImageToQuiz(_ image: UIImage, count: Int, completion: @escaping (Result<Quiz, Error>) -> Void) {
         let recognitionService = TextRecognitionService()
         let quizService = QuizService(networkManager: NetworkManager())
 
         recognitionService.recognizeText(from: image) { [weak self] text in
-            guard let self = self, let recognizedText = text, !recognizedText.isEmpty else {
+            guard let self = self else { return }
+            guard let recognizedText = text, !recognizedText.isEmpty else {
+                let error = NSError(domain: "QuizError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Не удалось распознать текст на фото. Попробуйте сделать более четкий снимок."])
+                completion(.failure(error))
                 return
             }
 
@@ -101,11 +119,12 @@ private extension QuizCoordinator {
                 do {
                     let quiz = try await quizService.generateQuiz(for: recognizedText, count: count)
                     await MainActor.run {
+                        completion(.success(quiz))
                         self.showQuiz(quiz: quiz)
                     }
                 } catch {
                     await MainActor.run {
-                        print("Ошибка генерации: \(error.localizedDescription)")
+                        completion(.failure(error))
                     }
                 }
             }

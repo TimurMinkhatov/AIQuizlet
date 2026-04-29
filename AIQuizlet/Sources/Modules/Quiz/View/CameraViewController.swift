@@ -8,6 +8,7 @@
 
 import UIKit
 import PhotosUI
+import SnapKit
 
 final class CameraViewController: UIViewController {
     
@@ -35,6 +36,11 @@ final class CameraViewController: UIViewController {
         setupConstraints()
         setupActions()
         viewModel.setupPreview(on: view)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        viewModel.updatePreviewFrame(view.bounds)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -70,7 +76,7 @@ extension CameraViewController: PHPickerViewControllerDelegate {
 
 private extension CameraViewController {
     
-    @objc func didTabCapture() {
+    @objc func didTapCapture() {
         cameraView.animateShutterTap()
         viewModel.capturePhoto()
     }
@@ -103,7 +109,7 @@ private extension CameraViewController {
     }
     
     func setupActions() {
-        cameraView.shutterButton.addTarget(self, action: #selector(didTabCapture), for: .touchUpInside)
+        cameraView.shutterButton.addTarget(self, action: #selector(didTapCapture), for: .touchUpInside)
         cameraView.galleryButton.addTarget(self, action: #selector(didTapGallery), for: .touchUpInside)
     }
 }

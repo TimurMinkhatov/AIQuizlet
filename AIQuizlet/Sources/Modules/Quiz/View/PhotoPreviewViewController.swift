@@ -12,15 +12,15 @@ import SnapKit
 final class PhotoPreviewViewController: UIViewController {
 
     // MARK: - Properties
-
-    var onContinue: ((Int) -> Void)?
-    var onRetake: (() -> Void)?
+    weak var coordinator: QuizCoordinator?
+    private let viewModel: PhotoPreviewViewModel
     private let previewView: PhotoPreviewView
 
     // MARK: - Init
 
-    init(image: UIImage) {
-        self.previewView = PhotoPreviewView(image: image)
+    init(viewModel: PhotoPreviewViewModel) {
+        self.viewModel = viewModel
+        self.previewView = PhotoPreviewView(image: viewModel.image)
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -34,12 +34,19 @@ final class PhotoPreviewViewController: UIViewController {
         super.viewDidLoad()
         setupMainUI()
         setupActions()
+        bindViewModel()
     }
 
     // MARK: - Public Methods
 
     func stopLoading() {
         previewView.showLoading(false)
+    }
+    
+    func showError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        self.present(alert, animated: true)
     }
 }
 
@@ -48,12 +55,11 @@ final class PhotoPreviewViewController: UIViewController {
 private extension PhotoPreviewViewController {
 
     @objc func didTapContinue() {
-        previewView.showLoading(true)
-        onContinue?(previewView.selectedQuestionCount)
+        viewModel.generateQuiz(questionsCount: previewView.selectedQuestionCount)
     }
 
     @objc func didTapRetake() {
-        onRetake?()
+        coordinator?.didRequestRetake()
     }
 }
 
@@ -61,6 +67,25 @@ private extension PhotoPreviewViewController {
 
 private extension PhotoPreviewViewController {
 
+    func bindViewModel() {
+        
+        viewModel.onLoadingStateChanged = { [weak self] isLoading in
+            DispatchQueue.main.async {
+                self?.previewView.showLoading(isLoading)
+            }
+        }
+        
+        viewModel.onErrorOccurred = { [weak self] error in
+            DispatchQueue.main.async {
+                self?.showError(error)
+            }
+        }
+        
+        viewModel.onSuccess = { [weak self] in
+            self?.coordinator?.showQuiz(quiz: $0)
+        }
+    }
+    
     func setupMainUI() {
         navigationController?.setNavigationBarHidden(true, animated: false)
 
