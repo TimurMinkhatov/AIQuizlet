@@ -265,7 +265,7 @@ private extension QuizViewController {
                     self.render(question: question, number: current)
                 case .showingResult(_, let correctIndex, let question):
                     self.showResultUI(correctIndex: correctIndex, question: question)
-                case .finished(let score, let total):
+                case .finished(let                                                                                                                                                                                              score, let total):
                     break
                 case .idle: break
                 }
