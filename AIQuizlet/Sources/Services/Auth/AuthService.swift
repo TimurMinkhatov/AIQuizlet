@@ -13,6 +13,9 @@ final class AuthService {
     // MARK: - Properties
     
     static let shared = AuthService()
+    var currentUser: FirebaseAuth.User? {
+        Auth.auth().currentUser
+    }
     
     // MARK: - Init
     
