@@ -5,17 +5,21 @@
 //  Created by Azamat Zakirov on 13.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
+
 import UIKit
+import SwiftData
 
 final class TabBarCoordinator: Coordinator {
     var navigationController: UINavigationController
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
+    let modelContainer: ModelContainer
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, modelContainer: ModelContainer) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
+        self.modelContainer = modelContainer
     }
     
     func start() {
