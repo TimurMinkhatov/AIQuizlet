@@ -15,6 +15,10 @@ final class QuizCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+    
+    private let networkManager = NetworkManager()
+    private lazy var quizService = QuizService(networkManager: networkManager)
+    private let cameraService = CameraService()
 
     // MARK: - Init
 
@@ -44,7 +48,6 @@ final class QuizCoordinator: Coordinator {
 extension QuizCoordinator {
 
     func showTextInput() {
-        let quizService = QuizService(networkManager: NetworkManager())
         let vm = TextInputViewModel(quizService: quizService)
         vm.coordinator = self
         let vc = TextInputViewController(viewModel: vm)
@@ -52,7 +55,6 @@ extension QuizCoordinator {
     }
 
     func showPhotoFlow() {
-        let cameraService = CameraService()
         let vm = CameraViewModel(cameraService: cameraService)
         vm.coordinator = self
         let vc = CameraViewController(viewModel: vm)
@@ -61,7 +63,6 @@ extension QuizCoordinator {
     }
 
     func showQuiz(quiz: Quiz) {
-        let quizService = QuizService(networkManager: NetworkManager())
         let vm = QuizViewModel(quizService: quizService)
         vm.setQuiz(quiz)
         let vc = QuizViewController(viewModel: vm)
@@ -78,7 +79,6 @@ extension QuizCoordinator {
 
 private extension QuizCoordinator {
     
-
     func showPhotoPreview(with image: UIImage) {
         let vm = PhotoPreviewViewModel(image: image)
         let vc = PhotoPreviewViewController(viewModel: vm)
@@ -87,47 +87,5 @@ private extension QuizCoordinator {
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
         
-    }
-    
-    
-    
-    func handlePhotoGeneration(image: UIImage, count: Int, for vc: PhotoPreviewViewController) {
-        self.processImageToQuiz(image, count: count) { [weak vc] result in
-            DispatchQueue.main.async {
-                vc?.stopLoading()
-                
-                if case .failure(let error) = result {
-                    vc?.showError(error.localizedDescription)
-                }
-            }
-        }
-    }
-
-    func processImageToQuiz(_ image: UIImage, count: Int, completion: @escaping (Result<Quiz, Error>) -> Void) {
-        let recognitionService = TextRecognitionService()
-        let quizService = QuizService(networkManager: NetworkManager())
-
-        recognitionService.recognizeText(from: image) { [weak self] text in
-            guard let self = self else { return }
-            guard let recognizedText = text, !recognizedText.isEmpty else {
-                let error = NSError(domain: "QuizError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Не удалось распознать текст на фото. Попробуйте сделать более четкий снимок."])
-                completion(.failure(error))
-                return
-            }
-
-            Task {
-                do {
-                    let quiz = try await quizService.generateQuiz(for: recognizedText, count: count)
-                    await MainActor.run {
-                        completion(.success(quiz))
-                        self.showQuiz(quiz: quiz)
-                    }
-                } catch {
-                    await MainActor.run {
-                        completion(.failure(error))
-                    }
-                }
-            }
-        }
     }
 }

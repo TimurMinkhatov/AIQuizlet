@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PhotosUI
 
 final class CameraViewModel {
     
@@ -56,6 +57,19 @@ final class CameraViewModel {
     
     func updatePreviewFrame(_ bounds: CGRect) {
         cameraService.updatePreviewFrame(bounds)
+    }
+    
+    func handlePickerResults(_ results: [PHPickerResult]) {
+        guard let provider = results.first?.itemProvider,
+              provider.canLoadObject(ofClass: UIImage.self) else { return }
+        
+        provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
+            if let selectedImage = image as? UIImage {
+                DispatchQueue.main.async {
+                    self?.coordinator?.didCapturePhoto(selectedImage)
+                }
+            }
+        }
     }
 }
 

@@ -60,15 +60,7 @@ extension CameraViewController: PHPickerViewControllerDelegate {
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
-        
-        provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
-            if let selectedImage = image as? UIImage {
-                DispatchQueue.main.async {
-                    self?.viewModel.handleSelectedPhoto(selectedImage)
-                }
-            }
-        }
+        viewModel.handlePickerResults(results)
     }
 }
 

@@ -106,16 +106,16 @@ private extension QuizOptionButton {
     }
     
     func setupConstraints() {
-        label.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(16)
-            make.centerY.equalToSuperview()
-            make.trailing.equalTo(iconImageView.snp.leading).offset(-8)
+        label.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalTo(iconImageView.snp.leading).offset(-8)
         }
         
-        iconImageView.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(16)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(20)
+        iconImageView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(20)
         }
     }
 }

@@ -79,21 +79,21 @@ private extension CameraView {
     }
     
     func setupConstraints() {
-        shutterOutterView.snp.makeConstraints { make in
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(40)
-            make.centerX.equalToSuperview()
-            make.size.equalTo(70)
+        shutterOutterView.snp.makeConstraints {
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(40)
+            $0.centerX.equalToSuperview()
+            $0.size.equalTo(70)
         }
         
-        shutterButton.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(54)
+        shutterButton.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.size.equalTo(54)
         }
         
-        galleryButton.snp.makeConstraints { make in
-            make.centerY.equalTo(shutterOutterView)
-            make.leading.equalToSuperview().offset(40)
-            make.size.equalTo(50)
+        galleryButton.snp.makeConstraints {
+            $0.centerY.equalTo(shutterOutterView)
+            $0.leading.equalToSuperview().offset(40)
+            $0.size.equalTo(50)
         }
     }
 }

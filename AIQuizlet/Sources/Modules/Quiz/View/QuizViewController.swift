@@ -185,71 +185,71 @@ private extension QuizViewController {
     }
     
     func setupConstraints() {
-        progressView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(4)
+        progressView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(4)
         }
         
-        progressLabel.snp.makeConstraints { make in
-            make.top.equalTo(progressView.snp.bottom).offset(10)
-            make.centerX.equalToSuperview()
+        progressLabel.snp.makeConstraints {
+            $0.top.equalTo(progressView.snp.bottom).offset(10)
+            $0.centerX.equalToSuperview()
         }
         
-        nextButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.leading.trailing.equalToSuperview().inset(24)
-            make.height.equalTo(56)
+        nextButton.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.height.equalTo(56)
         }
         
-        cardView.snp.makeConstraints { make in
-            make.top.equalTo(progressLabel.snp.bottom).offset(20)
-            make.leading.trailing.equalToSuperview().inset(24)
-            make.bottom.equalTo(nextButton.snp.top).offset(-20)
+        cardView.snp.makeConstraints {
+            $0.top.equalTo(progressLabel.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.bottom.equalTo(nextButton.snp.top).offset(-20)
         }
         
-        cardScrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        cardScrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
-        cardContentView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.width.equalToSuperview()
+        cardContentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
         }
         
-        questionLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
-            make.leading.trailing.equalToSuperview().inset(20)
+        questionLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        optionsStack.snp.makeConstraints { make in
-            make.top.equalTo(questionLabel.snp.bottom).offset(24)
-            make.leading.trailing.equalToSuperview().inset(20)
+        optionsStack.snp.makeConstraints {
+            $0.top.equalTo(questionLabel.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
         
-        explanationView.snp.makeConstraints { make in
-            make.top.equalTo(optionsStack.snp.bottom).offset(20)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview().inset(24)
+        explanationView.snp.makeConstraints {
+            $0.top.equalTo(optionsStack.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalToSuperview().inset(24)
         }
         
-        bulbIconImageView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.leading.equalToSuperview().offset(16)
-            make.size.equalTo(20)
+        bulbIconImageView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(16)
+            $0.leading.equalToSuperview().offset(16)
+            $0.size.equalTo(20)
         }
         
-        explanationTitleLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(bulbIconImageView)
-            make.leading.equalTo(bulbIconImageView.snp.trailing).offset(10)
-            make.trailing.equalToSuperview().inset(16)
+        explanationTitleLabel.snp.makeConstraints {
+            $0.centerY.equalTo(bulbIconImageView)
+            $0.leading.equalTo(bulbIconImageView.snp.trailing).offset(10)
+            $0.trailing.equalToSuperview().inset(16)
         }
         
-        explanationLabel.snp.makeConstraints { make in
-            make.top.equalTo(explanationTitleLabel.snp.bottom).offset(8)
-            make.leading.equalTo(explanationTitleLabel.snp.leading)
-            make.trailing.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(16)
+        explanationLabel.snp.makeConstraints {
+            $0.top.equalTo(explanationTitleLabel.snp.bottom).offset(8)
+            $0.leading.equalTo(explanationTitleLabel.snp.leading)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(16)
         }
     }
 }

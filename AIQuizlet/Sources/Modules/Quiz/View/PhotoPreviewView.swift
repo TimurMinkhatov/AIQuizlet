@@ -211,43 +211,43 @@ private extension PhotoPreviewView {
     }
     
     func setupConstraints() {
-        imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        imageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
-        glassPanel.snp.makeConstraints { make in
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(16)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.height.equalTo(230)
+        glassPanel.snp.makeConstraints {
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(230)
         }
 
-        questionCountTitleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(24)
-            make.leading.equalToSuperview().offset(20)
+        questionCountTitleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.leading.equalToSuperview().offset(20)
         }
         
-        questionCountStackView.snp.makeConstraints { make in
-            make.top.equalTo(questionCountTitleLabel.snp.bottom).offset(12)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(44)
+        questionCountStackView.snp.makeConstraints {
+            $0.top.equalTo(questionCountTitleLabel.snp.bottom).offset(12)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(44)
         }
         
-        retakeButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(30)
-            make.leading.equalToSuperview().offset(20)
-            make.height.equalTo(54)
-            make.trailing.equalTo(self.snp.centerX).offset(-8)
+        retakeButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(30)
+            $0.leading.equalToSuperview().offset(20)
+            $0.height.equalTo(54)
+            $0.trailing.equalTo(self.snp.centerX).offset(-8)
         }
         
-        continueButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(30)
-            make.trailing.equalToSuperview().offset(-20)
-            make.height.equalTo(54)
-            make.leading.equalTo(self.snp.centerX).offset(8)
+        continueButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(30)
+            $0.trailing.equalToSuperview().offset(-20)
+            $0.height.equalTo(54)
+            $0.leading.equalTo(self.snp.centerX).offset(8)
         }
         
-        activityIndicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+        activityIndicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }
