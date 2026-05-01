@@ -15,13 +15,13 @@ final class ProfileCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    var storageService: StorageService
+    var assembly: ServicesAssembly
     
     // MARK: - Init
     
-    init(navigationController: UINavigationController, storageService: StorageService) {
+    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
         self.navigationController = navigationController
-        self.storageService = storageService
+        self.assembly = assembly
     }
     
     // MARK: - Coordinator
@@ -43,7 +43,7 @@ final class ProfileCoordinator: Coordinator {
 private extension ProfileCoordinator {
     
     func showProfile() {
-        let vm = ProfileViewModel(storageService: storageService)
+        let vm = ProfileViewModel(storageService: assembly.storageService)
         vm.coordinator = self
         let vc = ProfileViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)

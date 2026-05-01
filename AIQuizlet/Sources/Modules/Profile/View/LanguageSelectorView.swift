@@ -25,7 +25,15 @@ final class LanguageSelectorView: UIView {
         label.font = .systemFont(ofSize: 17, weight: .semibold)
         return label
     }()
-
+    
+    private lazy var buttonStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [russianButton, englishButton])
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.distribution = .fillEqually
+        return stack
+    }()
+    
     private lazy var russianButton = makeLanguageButton(title: "Русский")
     private lazy var englishButton = makeLanguageButton(title: "English")
 
@@ -76,10 +84,6 @@ private extension LanguageSelectorView {
     }
 
     func setupLayout() {
-        let buttonStack = UIStackView(arrangedSubviews: [russianButton, englishButton])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 8
-        buttonStack.distribution = .fillEqually
 
         addSubview(titleLabel)
         addSubview(buttonStack)

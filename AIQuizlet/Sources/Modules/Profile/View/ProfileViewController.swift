@@ -24,6 +24,8 @@ final class ProfileViewController: UIViewController {
     }()
 
     private lazy var contentView = UIView()
+    
+    private lazy var profileView: ProfileView = ProfileView(viewModel: viewModel)
 
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
@@ -34,60 +36,6 @@ final class ProfileViewController: UIViewController {
         layer.startPoint = CGPoint(x: 0, y: 0)
         layer.endPoint = CGPoint(x: 1, y: 1)
         return layer
-    }()
-
-    private lazy var avatarGradientLayer: CAGradientLayer = {
-        let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 1, y: 1)
-        return layer
-    }()
-
-    private lazy var profileCardView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .secondarySystemGroupedBackground
-        view.layer.cornerRadius = 20
-        return view
-    }()
-
-    private lazy var profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.image = UIImage(systemName: "person")
-        imageView.tintColor = .white
-        return imageView
-    }()
-
-    private lazy var profileContainerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 40
-        view.clipsToBounds = true
-        return view
-    }()
-
-    private lazy var infoStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 4
-        return stack
-    }()
-
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Профиль"
-        label.font = .systemFont(ofSize: 20, weight: .bold)
-        return label
-    }()
-
-    private lazy var emailLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        label.textColor = .secondaryLabel
-        return label
     }()
 
     private lazy var totalTestsCard = StatCardView(
@@ -114,8 +62,8 @@ final class ProfileViewController: UIViewController {
         tintColor: .systemPurple
     )
 
-    private lazy var statsTopRow: UIStackView = {
-        let stack = UIStackView()
+    private lazy var statsTopRow = {
+        let stack = UIStackView(arrangedSubviews: [totalTestsCard, avgScoreCard])
         stack.axis = .horizontal
         stack.spacing = 12
         stack.distribution = .fillEqually
@@ -123,7 +71,7 @@ final class ProfileViewController: UIViewController {
     }()
 
     private lazy var statsBottomRow: UIStackView = {
-        let stack = UIStackView()
+        let stack = UIStackView(arrangedSubviews: [bestScoreCard, completedCard])
         stack.axis = .horizontal
         stack.spacing = 12
         stack.distribution = .fillEqually
@@ -131,7 +79,7 @@ final class ProfileViewController: UIViewController {
     }()
 
     private lazy var statsStack: UIStackView = {
-        let stack = UIStackView()
+        let stack = UIStackView(arrangedSubviews: [statsTopRow, statsBottomRow])
         stack.axis = .vertical
         stack.spacing = 12
         return stack
@@ -147,29 +95,9 @@ final class ProfileViewController: UIViewController {
         return view
     }()
 
-    private lazy var clearDataButton: UIButton = {
-        var config = UIButton.Configuration.plain()
-        config.title = "Очистить все данные"
-        config.image = UIImage(systemName: "trash")
-        config.baseForegroundColor = .systemRed
-        config.imagePadding = 8
-        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-        let button = UIButton(configuration: config)
-        button.contentHorizontalAlignment = .left
-        return button
-    }()
+    private lazy var clearDataButton = makeSettingsButton(image: "trash", color: .systemRed, text: "Очистить все данные")
 
-    private lazy var logoutButton: UIButton = {
-        var config = UIButton.Configuration.plain()
-        config.title = "Выйти из аккаунта"
-        config.image = UIImage(systemName: "rectangle.portrait.and.arrow.right")
-        config.baseForegroundColor = .label
-        config.imagePadding = 8
-        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-        let button = UIButton(configuration: config)
-        button.contentHorizontalAlignment = .left
-        return button
-    }()
+    private lazy var logoutButton = makeSettingsButton(image: "rectangle.portrait.and.arrow.right", color: .label, text: "Выйти из аккаунта")
 
     private lazy var versionLabel: UILabel = {
         let label = UILabel()
@@ -199,7 +127,6 @@ extension ProfileViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Профиль"
-        setupNavigationBar()
         setupLayout()
         setupActions()
         bindViewModel()
@@ -209,8 +136,6 @@ extension ProfileViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         gradientLayer.frame = view.bounds
-        avatarGradientLayer.frame = profileContainerView.bounds
-        avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
     }
 }
 
@@ -218,42 +143,19 @@ extension ProfileViewController {
 
 private extension ProfileViewController {
 
-    func setupNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.tintColor = .white
-    }
-
     func setupLayout() {
         view.layer.insertSublayer(gradientLayer, at: 0)
-        profileContainerView.layer.insertSublayer(avatarGradientLayer, at: 0)
-
-        statsTopRow.addArrangedSubview(totalTestsCard)
-        statsTopRow.addArrangedSubview(avgScoreCard)
-        statsBottomRow.addArrangedSubview(bestScoreCard)
-        statsBottomRow.addArrangedSubview(completedCard)
-        statsStack.addArrangedSubview(statsTopRow)
-        statsStack.addArrangedSubview(statsBottomRow)
-
-        actionsCardView.addSubview(clearDataButton)
-        actionsCardView.addSubview(logoutButton)
 
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubview(profileCardView)
-        profileCardView.addSubview(profileContainerView)
-        profileContainerView.addSubview(profileImageView)
-        profileCardView.addSubview(infoStack)
-        infoStack.addArrangedSubview(nameLabel)
-        infoStack.addArrangedSubview(emailLabel)
+        contentView.addSubview(profileView)
         contentView.addSubview(statsStack)
         contentView.addSubview(themeSelectorView)
         contentView.addSubview(languageSelectorView)
         contentView.addSubview(actionsCardView)
         contentView.addSubview(versionLabel)
+        actionsCardView.addSubview(clearDataButton)
+        actionsCardView.addSubview(logoutButton)
 
         scrollView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -264,31 +166,15 @@ private extension ProfileViewController {
             $0.width.equalToSuperview()
             $0.height.greaterThanOrEqualToSuperview()
         }
-
-        profileCardView.snp.makeConstraints {
+        
+        profileView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
-        }
 
-        profileContainerView.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(16)
-            $0.top.bottom.equalToSuperview().inset(24)
-            $0.width.height.equalTo(80)
-        }
-
-        profileImageView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.height.equalTo(30)
-        }
-
-        infoStack.snp.makeConstraints {
-            $0.leading.equalTo(profileContainerView.snp.trailing).offset(16)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalTo(profileContainerView)
         }
 
         statsStack.snp.makeConstraints {
-            $0.top.equalTo(profileCardView.snp.bottom).offset(12)
+            $0.top.equalTo(profileView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
@@ -354,13 +240,25 @@ private extension ProfileViewController {
     }
 
     func updateUI() {
-        emailLabel.text = viewModel.email
         if let stats = try? viewModel.fetchStats() {
             totalTestsCard.setValue("\(stats.totalQuizzes)")
             avgScoreCard.setValue("\(Int(stats.avgScore))%")
             bestScoreCard.setValue("\(Int(stats.bestScores))%")
             completedCard.setValue("\(stats.totalQuestions)")
         }
+    }
+    
+    func makeSettingsButton(image: String, color: UIColor, text: String) -> UIButton {
+        var config = UIButton.Configuration.plain()
+        config.title = text
+        config.image = UIImage(systemName: image)
+        config.baseForegroundColor = .label
+        config.imagePadding = 8
+        config.baseForegroundColor = color
+        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+        let button = UIButton(configuration: config)
+        button.contentHorizontalAlignment = .left
+        return button
     }
 
     @objc func clearDataTapped() {
