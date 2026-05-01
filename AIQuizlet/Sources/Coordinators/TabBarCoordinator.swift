@@ -54,7 +54,7 @@ private extension TabBarCoordinator {
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: nav)
+            let homeCoordinator = HomeCoordinator(navigationController: nav, assembly: assembly)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()

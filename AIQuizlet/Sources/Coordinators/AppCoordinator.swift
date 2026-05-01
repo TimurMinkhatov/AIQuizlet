@@ -40,7 +40,7 @@ final class AppCoordinator: Coordinator {
     func showAuth() {
         children.removeAll()
         
-        let authCoordinator = AuthCoordinator(navigationController: navigationController)
+        let authCoordinator = AuthCoordinator(navigationController: navigationController, assembly: assembly)
         authCoordinator.parentCoordinator = self
         children.append(authCoordinator)
         authCoordinator.start()

@@ -1,0 +1,30 @@
+//
+//  FSQuizResult.swift
+//  AIQuizlet
+//
+//  Created by Timur Minkhatov on 01/05/2026.
+//  Copyright © 2026 t-bank-practice-team. All rights reserved.
+//
+
+import Foundation
+
+struct FSQuizResult: Codable {
+
+    let id: String
+    let userId: String
+    let score: Double
+    let correctCount: Int
+    let totalQuestions: Int
+    let completedAt: Date
+
+    var asDictionary: [String: Any] {
+        return [
+            "id": id,
+            "userId": userId,
+            "score": score,
+            "correctCount": correctCount,
+            "totalQuestions": totalQuestions,
+            "completedAt": completedAt
+        ]
+    }
+}

@@ -240,11 +240,13 @@ private extension ProfileViewController {
     }
 
     func updateUI() {
-        if let stats = try? viewModel.fetchStats() {
-            totalTestsCard.setValue("\(stats.totalQuizzes)")
-            avgScoreCard.setValue("\(Int(stats.avgScore))%")
-            bestScoreCard.setValue("\(Int(stats.bestScores))%")
-            completedCard.setValue("\(stats.totalQuestions)")
+        Task {
+            if let stats = try? await viewModel.fetchStats() {
+                totalTestsCard.setValue("\(stats.totalQuizzes)")
+                avgScoreCard.setValue("\(Int(stats.avgScore))%")
+                bestScoreCard.setValue("\(Int(stats.bestScores))%")
+                completedCard.setValue("\(stats.totalQuestions)")
+            }
         }
     }
     
