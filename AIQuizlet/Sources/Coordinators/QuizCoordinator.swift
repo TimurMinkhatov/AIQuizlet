@@ -7,11 +7,13 @@ final class QuizCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+    let assembly: ServicesAssembly
 
     // MARK: - Init
 
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
         self.navigationController = navigationController
+        self.assembly = assembly
     }
 
     // MARK: - Coordinator
@@ -41,7 +43,7 @@ private extension QuizCoordinator {
 
     func showQuiz(quiz: Quiz) {
         let quizService = QuizService(networkManager: NetworkManager())
-        let vm = QuizViewModel(quizService: quizService)
+        let vm = QuizViewModel(assembly: assembly)
         vm.setQuiz(quiz)
         let vc = QuizViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)

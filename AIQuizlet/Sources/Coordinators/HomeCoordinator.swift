@@ -15,11 +15,13 @@ final class HomeCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
+    let assembly: ServicesAssembly
     
     // MARK: - Init
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
         self.navigationController = navigationController
+        self.assembly = assembly
     }
     
     // MARK: - Public Methods
@@ -45,7 +47,7 @@ extension HomeCoordinator {
     }
     
     func showTextInput() {
-        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController, assembly: assembly)
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.start()
