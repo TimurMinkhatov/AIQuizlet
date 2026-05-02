@@ -18,7 +18,7 @@ final class PhotoPreviewViewModel {
     
     var onLoadingStateChanged: ((Bool) -> Void)?
     var onErrorOccurred: ((String) -> Void)?
-    var onSuccess: ((Quiz) -> Void)?
+    var onSuccess: ((Quiz, QuizRecord) -> Void)?
     
     // MARK: - Init
     
@@ -48,9 +48,22 @@ final class PhotoPreviewViewModel {
             Task {
                 do {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
+                    
                     await MainActor.run {
+                        let questionRecords = quiz.questions.map {
+                            QuestionRecord(
+                                text: $0.text,
+                                answers: $0.answers,
+                                correctAnswer: $0.correctAnswer,
+                                explanation: $0.explanation,
+                                userAnswerIndex: -1
+                            )
+                        }
+                        
+                        let record = QuizRecord(title: quiz.title, questions: questionRecords)
+                        
                         self.onLoadingStateChanged?(false)
-                        self.onSuccess?(quiz)
+                        self.onSuccess?(quiz, record)
                     }
                 } catch {
                     await MainActor.run {

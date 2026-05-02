@@ -81,8 +81,10 @@ private extension PhotoPreviewViewController {
             }
         }
         
-        viewModel.onSuccess = { [weak self] in
-            self?.coordinator?.showQuiz(quiz: $0)
+        viewModel.onSuccess = { [weak self] quiz, record in
+            DispatchQueue.main.async {
+                self?.coordinator?.showQuiz(quiz: quiz, record: record)
+            }
         }
     }
     

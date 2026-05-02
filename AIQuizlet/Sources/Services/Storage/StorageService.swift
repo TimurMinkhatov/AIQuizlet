@@ -29,7 +29,8 @@ final class StorageService {
                 text: $0.text,
                 answers: $0.answers,
                 correctAnswer: $0.correctAnswer,
-                explanation: $0.explanation
+                explanation: $0.explanation,
+                userAnswerIndex: -1
             )
         }
         let quizRecord = QuizRecord(title: quiz.title, questions: questions)

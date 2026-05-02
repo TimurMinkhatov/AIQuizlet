@@ -35,7 +35,22 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        showQuiz(quiz: quiz)
+        
+        let questionRecords = quiz.questions.map {
+            QuestionRecord(
+                text: $0.text,
+                answers: $0.answers,
+                correctAnswer: $0.correctAnswer,
+                explanation: $0.explanation,
+                userAnswerIndex: -1
+            )
+        }
+        
+        let quizRecord = QuizRecord(
+            title: quiz.title,
+            questions: questionRecords
+        )
+        showQuiz(quiz: quiz, record: quizRecord)
     }
 
     func didCapturePhoto(_ image: UIImage) {
@@ -62,9 +77,10 @@ extension QuizCoordinator {
         navigationController.pushViewController(vc, animated: true)
     }
 
-    func showQuiz(quiz: Quiz) {
+    func showQuiz(quiz: Quiz, record: QuizRecord) {
         let vm = QuizViewModel(quizService: quizService)
-        vm.setQuiz(quiz)
+        vm.coordinator = self
+        vm.setQuiz(quiz, record: record)
         let vc = QuizViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
@@ -72,6 +88,17 @@ extension QuizCoordinator {
     
     func didRequestRetake() {
         navigationController.popViewController(animated: true)
+    }
+    
+    func showResult(with result: QuizResult) {
+        let vm = QuizResultViewModel(quizResult: result)
+        let vc = QuizResultViewController(viewModel: vm)
+        vc.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func finishFlow() {
+        navigationController.popToRootViewController(animated: true)
     }
 }
 

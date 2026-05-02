@@ -151,6 +151,7 @@ private extension QuizViewController {
     }
         
     @objc func nextTapped() {
+        print("Кнопка 'Далее' физически нажата в контроллере") // ОТЛАДКА
         viewModel.nextQuestion()
     }
 }
@@ -269,8 +270,8 @@ private extension QuizViewController {
                     self.render(question: question, number: current)
                 case .showingResult(_, let correctIndex, let question):
                     self.showResultUI(correctIndex: correctIndex, question: question)
-                case .finished(_, _):
-                    break
+                case .finished(let score, let total):
+                    print("Тест завершен: \(score) из \(total)")
                 case .idle: break
                 }
             }

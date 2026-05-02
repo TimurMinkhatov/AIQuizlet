@@ -20,6 +20,9 @@ final class QuizViewModel {
     }
 
     // MARK: - Properties
+    
+    weak var coordinator: QuizCoordinator?
+    private var currentQuizRecord: QuizRecord?
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
@@ -48,8 +51,9 @@ final class QuizViewModel {
 
     // MARK: - Public Methods
 
-    func setQuiz(_ quiz: Quiz) {
+    func setQuiz(_ quiz: Quiz, record: QuizRecord? = nil) {
         self.quiz = quiz
+        self.currentQuizRecord = record
         self.currentQuestionIndex = 0
         self.correctAnswersCount = 0
         showCurrentQuestion()
@@ -67,8 +71,18 @@ final class QuizViewModel {
     }
 
     func nextQuestion() {
+        print("Нажата кнопка Далее. Текущий индекс: \(currentQuestionIndex)")
         currentQuestionIndex += 1
-        showCurrentQuestion()
+        guard let total = quiz?.questions.count else {
+            print("Ошибка: quiz == nil!") // ОТЛАДКА
+            return
+        }
+        if currentQuestionIndex < total {
+            showCurrentQuestion()
+        } else {
+            print("Все вопросы пройдены, вызываю finishQuiz()") // ОТЛАДКА
+            finishQuiz()
+        }
     }
 }
 
@@ -87,7 +101,23 @@ private extension QuizViewModel {
                 total: quiz.questions.count
             )
         } else {
-            state = .finished(score: correctAnswersCount, total: quiz.questions.count)
+            finishQuiz()
         }
+    }
+    
+    func finishQuiz() {
+        guard let quiz = quiz else { return }
+        guard let record = currentQuizRecord else {
+            print("Ошибка: currentQuizRecord пустой, переход отменен") // ОТЛАДКА
+            return
+        }
+        
+        let result = QuizResult(
+            score: correctAnswersCount,
+            totalQuestions: quiz.questions.count,
+            quiz: record
+        )
+        print("Координатор, показывай результат!") // ОТЛАДКА
+        coordinator?.showResult(with: result)
     }
 }
