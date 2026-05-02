@@ -115,7 +115,7 @@ private extension FirestoreService {
         
         let userRef = db.collection("users").document(userId)
         let document = try await userRef.getDocument()
-        guard var userData = document.data() else { return }
+        guard let userData = document.data() else { return }
         
         let totalQuizzes = (userData["totalQuizzes"] as? Int ?? 0) + 1
         let totalCompleted = (userData["totalCompleted"] as? Int ?? 0) + result.totalQuestions

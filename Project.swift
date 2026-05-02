@@ -42,13 +42,26 @@ let project = Project(
                     """,
                     name: "SwiftLint",
                     basedOnDependencyAnalysis: false
+                ),
+                .pre(
+                    script: """
+                    SWIFTGEN="${SRCROOT}/Geko/Dependencies/Cocoapods/SwiftGen/bin/swiftgen"
+                    if test -f "$SWIFTGEN"; then
+                        "$SWIFTGEN" config run --config "${SRCROOT}/swiftgen.yml"
+                    elif test -f /opt/homebrew/bin/swiftgen; then
+                        /opt/homebrew/bin/swiftgen config run --config "${SRCROOT}/swiftgen.yml"
+                    else
+                        echo "warning: SwiftGen not installed"
+                    fi
+                    """,
+                    name: "SwiftGen",
+                    basedOnDependencyAnalysis: false
                 )
-            ],
-            dependencies: [
+            ],            dependencies: [
                 .external(name: "Moya"),
                 .external(name: "SnapKit"),
- 		.external(name: "FirebaseAuth"),
-    		.external(name: "FirebaseFirestore"),
+                .external(name: "FirebaseAuth"),
+                .external(name: "FirebaseFirestore"),
             ],
             settings: .settings(
                 base: [

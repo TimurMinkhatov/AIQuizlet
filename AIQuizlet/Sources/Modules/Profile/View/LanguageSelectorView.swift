@@ -20,7 +20,7 @@ final class LanguageSelectorView: UIView {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Язык"
+        label.text = L10n.Profile.Language.title
         label.textColor = .label
         label.font = .systemFont(ofSize: 17, weight: .semibold)
         return label
@@ -34,8 +34,8 @@ final class LanguageSelectorView: UIView {
         return stack
     }()
     
-    private lazy var russianButton = makeLanguageButton(title: "Русский")
-    private lazy var englishButton = makeLanguageButton(title: "English")
+    private lazy var russianButton = makeLanguageButton(title: L10n.Profile.Language.russian)
+    private lazy var englishButton = makeLanguageButton(title: L10n.Profile.Language.english)
 
     // MARK: - Init
 

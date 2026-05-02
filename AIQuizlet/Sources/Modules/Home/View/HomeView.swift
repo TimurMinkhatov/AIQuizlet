@@ -18,14 +18,14 @@ final class HomeView: UIView {
     private lazy var welcomeLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 24, weight: .bold)
-        label.text = "Привет!"
+        label.text = L10n.Home.greeting
         label.textColor = .white
         return label
     }()
     
     private lazy var recentTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Недавние тесты"
+        label.text = L10n.Home.RecentQuizzes.title
         label.font = .systemFont(ofSize: 20, weight: .semibold)
         label.textColor = .white
         return label
@@ -58,8 +58,8 @@ final class HomeView: UIView {
     }()
     
     lazy var photoCard = ActionCardView(
-        title: "Создать тест по конспекту",
-        subtitle: "Сфотографируйте конспект и получите готовый тест",
+        title: L10n.Home.CreateFromPhoto.title,
+        subtitle: L10n.Home.CreateFromPhoto.subtitle,
         iconName: "camera",
         gradientColors: [
             UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
@@ -68,8 +68,8 @@ final class HomeView: UIView {
     )
     
     lazy var textCard = ActionCardView(
-        title: "Создать из текста",
-        subtitle: "Вставьте или введите текст лекции",
+        title: L10n.Home.CreateFromText.title,
+        subtitle: L10n.Home.CreateFromText.subtitle,
         iconName: "text.document",
         gradientColors: [
             UIColor(red: 173/255, green: 70/255, blue: 255/255, alpha: 1),

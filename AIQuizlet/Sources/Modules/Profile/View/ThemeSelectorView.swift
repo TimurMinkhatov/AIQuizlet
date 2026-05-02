@@ -20,15 +20,15 @@ final class ThemeSelectorView: UIView {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Тема оформления"
+        label.text = L10n.Profile.Theme.title
         label.textColor = .label
         label.font = .systemFont(ofSize: 17, weight: .semibold)
         return label
     }()
 
-    private lazy var lightButton = makeThemeButton(title: "Светлая", systemImage: "sun.max")
-    private lazy var darkButton = makeThemeButton(title: "Тёмная", systemImage: "moon")
-    private lazy var systemButton = makeThemeButton(title: "Системная", systemImage: "desktopcomputer")
+    private lazy var lightButton = makeThemeButton(title: L10n.Profile.Theme.light, systemImage: "sun.max")
+    private lazy var darkButton = makeThemeButton(title: L10n.Profile.Theme.dark, systemImage: "moon")
+    private lazy var systemButton = makeThemeButton(title: L10n.Profile.Theme.system, systemImage: "desktopcomputer")
 
     // MARK: - Init
 

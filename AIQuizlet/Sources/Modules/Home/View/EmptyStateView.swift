@@ -36,7 +36,7 @@ final class EmptyStateView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "У вас пока нет тестов"
+        label.text = L10n.Home.Empty.title
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .black
         label.textAlignment = .center
@@ -45,7 +45,7 @@ final class EmptyStateView: UIView {
     
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Создайте первый тест!"
+        label.text = L10n.Home.Empty.subtitle
         label.font = .systemFont(ofSize: 14)
         label.textColor = .systemGray
         label.textAlignment = .center

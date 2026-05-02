@@ -1,0 +1,92 @@
+// MARK: - Auth
+"auth.login.title" = "Welcome Back!";
+"auth.login.subtitle" = "Sign in to your account";
+"auth.register.title" = "Create Account";
+"auth.register.subtitle" = "Register to get started";
+"auth.email.label" = "Email";
+"auth.email.placeholder" = "example@email.com";
+"auth.password.label" = "Password";
+"auth.password.placeholder" = "······";
+"auth.password.registerPlaceholder" = "At least 6 characters";
+"auth.confirmPassword.label" = "Confirm Password";
+"auth.confirmPassword.placeholder" = "Repeat password";
+"auth.login.button" = "Sign In";
+"auth.register.button" = "Register";
+"auth.switchToRegister" = "Don't have an account? Register";
+"auth.switchToLogin" = "Already have an account? Sign In";
+"auth.error.invalidEmail" = "Invalid email format";
+"auth.error.weakPassword" = "Password must be at least 6 characters";
+"auth.error.passwordMismatch" = "Passwords do not match";
+
+// MARK: - Home
+"home.greeting" = "Hello!";
+"home.createFromPhoto.title" = "Create Test from Notes";
+"home.createFromPhoto.subtitle" = "Take a photo of your notes and get a ready test";
+"home.createFromText.title" = "Create from Text";
+"home.createFromText.subtitle" = "Paste or enter your lecture text";
+"home.recentQuizzes.title" = "Recent Tests";
+"home.empty.title" = "No tests yet";
+"home.empty.subtitle" = "Create your first one!";
+
+// MARK: - Quiz
+"quiz.textInput.title" = "Enter text";
+"quiz.textInput.placeholder" = "Paste lecture text, notes or textbook...";
+"quiz.textInput.minLength" = "Minimum recommended length is 50 characters";
+"quiz.textInput.questionCount" = "Number of questions";
+"quiz.textInput.characterCount" = "%d / 5000 characters";
+"quiz.textInput.paste.button" = "Paste";
+"quiz.textInput.generate.button" = "Generate test";
+"quiz.question.counter" = "Question %d of %d";
+"quiz.explanation.title" = "Explanation:";
+"quiz.next.button" = "Next";
+"quiz.finish.button" = "Finish Test";
+"quiz.result.correct" = "Correct!";
+"quiz.result.incorrect" = "Incorrect";
+"quiz.question.title" = "Question %d: %@";
+"quiz.answer.option" = "Option %@ — %@";
+"quiz.explanation.default" = "Correct answer based on the provided text.";
+
+// MARK: - Result
+"result.tryAgain.button" = "Try Again";
+"result.home.button" = "Home";
+"result.breakdown.title" = "Question Breakdown";
+"result.correctCount" = "%d of %d correct answers";
+
+// MARK: - History
+"history.title" = "Test History";
+"history.search.placeholder" = "Search by title...";
+"history.questions.count" = "%d questions";
+
+// MARK: - Profile
+"profile.title" = "Profile";
+"profile.stats.totalQuizzes" = "Total Tests";
+"profile.stats.averageScore" = "Average Score";
+"profile.stats.bestScore" = "Best Score";
+"profile.stats.totalCompleted" = "Questions Solved";
+"profile.settings.title" = "Settings";
+"profile.theme.title" = "Appearance";
+"profile.theme.light" = "Light";
+"profile.theme.dark" = "Dark";
+"profile.theme.system" = "System";
+"profile.language.title" = "Language";
+"profile.language.russian" = "Русский";
+"profile.language.english" = "English";
+"profile.deleteData.button" = "Clear All Data";
+"profile.logout.button" = "Sign Out";
+"profile.version" = "Version %@";
+"profile.deleteData.title" = "Delete All Data?";
+"profile.deleteData.message" = "This will delete all created tests and results. This action cannot be undone.";
+"profile.deleteData.confirmButton" = "Delete";
+"profile.deleteData.cancel" = "Cancel";
+"profile.logout.title" = "Are you sure you want to sign out?";
+"profile.logout.message" = "You can sign in again at any time.";
+"profile.logout.confirmButton" = "Sign Out";
+"profile.logout.cancel" = "Cancel";
+
+// MARK: - Common
+"common.error.title" = "Error";
+"common.error.noInternet" = "No internet connection";
+"common.error.serverError" = "Server error. Please try again";
+"common.loading" = "Loading...";
+"common.ok" = "OK";
+"common.cancel" = "Cancel";

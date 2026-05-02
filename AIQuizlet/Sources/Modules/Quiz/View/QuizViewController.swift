@@ -78,7 +78,7 @@ final class QuizViewController: UIViewController {
     
     private lazy var explanationTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Объяснение:"
+        label.text = L10n.Quiz.Explanation.title
         label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .black
         return label
@@ -102,7 +102,7 @@ final class QuizViewController: UIViewController {
     
     private lazy var nextButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Далее", for: .normal)
+        button.setTitle(L10n.Quiz.Next.button, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
@@ -296,19 +296,19 @@ private extension QuizViewController {
     }
     
     func updateProgress(current: Int, total: Int) {
-        progressLabel.text = "Вопрос \(current) из \(total)"
+        progressLabel.text = L10n.Quiz.Question.counter(current, total)
         let progress = Float(current) / Float(total)
         progressView.setProgress(progress, animated: true)
     }
     
     func render(question: Question, number: Int) {
-        questionLabel.text = "Вопрос \(number): \(question.text)"
+        questionLabel.text = L10n.Quiz.Question.title(number, question.text)
         optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let prefixes = ["A", "B", "C", "D"]
         
         question.answers.enumerated().forEach { index, answerText in
             let button = QuizOptionButton()
-            button.title = "Вариант \(prefixes[index % 4]) — \(answerText)"
+            button.title = L10n.Quiz.Answer.option(prefixes[index % 4], answerText)
             button.tag = index
             button.addTarget(self, action: #selector(optionTapped(_:)), for: .touchUpInside)
             optionsStack.addArrangedSubview(button)
@@ -324,7 +324,7 @@ private extension QuizViewController {
             button.updateState(index == correctIndex ? .correct : .wrong)
     }
         
-        explanationLabel.text = question.explanation ?? "Правильный ответ на основе предоставленного текста."
+        explanationLabel.text = question.explanation ?? L10n.Quiz.Explanation.default
         explanationView.isHidden = false
         nextButton.isHidden = false
         

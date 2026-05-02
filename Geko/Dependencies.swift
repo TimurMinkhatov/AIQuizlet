@@ -6,7 +6,8 @@ let cocoapodsDependencies = CocoapodsDependencies(
     ],
     dependencies: [
         .cdn(name: "RecaptchaInterop", requirement: .upToNextMajor("100.0.0")),
-        .cdn(name: "SnapKit", requirement: .exact("5.7.1"))
+        .cdn(name: "SnapKit", requirement: .exact("5.7.1")),
+        .cdn(name: "SwiftGen", requirement: .upToNextMajor("6.6.0")) 
     ]
 )
 
