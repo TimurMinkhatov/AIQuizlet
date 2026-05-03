@@ -15,13 +15,13 @@ final class QuizCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    let assembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
 
     // MARK: - Init
 
-    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
+    init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
-        self.assembly = assembly
+        self.servicesAssembly = servicesAssembly
     }
 
     // MARK: - Coordinator
@@ -46,14 +46,14 @@ final class QuizCoordinator: Coordinator {
 extension QuizCoordinator {
 
     func showTextInput() {
-        let vm = TextInputViewModel(quizService: quizService)
+        let vm = TextInputViewModel(quizService: servicesAssembly.quizService)
         vm.coordinator = self
         let vc = TextInputViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
     }
 
     func showPhotoFlow() {
-        let vm = CameraViewModel(cameraService: cameraService)
+        let vm = CameraViewModel(cameraService: servicesAssembly.cameraService)
         vm.coordinator = self
         let vc = CameraViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true
@@ -61,8 +61,7 @@ extension QuizCoordinator {
     }
 
     func showQuiz(quiz: Quiz) {
-        let quizService = QuizService(networkManager: NetworkManager())
-        let vm = QuizViewModel(assembly: assembly)
+        let vm = QuizViewModel(quizService: servicesAssembly.quizService)
         vm.setQuiz(quiz)
         let vc = QuizViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true
