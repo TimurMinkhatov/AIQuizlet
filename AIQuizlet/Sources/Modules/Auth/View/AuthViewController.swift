@@ -9,43 +9,6 @@
 import UIKit
 import SnapKit
 
-// MARK: - Constants
-
-private extension AuthViewController {
-    enum Constants {
-        static let cardCornerRadius: CGFloat = 20
-        static let iconCornerRadius: CGFloat = 40
-        static let buttonCornerRadius: CGFloat = 12
-        static let cardHorizontalInset: CGFloat = 20
-        static let cardVerticalInset: CGFloat = 60
-        static let iconSize: CGFloat = 80
-        static let iconImageSize: CGFloat = 40
-        static let buttonHeight: CGFloat = 50
-
-        enum Strings {
-            static let loginTitle = "Добро пожаловать!"
-            static let loginSubtitle = "Войдите в свой аккаунт"
-            static let loginPasswordPlaceholder = "······"
-            static let loginAction = "Войти"
-            static let loginSwitch = "Нет аккаунта? Зарегистрироваться"
-
-            static let registerTitle = "Создать аккаунт"
-            static let registerSubtitle = "Зарегистрируйтесь для начала работы"
-            static let registerPasswordPlaceholder = "Минимум 6 символов"
-            static let registerAction = "Зарегистрироваться"
-            static let registerSwitch = "Уже есть аккаунт? Войти"
-
-            static let emailLabel = "Email"
-            static let emailPlaceholder = "example@email.com"
-            static let passwordLabel = "Пароль"
-            static let confirmPasswordLabel = "Подтвердите пароль"
-            static let confirmPasswordPlaceholder = "Повторите пароль"
-            static let errorTitle = "Ошибка"
-            static let errorAction = "OK"
-        }
-    }
-}
-
 // MARK: - AuthViewController
 
 final class AuthViewController: UIViewController {
@@ -162,7 +125,7 @@ final class AuthViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("Инициализатор не реализован")
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -322,5 +285,42 @@ private extension AuthViewController {
 
     @objc func switchTapped() {
         state = (state == .login) ? .register : .login
+    }
+}
+
+// MARK: - Constants
+
+private extension AuthViewController {
+    enum Constants {
+        static let cardCornerRadius: CGFloat = 20
+        static let iconCornerRadius: CGFloat = 40
+        static let buttonCornerRadius: CGFloat = 12
+        static let cardHorizontalInset: CGFloat = 20
+        static let cardVerticalInset: CGFloat = 60
+        static let iconSize: CGFloat = 80
+        static let iconImageSize: CGFloat = 40
+        static let buttonHeight: CGFloat = 50
+
+        enum Strings {
+            static let loginTitle = "Добро пожаловать!"
+            static let loginSubtitle = "Войдите в свой аккаунт"
+            static let loginPasswordPlaceholder = "······"
+            static let loginAction = "Войти"
+            static let loginSwitch = "Нет аккаунта? Зарегистрироваться"
+
+            static let registerTitle = "Создать аккаунт"
+            static let registerSubtitle = "Зарегистрируйтесь для начала работы"
+            static let registerPasswordPlaceholder = "Минимум 6 символов"
+            static let registerAction = "Зарегистрироваться"
+            static let registerSwitch = "Уже есть аккаунт? Войти"
+
+            static let emailLabel = "Email"
+            static let emailPlaceholder = "example@email.com"
+            static let passwordLabel = "Пароль"
+            static let confirmPasswordLabel = "Подтвердите пароль"
+            static let confirmPasswordPlaceholder = "Повторите пароль"
+            static let errorTitle = "Ошибка"
+            static let errorAction = "OK"
+        }
     }
 }
