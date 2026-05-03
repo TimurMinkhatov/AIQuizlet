@@ -15,7 +15,7 @@ final class QuizCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    let servicesAssembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     private weak var currentQuizViewModel: QuizViewModel?
 
     // MARK: - Init
@@ -75,7 +75,6 @@ extension QuizCoordinator {
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
     }
-
 
     func showQuiz(quiz: Quiz, record: QuizRecord) {
         let vm = QuizViewModel(quizService: servicesAssembly.quizService)

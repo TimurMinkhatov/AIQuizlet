@@ -23,16 +23,21 @@ final class AuthViewModel {
     private var email: String = ""
     private var password: String = ""
     private var confirmPassword: String = ""
-
-    private let authService = AuthService.shared
-
+    private let serviceAssembly: ServicesAssembly
+    
+    // MARK: - Init
+    
+    init(serviceAssembly: ServicesAssembly) {
+        self.assembly = assembly
+    }
+    
     // MARK: - Public Methods
 
     func signIn(email: String, password: String) {
         self.email = email
         self.password = password
         guard validateLoginForm() else { return }
-        authService.signIn(email: email, password: password) { [weak self] result in
+        assembly.authService.signIn(email: email, password: password) { [weak self] result in
             switch result {
             case .success:
                 self?.coordinator?.didFinishAuth()
@@ -47,9 +52,12 @@ final class AuthViewModel {
         self.password = password
         self.confirmPassword = confirmPassword
         guard validateRegisterForm() else { return }
-        authService.register(email: email, password: password) { [weak self] result in
+        assembly.authService.register(email: email, password: password) { [weak self] result in
             switch result {
             case .success:
+                Task {
+                    try? await self?.assembly.firestoreService.createUser(email: email)
+                }
                 self?.coordinator?.didFinishAuth()
             case .failure(let error):
                 self?.onError?(error.localizedDescription)

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 final class QuizViewModel {
 
@@ -26,7 +27,7 @@ final class QuizViewModel {
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
-    private let quizService: QuizService
+    private let assembly: ServicesAssembly
     
     private(set) var state: State = .idle {
         didSet {
@@ -44,8 +45,8 @@ final class QuizViewModel {
 
     // MARK: - Init
 
-    init(quizService: QuizService) {
-        self.quizService = quizService
+    init(assembly: ServicesAssembly) {
+        self.assembly = assembly
     }
 
     // MARK: - Public Methods
@@ -55,6 +56,10 @@ final class QuizViewModel {
         self.currentQuizRecord = record
         self.currentQuestionIndex = 0
         restoreCurrentQuestionState()
+        
+        Task {
+            try? await saveQuiz(quiz)
+        }
     }
 
     func selectAnswer(index: Int) {
@@ -99,28 +104,28 @@ final class QuizViewModel {
     }
     
     func restart() {
-            guard let quiz = quiz else { return }
+        guard let quiz = quiz else { return }
             
-            let questionRecords = quiz.questions.map {
-                QuestionRecord(
-                    text: $0.text,
-                    answers: $0.answers,
-                    correctAnswer: $0.correctAnswer,
-                    explanation: $0.explanation,
-                    userAnswerIndex: -1
-                )
-            }
-            
-            let newRecord = QuizRecord(
-                title: quiz.title,
-                questions: questionRecords
+        let questionRecords = quiz.questions.map {
+            QuestionRecord(
+                text: $0.text,
+                answers: $0.answers,
+                correctAnswer: $0.correctAnswer,
+                explanation: $0.explanation,
+                userAnswerIndex: -1
             )
-            
-            self.currentQuizRecord = newRecord
-            self.currentQuestionIndex = 0
-            
-            showCurrentQuestion()
         }
+            
+        let newRecord = QuizRecord(
+            title: quiz.title,
+            questions: questionRecords
+        )
+            
+        self.currentQuizRecord = newRecord
+        self.currentQuestionIndex = 0
+            
+        showCurrentQuestion()
+    }
 }
 
 // MARK: - Private Methods
@@ -144,9 +149,7 @@ private extension QuizViewModel {
     
     func finishQuiz() {
         guard let quiz = quiz else { return }
-        guard let record = currentQuizRecord else {
-            return
-        }
+        guard let record = currentQuizRecord else { return }
         
         let finalScore = record.questions.filter { $0.userAnswerIndex == $0.correctAnswer }.count
         
@@ -156,6 +159,11 @@ private extension QuizViewModel {
             quiz: record
         )
         coordinator?.showResult(with: result)
+        
+        let scorePercentage = Double(finalScore) / Double(quiz.questions.count) * 100
+        Task {
+            try? await saveQuizResult(score: scorePercentage, total: quiz.questions.count, correctCount: finalScore)
+        }
     }
     
     func restoreCurrentQuestionState() {
@@ -182,5 +190,35 @@ private extension QuizViewModel {
                 total: quiz.questions.count
             )
         }
+    }
+    
+    private func saveQuizResult(score: Double, total: Int, correctCount: Int) async throws {
+        let result = FSQuizResult(
+            id: UUID().uuidString,
+            userId: Auth.auth().currentUser?.uid ?? "",
+            score: score,
+            correctCount: correctCount,
+            totalQuestions: total,
+            completedAt: Date()
+        )
+        try await assembly.firestoreService.saveQuizResult(quizResult: result)
+    }
+    
+    private func saveQuiz(_ quiz: Quiz) async throws {
+        let fsQuiz = FSQuiz(
+            id: UUID().uuidString,
+            userId: Auth.auth().currentUser?.uid ?? "",
+            title: quiz.title,
+            createdAt: Date(),
+            questions: quiz.questions.map {
+                FSQuestion(
+                    text: $0.text,
+                    answers: $0.answers,
+                    correctAnswer: $0.correctAnswer,
+                    explanation: $0.explanation
+                )
+            }
+        )
+        try await assembly.firestoreService.saveQuiz(quiz: fsQuiz)
     }
 }
