@@ -13,9 +13,8 @@ final class HomeViewController: UIViewController {
     
     // MARK: - Properties
     
-    var viewModel: HomeViewModel!
+    private let viewModel: HomeViewModel
     private var homeView: HomeView { return view as! HomeView }
-    private lazy var gradient = CAGradientLayer()
     
     // MARK: - Init
     
@@ -44,9 +43,11 @@ final class HomeViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if view.layer.sublayers?.first(where: { $0 is CAGradientLayer }) == nil {
-            setupGradient()
-        }
+        view.applyGradient(colors: [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
+            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
+        ])
     }
 }
 
@@ -71,16 +72,6 @@ private extension HomeViewController {
             self?.viewModel.textInputSelected()
         }
         homeView.onProfileTap(target: self, action: #selector(profileTapped))
-    }
-    
-    func setupGradient() {
-        gradient.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
-        gradient.frame = view.bounds
-        view.layer.insertSublayer(gradient, at: 0)
     }
     
     func renderRecentTests() {

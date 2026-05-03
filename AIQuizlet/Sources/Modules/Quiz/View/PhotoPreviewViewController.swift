@@ -12,7 +12,6 @@ import SnapKit
 final class PhotoPreviewViewController: UIViewController {
 
     // MARK: - Properties
-    weak var coordinator: QuizCoordinator?
     private let viewModel: PhotoPreviewViewModel
     private let previewView: PhotoPreviewView
 
@@ -32,7 +31,7 @@ final class PhotoPreviewViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupMainUI()
+        setupUI()
         setupActions()
         bindViewModel()
     }
@@ -59,7 +58,7 @@ private extension PhotoPreviewViewController {
     }
 
     @objc func didTapRetake() {
-        coordinator?.didRequestRetake()
+        viewModel.didRequestRetake()
     }
 }
 
@@ -80,21 +79,17 @@ private extension PhotoPreviewViewController {
                 self?.showError(error)
             }
         }
-        
-        viewModel.onSuccess = { [weak self] in
-            self?.coordinator?.showQuiz(quiz: $0)
-        }
     }
     
-    func setupMainUI() {
+    func setupUI() {
         navigationController?.setNavigationBarHidden(true, animated: false)
 
         view.addSubview(previewView)
-        previewView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        previewView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
 
-        view.layoutIfNeeded()
+        view.layoutIfNeeded() 
     }
 
     func setupActions() {

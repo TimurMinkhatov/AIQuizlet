@@ -82,7 +82,7 @@ private extension QuizCoordinator {
     func showPhotoPreview(with image: UIImage) {
         let vm = PhotoPreviewViewModel(image: image)
         let vc = PhotoPreviewViewController(viewModel: vm)
-        vc.coordinator = self
+        vm.coordinator = self
         
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)

@@ -9,19 +9,66 @@
 import UIKit
 import SnapKit
 
+
+// MARK: - Constants
+
+private extension QuizViewController {
+    enum Constants {
+        
+        enum Layout {
+            static let cardCornerRadius: CGFloat = 24
+            static let buttonCornerRadius: CGFloat = 16
+            static let explanationCornerRadius: CGFloat = 12
+            static let progressHeight: CGFloat = 4
+            static let nextButtonHeight: CGFloat = 56
+            static let optionButtonHeight: CGFloat = 60
+            static let shadowRadius: CGFloat = 20
+            static let shadowOpacity: Float = 0.05
+            
+            static let standardInset: CGFloat = 24
+            static let sidePadding: CGFloat = 20
+            static let verticalSpacing: CGFloat = 24
+            static let smallSpacing: CGFloat = 10
+            static let innerPadding: CGFloat = 16
+            static let selectedBorderWidth: CGFloat = 2.5
+        }
+        
+        enum Colors {
+            static let gradient = [
+                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
+                UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
+            ]
+            static let shadow = UIColor.black
+            static let trackTint = UIColor.systemGray6
+            static let infoIcon = UIColor.blue
+        }
+        
+        enum Strings {
+            static let explanationTitle = "Объяснение:"
+            static let nextButtonTitle = "Далее"
+            static let progressFormat = "Вопрос %d из %d"
+            static let defaultExplanation = "Правильный ответ на основе предоставленного текста."
+            static let optionPrefixes = ["A", "B", "C", "D"]
+            static let optionTitleFormat = "Вариант %@ — %@"
+        }
+    }
+}
+
+// MARK: - QuizViewController
+
 final class QuizViewController: UIViewController {
     
     // MARK: - Properties
-    
     private let viewModel: QuizViewModel
     private let cardContentView = UIView()
     private let nextButtonGradient = CAGradientLayer()
+    private var selectedOptionIndex: Int?
     
     // MARK: - UI Elements
-    
     private lazy var progressView: UIProgressView = {
         let progress = UIProgressView(progressViewStyle: .default)
-        progress.trackTintColor = .systemGray6
+        progress.trackTintColor = Constants.Colors.trackTint
         return progress
     }()
     
@@ -36,10 +83,10 @@ final class QuizViewController: UIViewController {
     private lazy var cardView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 24
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.05
-        view.layer.shadowRadius = 20
+        view.layer.cornerRadius = Constants.Layout.cardCornerRadius
+        view.layer.shadowColor = Constants.Colors.shadow.cgColor
+        view.layer.shadowOpacity = Constants.Layout.shadowOpacity
+        view.layer.shadowRadius = Constants.Layout.shadowRadius
         view.layer.shadowOffset = CGSize(width: 0, height: 10)
         return view
     }()
@@ -69,7 +116,7 @@ final class QuizViewController: UIViewController {
     private lazy var explanationView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = Constants.Layout.explanationCornerRadius
         view.layer.borderWidth = 1
         view.layer.borderColor = UIColor.systemGray5.cgColor
         view.isHidden = true
@@ -78,7 +125,7 @@ final class QuizViewController: UIViewController {
     
     private lazy var explanationTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Объяснение:"
+        label.text = Constants.Strings.explanationTitle
         label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .black
         return label
@@ -95,23 +142,22 @@ final class QuizViewController: UIViewController {
     private lazy var bulbIconImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(systemName: "info.circle")
-        iv.tintColor = .blue
+        iv.tintColor = Constants.Colors.infoIcon
         iv.contentMode = .scaleAspectFit
         return iv
     }()
     
     private lazy var nextButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Далее", for: .normal)
+        button.setTitle(Constants.Strings.nextButtonTitle, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 16
+        button.layer.cornerRadius = Constants.Layout.buttonCornerRadius
         button.isHidden = true
         return button
     }()
     
     // MARK: - Init
-    
     init(viewModel: QuizViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -120,7 +166,6 @@ final class QuizViewController: UIViewController {
     required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -139,46 +184,33 @@ final class QuizViewController: UIViewController {
 }
 
 // MARK: - Actions
-
 private extension QuizViewController {
-    
     @objc func optionTapped(_ sender: QuizOptionButton) {
+        selectedOptionIndex = sender.tag
         optionsStack.arrangedSubviews.forEach {
             ($0 as? QuizOptionButton)?.updateState(.normal)
         }
         sender.updateState(.selected)
         viewModel.selectAnswer(index: sender.tag)
     }
-        
+    
     @objc func nextTapped() {
         viewModel.nextQuestion()
     }
 }
 
 // MARK: - Setup Logic
-
 private extension QuizViewController {
-    
     func setupUI() {
         view.backgroundColor = .white
         navigationItem.backButtonDisplayMode = .minimal
         navigationController?.navigationBar.tintColor = .black
         
-        view.addSubview(progressView)
-        view.addSubview(progressLabel)
-        view.addSubview(cardView)
-        view.addSubview(nextButton)
-        
+        view.addSubviews(progressView, progressLabel, cardView, nextButton)
         cardView.addSubview(cardScrollView)
         cardScrollView.addSubview(cardContentView)
-        
-        cardContentView.addSubview(questionLabel)
-        cardContentView.addSubview(optionsStack)
-        cardContentView.addSubview(explanationView)
-        
-        explanationView.addSubview(bulbIconImageView)
-        explanationView.addSubview(explanationTitleLabel)
-        explanationView.addSubview(explanationLabel)
+        cardContentView.addSubviews(questionLabel, optionsStack, explanationView)
+        explanationView.addSubviews(bulbIconImageView, explanationTitleLabel, explanationLabel)
         
         setupConstraints()
         nextButton.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
@@ -188,29 +220,27 @@ private extension QuizViewController {
         progressView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(4)
+            $0.height.equalTo(Constants.Layout.progressHeight)
         }
         
         progressLabel.snp.makeConstraints {
-            $0.top.equalTo(progressView.snp.bottom).offset(10)
+            $0.top.equalTo(progressView.snp.bottom).offset(Constants.Layout.smallSpacing)
             $0.centerX.equalToSuperview()
         }
         
         nextButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(56)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
+            $0.height.equalTo(Constants.Layout.nextButtonHeight)
         }
         
         cardView.snp.makeConstraints {
             $0.top.equalTo(progressLabel.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(24)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
             $0.bottom.equalTo(nextButton.snp.top).offset(-20)
         }
         
-        cardScrollView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        cardScrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
         cardContentView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -218,46 +248,44 @@ private extension QuizViewController {
         }
         
         questionLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().offset(Constants.Layout.standardInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.sidePadding)
         }
         
         optionsStack.snp.makeConstraints {
-            $0.top.equalTo(questionLabel.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(questionLabel.snp.bottom).offset(Constants.Layout.verticalSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.sidePadding)
         }
         
         explanationView.snp.makeConstraints {
             $0.top.equalTo(optionsStack.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalToSuperview().inset(24)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.sidePadding)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.standardInset)
         }
         
         bulbIconImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.leading.equalToSuperview().offset(16)
+            $0.top.equalToSuperview().offset(Constants.Layout.innerPadding)
+            $0.leading.equalToSuperview().offset(Constants.Layout.innerPadding)
             $0.size.equalTo(20)
         }
         
         explanationTitleLabel.snp.makeConstraints {
             $0.centerY.equalTo(bulbIconImageView)
             $0.leading.equalTo(bulbIconImageView.snp.trailing).offset(10)
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(Constants.Layout.innerPadding)
         }
         
         explanationLabel.snp.makeConstraints {
             $0.top.equalTo(explanationTitleLabel.snp.bottom).offset(8)
             $0.leading.equalTo(explanationTitleLabel.snp.leading)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview().inset(Constants.Layout.innerPadding)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.innerPadding)
         }
     }
 }
 
 // MARK: - Private Methods
-
 private extension QuizViewController {
-
     func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self = self else { return }
@@ -281,11 +309,7 @@ private extension QuizViewController {
         guard bounds.width > 0 else { return nil }
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = bounds
-        gradientLayer.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
+        gradientLayer.colors = Constants.Colors.gradient.map { $0.cgColor }
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         
@@ -300,7 +324,7 @@ private extension QuizViewController {
     }
     
     func updateProgress(current: Int, total: Int) {
-        progressLabel.text = "Вопрос \(current) из \(total)"
+        progressLabel.text = String(format: Constants.Strings.progressFormat, current, total)
         let progress = Float(current) / Float(total)
         progressView.setProgress(progress, animated: true)
     }
@@ -308,15 +332,15 @@ private extension QuizViewController {
     func render(question: Question, number: Int) {
         questionLabel.text = "Вопрос \(number): \(question.text)"
         optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let prefixes = ["A", "B", "C", "D"]
         
         question.answers.enumerated().forEach { index, answerText in
             let button = QuizOptionButton()
-            button.title = "Вариант \(prefixes[index % 4]) — \(answerText)"
+            let prefix = Constants.Strings.optionPrefixes[index % 4]
+            button.title = String(format: Constants.Strings.optionTitleFormat, prefix, answerText)
             button.tag = index
             button.addTarget(self, action: #selector(optionTapped(_:)), for: .touchUpInside)
             optionsStack.addArrangedSubview(button)
-            button.snp.makeConstraints { make in make.height.equalTo(60) }
+            button.snp.makeConstraints { make in make.height.equalTo(Constants.Layout.optionButtonHeight) }
         }
         cardScrollView.setContentOffset(.zero, animated: false)
     }
@@ -325,10 +349,15 @@ private extension QuizViewController {
         optionsStack.arrangedSubviews.enumerated().forEach { index, view in
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
-            button.updateState(index == correctIndex ? .correct : .wrong)
+            let resultState: QuizOptionButton.State = (index == correctIndex) ? .correct : .wrong
+            button.updateState(resultState)
+            
+            if index == selectedOptionIndex {
+                button.layer.borderWidth = Constants.Layout.selectedBorderWidth
+            }
         }
         
-        explanationLabel.text = question.explanation ?? "Правильный ответ на основе предоставленного текста."
+        explanationLabel.text = question.explanation ?? Constants.Strings.defaultExplanation
         explanationView.isHidden = false
         nextButton.isHidden = false
         
@@ -339,23 +368,13 @@ private extension QuizViewController {
     }
     
     func resetUI() {
+        selectedOptionIndex = nil
         explanationView.isHidden = true
         nextButton.isHidden = true
         optionsStack.arrangedSubviews.forEach { $0.isUserInteractionEnabled = true }
     }
     
     func updateNextButtonGradient() {
-        nextButtonGradient.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-        ]
-        nextButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
-        nextButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
-        nextButtonGradient.frame = nextButton.bounds
-        nextButtonGradient.cornerRadius = 16
-        
-        if nextButtonGradient.superlayer == nil {
-            nextButton.layer.insertSublayer(nextButtonGradient, at: 0)
-        }
+        nextButton.applyGradient(colors: Array(Constants.Colors.gradient.prefix(2)), cornerRadius: Constants.Layout.buttonCornerRadius)
     }
 }
