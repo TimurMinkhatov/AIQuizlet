@@ -15,17 +15,43 @@ final class PhotoPreviewView: UIView {
     
     private enum Constants {
         static let questionCounts: [Int] = [5, 10, 15, 20]
-        static let buttonCornerRadius: CGFloat = 16
-        static let questionButtonCornerRadius: CGFloat = 10
-        static let questionCountTitle = "Количество вопросов"
+        static let defaultQuestionCount: Int = 5
+        static let gradient: [UIColor] = [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+        ]
+        
+        enum Strings {
+            static let questionCountTitle = "Количество вопросов"
+            static let retakeButtonTitle = "Переснять"
+            static let continueButtonTitle = "Продолжить"
+            static let retakeIcon = "arrow.counterclockwise"
+            static let continueIcon = "checkmark"
+        }
+        
+        enum Layout {
+            static let glassPanelBottom: CGFloat = 16
+            static let glassPanelHeight: CGFloat = 230
+            static let horizontalInset: CGFloat = 16
+            static let innerPadding: CGFloat = 20
+            static let stackSpacing: CGFloat = 10
+            static let buttonSpacing: CGFloat = 8
+            static let topOffset: CGFloat = 24
+            static let titleBottomOffset: CGFloat = 12
+            static let buttonBottomInset: CGFloat = 30
+            static let buttonHeight: CGFloat = 54
+            static let questionStackHeight: CGFloat = 44
+            static let cornerRadius: CGFloat = 32
+            static let buttonCornerRadius: CGFloat = 16
+            static let questionButtonCornerRadius: CGFloat = 10
+            static let iconSize: CGFloat = 20
+        }
     }
     
     // MARK: - Properties
-    
-    private let activeQuestionGradient = CAGradientLayer()
-    private let continueButtonGradient = CAGradientLayer()
+
     private var questionButtons: [UIButton] = []
-    private(set) var selectedQuestionCount: Int = 5
+    private(set) var selectedQuestionCount: Int = Constants.defaultQuestionCount
     
     // MARK: - UI Elements
     
@@ -39,14 +65,14 @@ final class PhotoPreviewView: UIView {
     private lazy var glassPanel: UIVisualEffectView = {
         let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialDark)
         let view = UIVisualEffectView(effect: blurEffect)
-        view.layer.cornerRadius = 32
+        view.layer.cornerRadius = Constants.Layout.cornerRadius
         view.clipsToBounds = true
         return view
     }()
 
     private lazy var questionCountTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.questionCountTitle
+        label.text = Constants.Strings.questionCountTitle
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .white
         return label
@@ -55,37 +81,23 @@ final class PhotoPreviewView: UIView {
     private lazy var questionCountStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 10
+        stack.spacing = Constants.Layout.stackSpacing
         stack.distribution = .fillEqually
         return stack
     }()
     
-    lazy var retakeButton: UIButton = {
-        var config = UIButton.Configuration.filled()
-        config.title = "Переснять"
-        config.image = UIImage(systemName: "arrow.counterclockwise")
-        config.imagePadding = 8
-        config.baseForegroundColor = .white
-        config.background.cornerRadius = Constants.buttonCornerRadius
-        config.background.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-        
-        let button = UIButton(configuration: config)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
-        button.layer.cornerRadius = Constants.buttonCornerRadius
-        return button
-    }()
+    lazy var retakeButton = makeButton(
+        title: Constants.Strings.retakeButtonTitle,
+        systemImage: Constants.Strings.retakeIcon,
+        backgroundColor: .white.withAlphaComponent(0.1),
+        hasBorder: true
+    )
     
-    lazy var continueButton: UIButton = {
-        var config = UIButton.Configuration.filled()
-        config.title = "Продолжить"
-        config.image = UIImage(systemName: "checkmark")
-        config.imagePadding = 8
-        config.baseForegroundColor = .white
-        config.background.cornerRadius = Constants.buttonCornerRadius
-        config.background.backgroundColor = .clear
-        return UIButton(configuration: config)
-    }()
+    lazy var continueButton = makeButton(
+        title: Constants.Strings.continueButtonTitle,
+        systemImage: Constants.Strings.continueIcon,
+        backgroundColor: .clear
+    )
     
     lazy var activityIndicator: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .medium)
@@ -116,19 +128,23 @@ final class PhotoPreviewView: UIView {
     // MARK: - Public Methods
     
     func showLoading(_ isLoading: Bool) {
+        
+        activityIndicator.isHidden = !isLoading
         if isLoading {
             activityIndicator.startAnimating()
-            continueButton.configuration?.showsActivityIndicator = true
-            continueButton.configuration?.title = ""
-            continueButtonGradient.isHidden = true
-            continueButton.isEnabled = false
         } else {
             activityIndicator.stopAnimating()
-            continueButton.configuration?.showsActivityIndicator = false
-            continueButton.configuration?.title = "Продолжить"
-            continueButtonGradient.isHidden = false
-            continueButton.isEnabled = true
         }
+        
+        continueButton.isEnabled = !isLoading
+        
+        continueButton.layer.sublayers?
+            .filter { $0 is CAGradientLayer }
+            .forEach { $0.opacity = isLoading ? 0 : 1 }
+        continueButton.backgroundColor = isLoading ? .white.withAlphaComponent(0.1) : .clear
+        
+        continueButton.configuration?.title = isLoading ? "" : "Продолжить"
+            continueButton.configuration?.image = isLoading ? nil : UIImage(systemName: "checkmark")
     }
 }
 
@@ -138,31 +154,64 @@ private extension PhotoPreviewView {
     
     func setupUI() {
         backgroundColor = .black
-        addSubview(imageView)
-        addSubview(glassPanel)
+        addSubviews(imageView, glassPanel)
         
-        glassPanel.contentView.addSubview(questionCountTitleLabel)
-        glassPanel.contentView.addSubview(questionCountStackView)
-        glassPanel.contentView.addSubview(retakeButton)
-        glassPanel.contentView.addSubview(continueButton)
+        glassPanel.contentView.addSubviews(
+            questionCountTitleLabel,
+            questionCountStackView,
+            retakeButton,
+            continueButton
+        )
         continueButton.addSubview(activityIndicator)
+    }
+    
+    func makeButton(
+        title: String,
+        systemImage: String,
+        backgroundColor: UIColor,
+        hasBorder: Bool = false
+    ) -> UIButton {
+        var config = UIButton.Configuration.filled()
+        config.title = title
+        config.image = UIImage(systemName: systemImage)
+        config.imagePadding = 8
+        config.baseForegroundColor = .white
+        config.background.cornerRadius = Constants.Layout.buttonCornerRadius
+        config.background.backgroundColor = backgroundColor
+        
+        let button = UIButton(configuration: config)
+        
+        if hasBorder {
+            button.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+            button.layer.borderWidth = 1
+            button.layer.cornerRadius = Constants.Layout.buttonCornerRadius
+        }
+        
+        return button
+        
+    }
+    
+    
+    func createQuestionButton(with count: Int) -> UIButton {
+        let button = UIButton(type: .system)
+        button.setTitle("\(count)", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.layer.cornerRadius = Constants.Layout.questionButtonCornerRadius
+        button.tag = count
+        button.backgroundColor = .white.withAlphaComponent(0.1)
+        button.setTitleColor(.white.withAlphaComponent(0.7), for: .normal)
+        button.addTarget(self, action: #selector(questionCountTapped(_:)), for: .touchUpInside)
+        return button
     }
     
     func setupQuestionButtons() {
         Constants.questionCounts.forEach { count in
-            let button = UIButton(type: .system)
-            button.setTitle("\(count)", for: .normal)
-            button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-            button.layer.cornerRadius = Constants.questionButtonCornerRadius
-            button.tag = count
-            button.backgroundColor = .white.withAlphaComponent(0.1)
-            button.setTitleColor(.white.withAlphaComponent(0.7), for: .normal)
-            button.addTarget(self, action: #selector(questionCountTapped(_:)), for: .touchUpInside)
-            
+            let button = createQuestionButton(with: count)
             questionButtons.append(button)
             questionCountStackView.addArrangedSubview(button)
         }
-        selectedQuestionCount = 5
+        selectedQuestionCount = Constants.defaultQuestionCount
+        updateGradients()
     }
     
     @objc func questionCountTapped(_ sender: UIButton) {
@@ -179,35 +228,23 @@ private extension PhotoPreviewView {
     }
     
     func updateGradients() {
-        let colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-        ]
+        guard continueButton.bounds.width > 0 else { return }
+        continueButton.applyGradient(colors: Constants.gradient, cornerRadius: Constants.Layout.buttonCornerRadius)
         
-        continueButtonGradient.colors = colors
-        continueButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
-        continueButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
-        continueButtonGradient.frame = continueButton.bounds
-        continueButtonGradient.cornerRadius = Constants.buttonCornerRadius
-        
-        if continueButtonGradient.superlayer == nil {
-            continueButton.layer.insertSublayer(continueButtonGradient, at: 0)
-        }
-        
-        if let activeButton = questionButtons.first(where: { $0.tag == selectedQuestionCount }) {
-            activeQuestionGradient.colors = colors
-            activeQuestionGradient.startPoint = CGPoint(x: 0, y: 0.5)
-            activeQuestionGradient.endPoint = CGPoint(x: 1, y: 0.5)
-            activeQuestionGradient.frame = activeButton.bounds
-            activeQuestionGradient.cornerRadius = Constants.questionButtonCornerRadius
+        questionButtons.forEach { button in
             
-            activeButton.backgroundColor = .clear
-            activeButton.setTitleColor(.white, for: .normal)
+            button.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
             
-            if activeQuestionGradient.superlayer != activeButton.layer {
-                activeButton.layer.insertSublayer(activeQuestionGradient, at: 0)
+            if button.tag == selectedQuestionCount {
+                button.applyGradient(colors: Constants.gradient, cornerRadius: Constants.Layout.questionButtonCornerRadius)
+                button.setTitleColor(.white, for: .normal)
+                button.backgroundColor = .clear
+            } else {
+                button.backgroundColor = .white.withAlphaComponent(0.1)
+                button.setTitleColor(.white.withAlphaComponent(0.7), for: .normal)
             }
         }
+        
     }
     
     func setupConstraints() {
@@ -216,34 +253,34 @@ private extension PhotoPreviewView {
         }
         
         glassPanel.snp.makeConstraints {
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(230)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(Constants.Layout.glassPanelBottom)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.horizontalInset)
+            $0.height.equalTo(Constants.Layout.glassPanelHeight)
         }
 
         questionCountTitleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(24)
-            $0.leading.equalToSuperview().offset(20)
+            $0.top.equalToSuperview().offset(Constants.Layout.topOffset)
+            $0.leading.equalToSuperview().offset(Constants.Layout.innerPadding)
         }
         
         questionCountStackView.snp.makeConstraints {
-            $0.top.equalTo(questionCountTitleLabel.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(44)
+            $0.top.equalTo(questionCountTitleLabel.snp.bottom).offset(Constants.Layout.titleBottomOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.innerPadding)
+            $0.height.equalTo(Constants.Layout.questionStackHeight)
         }
         
         retakeButton.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(30)
-            $0.leading.equalToSuperview().offset(20)
-            $0.height.equalTo(54)
-            $0.trailing.equalTo(self.snp.centerX).offset(-8)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.buttonBottomInset)
+            $0.leading.equalToSuperview().offset(Constants.Layout.innerPadding)
+            $0.height.equalTo(Constants.Layout.buttonHeight)
+            $0.trailing.equalTo(self.snp.centerX).offset(-Constants.Layout.buttonSpacing)
         }
         
         continueButton.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(30)
-            $0.trailing.equalToSuperview().offset(-20)
-            $0.height.equalTo(54)
-            $0.leading.equalTo(self.snp.centerX).offset(8)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.buttonBottomInset)
+            $0.trailing.equalToSuperview().offset(-Constants.Layout.innerPadding)
+            $0.height.equalTo(Constants.Layout.buttonHeight)
+            $0.leading.equalTo(self.snp.centerX).offset(Constants.Layout.buttonSpacing)
         }
         
         activityIndicator.snp.makeConstraints {

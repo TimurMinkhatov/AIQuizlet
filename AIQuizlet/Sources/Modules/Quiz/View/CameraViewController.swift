@@ -32,9 +32,9 @@ final class CameraViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        cameraView.delegate = self
         setupMainUI()
         setupConstraints()
-        setupActions()
         viewModel.setupPreview(on: view)
     }
     
@@ -69,7 +69,6 @@ extension CameraViewController: PHPickerViewControllerDelegate {
 private extension CameraViewController {
     
     @objc func didTapCapture() {
-        cameraView.animateShutterTap()
         viewModel.capturePhoto()
     }
     
@@ -99,9 +98,17 @@ private extension CameraViewController {
             make.edges.equalToSuperview()
         }
     }
+}
+
+// MARK: Delegate
+
+extension CameraViewController: CameraViewDelegate {
     
-    func setupActions() {
-        cameraView.shutterButton.addTarget(self, action: #selector(didTapCapture), for: .touchUpInside)
-        cameraView.galleryButton.addTarget(self, action: #selector(didTapGallery), for: .touchUpInside)
+    func cameraViewDidTapShutter(_ view: CameraView) {
+        viewModel.capturePhoto()
+    }
+    
+    func cameraViewDidTapGallery(_ view: CameraView) {
+        didTapGallery()
     }
 }

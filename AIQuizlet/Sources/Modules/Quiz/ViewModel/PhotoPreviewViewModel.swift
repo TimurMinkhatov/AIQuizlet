@@ -12,6 +12,7 @@ final class PhotoPreviewViewModel {
     
     // MARK: - Properties
     
+    weak var coordinator: QuizCoordinator?
     let image: UIImage
     private let recognitionService: TextRecognitionService
     private let quizService: QuizService
@@ -63,7 +64,8 @@ final class PhotoPreviewViewModel {
                         let record = QuizRecord(title: quiz.title, questions: questionRecords)
                         
                         self.onLoadingStateChanged?(false)
-                        self.onSuccess?(quiz, record)
+
+                        self.coordinator?.showQuiz(quiz: quiz)
                     }
                 } catch {
                     await MainActor.run {
@@ -74,10 +76,20 @@ final class PhotoPreviewViewModel {
         }
     }
     
+    func didRequestRetake() {
+        coordinator?.didRequestRetake()
+    }
+}
     // MARK: - Private Methods
     
-    private func handleError(_ message: String) {
+private extension PhotoPreviewViewModel {
+        
+    func handleError(_ message: String) {
         onLoadingStateChanged?(false)
         onErrorOccurred?(message)
+    }
+    
+    func handleSuccess(quiz: Quiz) {
+        coordinator?.showQuiz(quiz: quiz)
     }
 }
