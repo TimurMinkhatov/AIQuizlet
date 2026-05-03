@@ -14,12 +14,12 @@ final class TabBarCoordinator: Coordinator {
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
-    let modelContainer: ModelContainer
+    let assembly: ServicesAssembly
     
-    init(navigationController: UINavigationController, modelContainer: ModelContainer) {
+    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
-        self.modelContainer = modelContainer
+        self.assembly = assembly
     }
     
     func start() {
@@ -54,7 +54,7 @@ private extension TabBarCoordinator {
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: nav)
+            let homeCoordinator = HomeCoordinator(navigationController: nav, assembly: assembly)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()
@@ -64,10 +64,10 @@ private extension TabBarCoordinator {
             historyViewController.title = "История"
             nav.setViewControllers([historyViewController], animated: false)
         case .profile:
-            let profileViewController = UIViewController()
-            profileViewController.view.backgroundColor = .white
-            profileViewController.title = "Профиль"
-            nav.setViewControllers([profileViewController], animated: false)
+            let profileCoordinator = ProfileCoordinator(navigationController: nav, assembly: assembly)
+            profileCoordinator.parentCoordinator = self
+            children.append(profileCoordinator)
+            profileCoordinator.start()
         }
     }
     
