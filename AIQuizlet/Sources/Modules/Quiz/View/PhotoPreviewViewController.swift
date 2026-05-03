@@ -12,6 +12,7 @@ import SnapKit
 final class PhotoPreviewViewController: UIViewController {
 
     // MARK: - Properties
+    weak var coordinator: QuizCoordinator?
     private let viewModel: PhotoPreviewViewModel
     private let previewView: PhotoPreviewView
 
