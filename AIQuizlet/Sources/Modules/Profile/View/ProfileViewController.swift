@@ -24,8 +24,8 @@ final class ProfileViewController: UIViewController {
     }()
 
     private lazy var contentView = UIView()
-    
-    private lazy var profileView: ProfileView = ProfileView(viewModel: viewModel)
+
+    private lazy var profileView = ProfileView()
 
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
@@ -62,10 +62,10 @@ final class ProfileViewController: UIViewController {
         tintColor: .systemPurple
     )
 
-    private lazy var statsTopRow = {
+    private lazy var statsTopRow: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [totalTestsCard, avgScoreCard])
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = Constants.statsSpacing
         stack.distribution = .fillEqually
         return stack
     }()
@@ -73,7 +73,7 @@ final class ProfileViewController: UIViewController {
     private lazy var statsBottomRow: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [bestScoreCard, completedCard])
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = Constants.statsSpacing
         stack.distribution = .fillEqually
         return stack
     }()
@@ -81,7 +81,7 @@ final class ProfileViewController: UIViewController {
     private lazy var statsStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [statsTopRow, statsBottomRow])
         stack.axis = .vertical
-        stack.spacing = 12
+        stack.spacing = Constants.statsSpacing
         return stack
     }()
 
@@ -91,18 +91,26 @@ final class ProfileViewController: UIViewController {
     private lazy var actionsCardView: UIView = {
         let view = UIView()
         view.backgroundColor = .secondarySystemGroupedBackground
-        view.layer.cornerRadius = 16
+        view.layer.cornerRadius = Constants.actionsCornerRadius
         return view
     }()
 
-    private lazy var clearDataButton = makeSettingsButton(image: "trash", color: .systemRed, text: L10n.Profile.DeleteData.button)
+    private lazy var clearDataButton = makeSettingsButton(
+        image: "trash",
+        color: .systemRed,
+        text: L10n.Profile.DeleteData.button
+    )
 
-    private lazy var logoutButton = makeSettingsButton(image: "rectangle.portrait.and.arrow.right", color: .label, text: L10n.Profile.Logout.button)
+    private lazy var logoutButton = makeSettingsButton(
+        image: "rectangle.portrait.and.arrow.right",
+        color: .label,
+        text: L10n.Profile.Logout.button
+    )
 
     private lazy var versionLabel: UILabel = {
         let label = UILabel()
         label.text = L10n.Profile.version("1.0.0")
-        label.font = .systemFont(ofSize: 13)
+        label.font = .systemFont(ofSize: Constants.versionFontSize)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -116,7 +124,7 @@ final class ProfileViewController: UIViewController {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has не been implemented")
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -130,6 +138,7 @@ extension ProfileViewController {
         setupLayout()
         setupActions()
         bindViewModel()
+        profileView.configure(with: viewModel)
         updateUI()
     }
 
@@ -166,56 +175,55 @@ private extension ProfileViewController {
             $0.width.equalToSuperview()
             $0.height.greaterThanOrEqualToSuperview()
         }
-        
-        profileView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
 
+        profileView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
         }
 
         statsStack.snp.makeConstraints {
-            $0.top.equalTo(profileView.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(profileView.snp.bottom).offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
         }
-        
+
         statsTopRow.snp.makeConstraints {
-            $0.height.equalTo(100)
+            $0.height.equalTo(Constants.statsCardHeight)
         }
 
         statsBottomRow.snp.makeConstraints {
-            $0.height.equalTo(100)
+            $0.height.equalTo(Constants.statsCardHeight)
         }
 
         themeSelectorView.snp.makeConstraints {
-            $0.top.equalTo(statsStack.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(statsStack.snp.bottom).offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
         }
 
         languageSelectorView.snp.makeConstraints {
-            $0.top.equalTo(themeSelectorView.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(themeSelectorView.snp.bottom).offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
         }
 
         actionsCardView.snp.makeConstraints {
-            $0.top.equalTo(languageSelectorView.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(languageSelectorView.snp.bottom).offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
         }
 
         clearDataButton.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(44)
+            $0.top.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
+            $0.height.equalTo(Constants.buttonHeight)
         }
 
         logoutButton.snp.makeConstraints {
             $0.top.equalTo(clearDataButton.snp.bottom)
-            $0.leading.trailing.bottom.equalToSuperview().inset(16)
-            $0.height.equalTo(44)
+            $0.leading.trailing.bottom.equalToSuperview().inset(Constants.horizontalInset)
+            $0.height.equalTo(Constants.buttonHeight)
         }
 
         versionLabel.snp.makeConstraints {
-            $0.top.equalTo(actionsCardView.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(24)
+            $0.top.equalTo(actionsCardView.snp.bottom).offset(Constants.sectionSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
+            $0.bottom.equalToSuperview().inset(Constants.versionBottomInset)
         }
     }
 
@@ -233,7 +241,11 @@ private extension ProfileViewController {
     func bindViewModel() {
         viewModel.onError = { [weak self] error in
             guard let self else { return }
-            let alert = UIAlertController(title: L10n.Common.Error.title, message: error, preferredStyle: .alert)
+            let alert = UIAlertController(
+                title: L10n.Common.Error.title,
+                message: error,
+                preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
             present(alert, animated: true)
         }
@@ -249,13 +261,12 @@ private extension ProfileViewController {
             }
         }
     }
-    
+
     func makeSettingsButton(image: String, color: UIColor, text: String) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.title = text
         config.image = UIImage(systemName: image)
-        config.baseForegroundColor = .label
-        config.imagePadding = 8
+        config.imagePadding = Constants.buttonImagePadding
         config.baseForegroundColor = color
         config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
         let button = UIButton(configuration: config)
@@ -287,5 +298,21 @@ private extension ProfileViewController {
             self?.viewModel.logout()
         })
         present(alert, animated: true)
+    }
+}
+
+// MARK: - Constants
+
+private extension ProfileViewController {
+    enum Constants {
+        static let statsSpacing: CGFloat = 12
+        static let statsCardHeight: CGFloat = 100
+        static let sectionSpacing: CGFloat = 12
+        static let horizontalInset: CGFloat = 16
+        static let buttonHeight: CGFloat = 44
+        static let buttonImagePadding: CGFloat = 8
+        static let actionsCornerRadius: CGFloat = 16
+        static let versionFontSize: CGFloat = 13
+        static let versionBottomInset: CGFloat = 24
     }
 }
