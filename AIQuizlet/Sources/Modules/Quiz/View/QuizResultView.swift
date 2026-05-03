@@ -12,17 +12,37 @@ import SnapKit
 final class QuizResultView: UIView {
     
     // MARK: - UI Elements
+    
     private let gradientLayer = CAGradientLayer()
     
+    lazy var tableView: UITableView = {
+        let table = UITableView(frame: .zero, style: .grouped)
+        table.backgroundColor = .clear
+        table.separatorStyle = .none
+        table.showsVerticalScrollIndicator = false
+        table.sectionFooterHeight = .leastNormalMagnitude
+        table.register(QuestionAnalysisCell.self, forCellReuseIdentifier: "AnalysisCell")
+        return table
+    }()
+    
+    // MARK: - Header Elements (Progress)
+    
     private lazy var headerView: UIView = {
-        let view = UIView()
-        view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 320)
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 380))
+        view.backgroundColor = .clear
         return view
     }()
     
     private lazy var percentageLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 48, weight: .bold)
+        label.font = .systemFont(ofSize: 56, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+
+    private lazy var statusLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 20, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -30,128 +50,198 @@ final class QuizResultView: UIView {
 
     private lazy var scoreDescriptionLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.textColor = .white
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textColor = .white.withAlphaComponent(0.8)
         label.textAlignment = .center
         return label
     }()
     
-    lazy var tableView: UITableView = {
-        let table = UITableView()
-        table.backgroundColor = .clear
-        table.separatorStyle = .none
-        table.register(QuestionAnalysisCell.self, forCellReuseIdentifier: "AnalysisCell")
-        return table
+    private lazy var progressContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    // MARK: - Footer Elements (Buttons)
+    
+    private lazy var footerView: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 120))
+        view.backgroundColor = .white
+        return view
+    }()
+
+    private lazy var buttonStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 16
+        stack.distribution = .fillEqually
+        return stack
     }()
 
     lazy var retryButton: UIButton = {
-        let btn = UIButton(type: .system)
-        btn.setTitle("Пройти заново", for: .normal)
-        btn.backgroundColor = .white.withAlphaComponent(0.2)
-        btn.setTitleColor(.white, for: .normal)
-        btn.layer.cornerRadius = 16
-        btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        return btn
+        makeButton(
+        title: "Пройти заново",
+        systemImage: "arrow.clockwise",
+        backgroundColor: UIColor(red: 52/255, green: 64/255, blue: 84/255, alpha: 1)
+        )
     }()
 
     lazy var homeButton: UIButton = {
-        let btn = UIButton(type: .system)
-        btn.setTitle("На главную", for: .normal)
-        btn.setTitleColor(.white, for: .normal)
-        btn.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-        return btn
+        makeButton(
+        title: "На главную",
+        systemImage: "house",
+        backgroundColor: UIColor(red: 108/255, green: 71/255, blue: 255/255, alpha: 1)
+        )
     }()
     
     // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .clear
         setupUI()
         setupConstraints()
     }
     
     required init?(coder: NSCoder) { fatalError() }
     
+    // MARK: - Lifecycle
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = bounds
+        applyGradient(
+            colors: [
+                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
+                UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
+            ],
+            startPoint: CGPoint(x: 0.5, y: 0),
+            endPoint: CGPoint(x: 0.5, y: 1)
+        )
+        homeButton.applyGradient(
+            colors: [
+                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+            ],
+            startPoint: CGPoint(x: 0, y: 0.5),
+            endPoint: CGPoint(x: 1, y: 0.5),
+            cornerRadius: 12
+        )
     }
-    
+
     // MARK: - Public Methods
-    func configure(with percent: String, description: String) {
-        percentageLabel.text = percent
+
+    
+    func configure(percentageText: String, statusText: String, description: String, percentage: Double) {
+        percentageLabel.text = percentageText
+        statusLabel.text = statusText
         scoreDescriptionLabel.text = description
+        percentageLabel.textColor = (percentage < 50) ? .systemRed : .systemGreen
     }
     
     func drawCircularProgress(percentage: Double) {
-        headerView.layer.sublayers?.filter { $0 is CAShapeLayer }.forEach { $0.removeFromSuperlayer() }
+        progressContainer.layer.sublayers?.filter { $0 is CAShapeLayer }.forEach { $0.removeFromSuperlayer() }
 
-        let center = CGPoint(x: headerView.bounds.midX, y: 150)
-        let circularPath = UIBezierPath(arcCenter: center, radius: 80, startAngle: -CGFloat.pi / 2, endAngle: 1.5 * CGFloat.pi, clockwise: true)
+        let center = CGPoint(x: progressContainer.bounds.midX, y: progressContainer.bounds.midY)
+        
+        let haloPath = UIBezierPath(arcCenter: center, radius: 80, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        let haloLayer = CAShapeLayer()
+        haloLayer.path = haloPath.cgPath
+        haloLayer.fillColor = UIColor.white.withAlphaComponent(0.1).cgColor
+        progressContainer.layer.addSublayer(haloLayer)
+
+        let circularPath = UIBezierPath(arcCenter: center, radius: 60, startAngle: -CGFloat.pi / 2, endAngle: 1.5 * CGFloat.pi, clockwise: true)
         
         let trackLayer = CAShapeLayer()
         trackLayer.path = circularPath.cgPath
-        trackLayer.strokeColor = UIColor.white.withAlphaComponent(0.1).cgColor
+        trackLayer.strokeColor = UIColor.systemRed.cgColor
         trackLayer.lineWidth = 12
         trackLayer.fillColor = UIColor.clear.cgColor
+        trackLayer.lineCap = .round
         
         let progressLayer = CAShapeLayer()
         progressLayer.path = circularPath.cgPath
-        progressLayer.strokeColor = (percentage < 50) ? UIColor.systemRed.cgColor : UIColor.systemGreen.cgColor
+        progressLayer.strokeColor = UIColor.systemGreen.cgColor
         progressLayer.lineWidth = 12
         progressLayer.fillColor = UIColor.clear.cgColor
         progressLayer.lineCap = .round
         progressLayer.strokeEnd = CGFloat(percentage / 100)
         
-        headerView.layer.addSublayer(trackLayer)
-        headerView.layer.addSublayer(progressLayer)
+        progressContainer.layer.addSublayer(trackLayer)
+        progressContainer.layer.addSublayer(progressLayer)
     }
 }
 
+// MARK: - Private Methods
+
 private extension QuizResultView {
-    func setupUI() {
-        gradientLayer.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
-        layer.addSublayer(gradientLayer)
+    
+    private func makeButton(
+        title: String,
+        systemImage: String,
+        backgroundColor: UIColor
+    ) -> UIButton {
+        var config = UIButton.Configuration.filled()
         
-        headerView.addSubview(percentageLabel)
-        headerView.addSubview(scoreDescriptionLabel)
+        var container = AttributeContainer()
+        container.font = .systemFont(ofSize: 15, weight: .semibold)
+        config.attributedTitle = AttributedString(title, attributes: container)
+        
+        config.image = UIImage(systemName: systemImage)
+        config.imagePadding = 8
+        
+        config.baseBackgroundColor = backgroundColor
+        config.baseForegroundColor = .white
+        config.background.cornerRadius = 12
+        
+        return UIButton(configuration: config)
+    }
+    
+    func setupUI() {
+        
+        addSubview(tableView)
+        
+        headerView.addSubviews(percentageLabel, statusLabel, scoreDescriptionLabel, progressContainer)
         
         tableView.tableHeaderView = headerView
         
-        addSubview(tableView)
-        addSubview(retryButton)
-        addSubview(homeButton)
+        footerView.addSubview(buttonStack)
+        
+        buttonStack.addArrangedSubviews(retryButton, homeButton)
+
+        tableView.tableFooterView = footerView
     }
     
     func setupConstraints() {
         tableView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(retryButton.snp.top).offset(-10)
+            $0.edges.equalToSuperview()
         }
-
+        
         percentageLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(60)
-            $0.centerX.equalToSuperview()
-        }
-
-        scoreDescriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(percentageLabel.snp.bottom).offset(100)
+            $0.top.equalToSuperview().offset(40)
             $0.centerX.equalToSuperview()
         }
         
-        homeButton.snp.makeConstraints {
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(10)
+        statusLabel.snp.makeConstraints {
+            $0.top.equalTo(percentageLabel.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
-            $0.height.equalTo(44)
         }
-
-        retryButton.snp.makeConstraints {
-            $0.bottom.equalTo(homeButton.snp.top).offset(-8)
+        
+        scoreDescriptionLabel.snp.makeConstraints {
+            $0.top.equalTo(statusLabel.snp.bottom).offset(4)
+            $0.centerX.equalToSuperview()
+        }
+        
+        progressContainer.snp.makeConstraints {
+            $0.top.equalTo(scoreDescriptionLabel.snp.bottom).offset(30)
+            $0.centerX.equalToSuperview()
+            $0.width.height.equalTo(180)
+        }
+        
+        buttonStack.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(16)
             $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(56)
+            $0.height.equalTo(52)
         }
     }
 }

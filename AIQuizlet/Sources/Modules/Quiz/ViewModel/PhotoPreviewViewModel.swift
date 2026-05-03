@@ -65,7 +65,7 @@ final class PhotoPreviewViewModel {
                         
                         self.onLoadingStateChanged?(false)
 
-                        self.coordinator?.showQuiz(quiz: quiz)
+                        self.coordinator?.showQuiz(quiz: quiz, record: record)
                     }
                 } catch {
                     await MainActor.run {
@@ -83,13 +83,24 @@ final class PhotoPreviewViewModel {
     // MARK: - Private Methods
     
 private extension PhotoPreviewViewModel {
-        
     func handleError(_ message: String) {
         onLoadingStateChanged?(false)
         onErrorOccurred?(message)
     }
     
     func handleSuccess(quiz: Quiz) {
-        coordinator?.showQuiz(quiz: quiz)
+        
+        let questionRecord = quiz.questions.map {
+            QuestionRecord(
+                text: $0.text,
+                answers: $0.answers,
+                correctAnswer: $0.correctAnswer,
+                explanation: $0.explanation,
+                userAnswerIndex: -1
+            )
+        }
+        
+        let record = QuizRecord(title: quiz.title, questions: questionRecord)
+        coordinator?.showQuiz(quiz: quiz, record: record)
     }
 }

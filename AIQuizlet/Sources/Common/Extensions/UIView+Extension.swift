@@ -32,3 +32,10 @@ extension UIView {
         layer.insertSublayer(gradient, at: 0)
     }
 }
+
+extension UIStackView {
+    
+    func addArrangedSubviews(_ views: UIView...) {
+        views.forEach { addArrangedSubview($0) }
+    }
+}

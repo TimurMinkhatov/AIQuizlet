@@ -47,6 +47,7 @@ private extension QuizViewController {
         enum Strings {
             static let explanationTitle = "Объяснение:"
             static let nextButtonTitle = "Далее"
+            static let finishButtonTitle = "Завершить"
             static let progressFormat = "Вопрос %d из %d"
             static let defaultExplanation = "Правильный ответ на основе предоставленного текста."
             static let optionPrefixes = ["A", "B", "C", "D"]
@@ -172,6 +173,11 @@ final class QuizViewController: UIViewController {
         bindViewModel()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if !nextButton.isHidden {
@@ -195,8 +201,11 @@ private extension QuizViewController {
     }
     
     @objc func nextTapped() {
-        print("Кнопка 'Далее' физически нажата в контроллере") // ОТЛАДКА
         viewModel.nextQuestion()
+    }
+    
+    @objc func backButtonTapped() {
+        viewModel.goBack()
     }
 }
 
@@ -214,6 +223,7 @@ private extension QuizViewController {
         explanationView.addSubviews(bulbIconImageView, explanationTitleLabel, explanationLabel)
         
         setupConstraints()
+        setupCustomBackButton()
         nextButton.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
     }
     
@@ -287,6 +297,20 @@ private extension QuizViewController {
 
 // MARK: - Private Methods
 private extension QuizViewController {
+    
+    func setupCustomBackButton() {
+        navigationItem.hidesBackButton = true
+        
+        let backButton = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.left"),
+            style: .plain,
+            target: self,
+            action: #selector(backButtonTapped)
+        )
+        
+        backButton.tintColor = .black
+        navigationItem.leftBarButtonItem = backButton
+    }
     func bindViewModel() {
         viewModel.onStateChange = { [weak self] state in
             guard let self = self else { return }
@@ -296,8 +320,10 @@ private extension QuizViewController {
                     self.resetUI()
                     self.updateProgress(current: current, total: total)
                     self.render(question: question, number: current)
-                case .showingResult(_, let correctIndex, let question):
-                    self.showResultUI(correctIndex: correctIndex, question: question)
+                case .showingResult(_, let correctIndex, let selectedIndex, let question, let isLastQuestion, let currentNumber, let total):
+                    self.updateProgress(current: currentNumber, total: total)
+                    self.render(question: question, number: currentNumber)
+                    self.showResultUI(correctIndex: correctIndex, selectedIndex: selectedIndex, question: question, isLastQuestion: isLastQuestion)
                 case .finished(let score, let total):
                     print("Тест завершен: \(score) из \(total)")
                 case .idle: break
@@ -346,7 +372,8 @@ private extension QuizViewController {
         cardScrollView.setContentOffset(.zero, animated: false)
     }
     
-    func showResultUI(correctIndex: Int, question: Question) {
+    func showResultUI(correctIndex: Int, selectedIndex: Int, question: Question, isLastQuestion: Bool) {
+        self.selectedOptionIndex = selectedIndex
         optionsStack.arrangedSubviews.enumerated().forEach { index, view in
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
@@ -360,6 +387,9 @@ private extension QuizViewController {
         
         explanationLabel.text = question.explanation ?? Constants.Strings.defaultExplanation
         explanationView.isHidden = false
+        
+        let title = isLastQuestion ? Constants.Strings.finishButtonTitle : Constants.Strings.nextButtonTitle
+        nextButton.setTitle(title, for: .normal)
         nextButton.isHidden = false
         
         view.layoutIfNeeded()

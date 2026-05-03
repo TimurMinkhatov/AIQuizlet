@@ -16,6 +16,7 @@ final class QuizCoordinator: Coordinator {
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     let servicesAssembly: ServicesAssembly
+    private weak var currentQuizViewModel: QuizViewModel?
 
     // MARK: - Init
 
@@ -80,6 +81,7 @@ extension QuizCoordinator {
         let vm = QuizViewModel(quizService: servicesAssembly.quizService)
         vm.coordinator = self
         vm.setQuiz(quiz, record: record)
+        currentQuizViewModel = vm
         let vc = QuizViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
@@ -90,8 +92,22 @@ extension QuizCoordinator {
     }
     
     func showResult(with result: QuizResult) {
+        do {
+            try servicesAssembly.storageService.saveQuizResult(result)
+        } catch {
+            print("Ошибка сохранения результата: \(error)")
+        }
         let vm = QuizResultViewModel(quizResult: result)
         let vc = QuizResultViewController(viewModel: vm)
+        
+        vm.onHome = { [weak self] in
+            self?.navigationController.popToRootViewController(animated: true)
+        }
+        
+        vm.onRetry = { [weak self] in
+            self?.currentQuizViewModel?.restart()
+            self?.navigationController.popViewController(animated: true)
+        }
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
     }

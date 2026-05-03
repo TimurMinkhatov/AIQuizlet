@@ -12,6 +12,8 @@ final class QuizResultViewModel {
     
     private let quizResult: QuizResult
     var onDataLoaded: (() -> Void)?
+    var onRetry: (() -> Void)?
+    var onHome: (() -> Void)?
     
     init(quizResult: QuizResult) {
         self.quizResult = quizResult
@@ -28,7 +30,7 @@ final class QuizResultViewModel {
         if percent >= 100 { return "Идеально" }
         if percent >= 80  { return "Отлично" }
         if percent >= 50  { return "Хорошо" }
-        return "Можео лучше"
+        return "Можно лучше"
     }
     
     var resultDescription: String {
@@ -49,8 +51,11 @@ final class QuizResultViewModel {
         quizResult.quiz.questions[index]
     }
     
+    func retryQuiz() {
+        onRetry?()
+    }
     
-    
-    
-    
+    func goHome() {
+        onHome?()
+    }
 }

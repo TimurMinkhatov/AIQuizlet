@@ -112,18 +112,13 @@ private extension HomeView {
     func setupUI() {
         backgroundColor = .clear
         
-        addSubview(scrollView)
-        addSubview(headerStackView)
+        addSubviews(scrollView,headerStackView)
         
         scrollView.addSubview(mainStackView)
         
-        headerStackView.addArrangedSubview(welcomeLabel)
-        headerStackView.addArrangedSubview(profileButton)
+        headerStackView.addArrangedSubviews(welcomeLabel, profileButton)
         
-        mainStackView.addArrangedSubview(photoCard)
-        mainStackView.addArrangedSubview(textCard)
-        mainStackView.addArrangedSubview(recentTitleLabel)
-        mainStackView.addArrangedSubview(emptyStateView)
+        mainStackView.addArrangedSubviews(photoCard, textCard, recentTitleLabel, emptyStateView)
     }
 
     func setupConstraints() {

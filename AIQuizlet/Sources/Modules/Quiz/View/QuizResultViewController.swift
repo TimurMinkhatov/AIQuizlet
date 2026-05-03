@@ -10,19 +10,23 @@ import UIKit
 
 final class QuizResultViewController: UIViewController {
     
+    // MARK: - Properties
+    
     private let contentView = QuizResultView()
     private let viewModel: QuizResultViewModel
     
+    // MARK: - Init
+    
     init(viewModel: QuizResultViewModel) {
-        
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Lifecycle
     
     override func loadView() {
         view = contentView
@@ -32,32 +36,22 @@ final class QuizResultViewController: UIViewController {
         super.viewDidLoad()
         setupDelegates()
         bindViewModel()
+        setupNavigation()
+        setupTargets()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         contentView.drawCircularProgress(percentage: viewModel.percentageValue)
-    }
-    
-    private func setupDelegates() {
-        contentView.tableView.delegate = self
-        contentView.tableView.dataSource = self
-    }
-    
-    private func bindViewModel() {
-        contentView.configure(
-            with: viewModel.scoreText,
-            description: viewModel.resultDescription
-        )
     }
 }
 
-// MARK: - TableView DataSource & Delegate
+// MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.numberOfQuestions
+        return viewModel.numberOfQuestions
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -68,8 +62,9 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
         let question = viewModel.getQuestion(at: indexPath.row)
         let isExpanded = viewModel.expandedIndexSet.contains(indexPath.row)
         
-        cell.configure(with: question, isExpanded: isExpanded)
+        cell.contentView.backgroundColor = .white
         
+        cell.configure(with: question, index: indexPath.row, isExpanded: isExpanded)
         return cell
     }
     
@@ -80,11 +75,68 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
             viewModel.expandedIndexSet.insert(indexPath.row)
         }
         
-        tableView.performBatchUpdates(nil)
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+    }
+    
+    // MARK: - Section Header Configuration
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = .white
+        headerView.layer.cornerRadius = 32
+        headerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         
-        if let cell = tableView.cellForRow(at: indexPath) as? QuestionAnalysisCell {
-            let question = viewModel.getQuestion(at: indexPath.row)
-            cell.configure(with: question, isExpanded: viewModel.expandedIndexSet.contains(indexPath.row))
+        let titleLabel = UILabel()
+        titleLabel.text = "Разбор вопросов"
+        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
+        titleLabel.textColor = .black
+        
+        headerView.addSubview(titleLabel)
+        titleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(24)
+            $0.leading.equalToSuperview().offset(24)
+            $0.bottom.equalToSuperview().offset(-16)
         }
+        
+        return headerView
+    }
+}
+
+// MARK: - Private Methods
+
+private extension QuizResultViewController {
+    
+    func setupNavigation() {
+        navigationItem.hidesBackButton = true
+    }
+    
+    func setupTargets() {
+        contentView.retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
+        contentView.homeButton.addTarget(self, action: #selector(homeTapped), for: .touchUpInside)
+
+    }
+    
+    func setupDelegates() {
+        contentView.tableView.delegate = self
+        contentView.tableView.dataSource = self
+    }
+    
+    func bindViewModel() {
+        contentView.configure(
+            percentageText: viewModel.scoreText,
+            statusText: viewModel.statusText,
+            description: viewModel.resultDescription,
+            percentage: viewModel.percentageValue
+        )
+    }
+    
+    // MARK: - Actions
+    
+    @objc func retryTapped() {
+        viewModel.retryQuiz()
+    }
+    
+    @objc func homeTapped() {
+        viewModel.goHome()
     }
 }

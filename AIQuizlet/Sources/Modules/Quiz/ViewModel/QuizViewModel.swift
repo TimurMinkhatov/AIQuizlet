@@ -15,7 +15,7 @@ final class QuizViewModel {
     enum State {
         case idle
         case showingQuestion(question: Question, currentNumber: Int, total: Int)
-        case showingResult(isCorrect: Bool, correctIndex: Int, question: Question)
+        case showingResult(isCorrect: Bool, correctIndex: Int, selectedIndex: Int, question: Question, isLastQuestion: Bool, currentNumber: Int, total: Int)
         case finished(score: Int, total: Int)
     }
 
@@ -26,7 +26,6 @@ final class QuizViewModel {
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
-    private var correctAnswersCount = 0
     private let quizService: QuizService
     
     private(set) var state: State = .idle {
@@ -55,35 +54,73 @@ final class QuizViewModel {
         self.quiz = quiz
         self.currentQuizRecord = record
         self.currentQuestionIndex = 0
-        self.correctAnswersCount = 0
-        showCurrentQuestion()
+        restoreCurrentQuestionState()
     }
 
     func selectAnswer(index: Int) {
         guard let quiz = quiz, currentQuestionIndex < quiz.questions.count else { return }
         let question = quiz.questions[currentQuestionIndex]
         
+        currentQuizRecord?.questions[currentQuestionIndex].userAnswerIndex = index
+        
         let isCorrect = (index == question.correctAnswer)
-        if isCorrect {
-            correctAnswersCount += 1
-        }
-        state = .showingResult(isCorrect: isCorrect, correctIndex: question.correctAnswer, question: question)
+        let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
+        
+        state = .showingResult(
+            isCorrect: isCorrect,
+            correctIndex: question.correctAnswer,
+            selectedIndex: index,
+            question: question,
+            isLastQuestion: isLastQuestion,
+            currentNumber: currentQuestionIndex + 1,
+            total: quiz.questions.count
+        )
     }
 
     func nextQuestion() {
-        print("Нажата кнопка Далее. Текущий индекс: \(currentQuestionIndex)")
         currentQuestionIndex += 1
         guard let total = quiz?.questions.count else {
-            print("Ошибка: quiz == nil!") // ОТЛАДКА
             return
         }
         if currentQuestionIndex < total {
             showCurrentQuestion()
         } else {
-            print("Все вопросы пройдены, вызываю finishQuiz()") // ОТЛАДКА
             finishQuiz()
         }
     }
+    
+    func goBack() {
+        if currentQuestionIndex > 0 {
+            currentQuestionIndex -= 1
+            restoreCurrentQuestionState()
+        } else {
+            coordinator?.didRequestRetake()
+        }
+    }
+    
+    func restart() {
+            guard let quiz = quiz else { return }
+            
+            let questionRecords = quiz.questions.map {
+                QuestionRecord(
+                    text: $0.text,
+                    answers: $0.answers,
+                    correctAnswer: $0.correctAnswer,
+                    explanation: $0.explanation,
+                    userAnswerIndex: -1
+                )
+            }
+            
+            let newRecord = QuizRecord(
+                title: quiz.title,
+                questions: questionRecords
+            )
+            
+            self.currentQuizRecord = newRecord
+            self.currentQuestionIndex = 0
+            
+            showCurrentQuestion()
+        }
 }
 
 // MARK: - Private Methods
@@ -108,16 +145,42 @@ private extension QuizViewModel {
     func finishQuiz() {
         guard let quiz = quiz else { return }
         guard let record = currentQuizRecord else {
-            print("Ошибка: currentQuizRecord пустой, переход отменен") // ОТЛАДКА
             return
         }
         
+        let finalScore = record.questions.filter { $0.userAnswerIndex == $0.correctAnswer }.count
+        
         let result = QuizResult(
-            score: correctAnswersCount,
+            score: finalScore,
             totalQuestions: quiz.questions.count,
             quiz: record
         )
-        print("Координатор, показывай результат!") // ОТЛАДКА
         coordinator?.showResult(with: result)
+    }
+    
+    func restoreCurrentQuestionState() {
+        guard let quiz = quiz, let record = currentQuizRecord else { return }
+        let question = quiz.questions[currentQuestionIndex]
+        let userAnswer = record.questions[currentQuestionIndex].userAnswerIndex
+        
+        if userAnswer != -1 {
+            let isCorrect = (userAnswer == question.correctAnswer)
+            let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
+            state = .showingResult(
+                isCorrect: isCorrect,
+                correctIndex: question.correctAnswer,
+                selectedIndex: userAnswer,
+                question: question,
+                isLastQuestion: isLastQuestion,
+                currentNumber: currentQuestionIndex + 1,
+                total: quiz.questions.count
+            )
+        } else {
+            state = .showingQuestion(
+                question: question,
+                currentNumber: currentQuestionIndex + 1,
+                total: quiz.questions.count
+            )
+        }
     }
 }

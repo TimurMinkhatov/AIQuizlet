@@ -15,11 +15,13 @@ final class TabBarCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
     let modelContainer: ModelContainer
+    private let servicesAssembly: ServicesAssembly
     
-    init(navigationController: UINavigationController, modelContainer: ModelContainer) {
+    init(navigationController: UINavigationController, modelContainer: ModelContainer, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
         self.modelContainer = modelContainer
+        self.servicesAssembly = servicesAssembly
     }
     
     func start() {
@@ -54,7 +56,7 @@ private extension TabBarCoordinator {
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: nav)
+            let homeCoordinator = HomeCoordinator(navigationController: nav, servicesAssembly: servicesAssembly)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()

@@ -18,13 +18,15 @@ final class AppCoordinator: Coordinator {
     var navigationController: UINavigationController
     let modelContainer: ModelContainer
     private var window: UIWindow?
+    private let servicesAssembly: ServicesAssembly
 
     // MARK: - Init
     
-    init(navigationController: UINavigationController, window: UIWindow?, modelContainer: ModelContainer) {
+    init(navigationController: UINavigationController, window: UIWindow?, modelContainer: ModelContainer ) {
         self.navigationController = navigationController
         self.window = window
         self.modelContainer = modelContainer
+        self.servicesAssembly = ServicesAssembly(modelContainer: modelContainer)
     }
 
     // MARK: - Public Methods
@@ -54,7 +56,8 @@ final class AppCoordinator: Coordinator {
         
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
-            modelContainer: modelContainer
+            modelContainer: modelContainer,
+            servicesAssembly: servicesAssembly
         )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
