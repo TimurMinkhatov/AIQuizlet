@@ -27,7 +27,7 @@ final class QuizViewModel {
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
-    private let assembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     
     private(set) var state: State = .idle {
         didSet {
@@ -45,8 +45,8 @@ final class QuizViewModel {
 
     // MARK: - Init
 
-    init(assembly: ServicesAssembly) {
-        self.assembly = assembly
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
     }
 
     // MARK: - Public Methods
@@ -201,7 +201,7 @@ private extension QuizViewModel {
             totalQuestions: total,
             completedAt: Date()
         )
-        try await assembly.firestoreService.saveQuizResult(quizResult: result)
+        try await servicesAssembly.firestoreService.saveQuizResult(quizResult: result)
     }
     
     private func saveQuiz(_ quiz: Quiz) async throws {
@@ -219,6 +219,6 @@ private extension QuizViewModel {
                 )
             }
         )
-        try await assembly.firestoreService.saveQuiz(quiz: fsQuiz)
+        try await servicesAssembly.firestoreService.saveQuiz(quiz: fsQuiz)
     }
 }

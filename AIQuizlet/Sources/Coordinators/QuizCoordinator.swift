@@ -77,7 +77,7 @@ extension QuizCoordinator {
     }
 
     func showQuiz(quiz: Quiz, record: QuizRecord) {
-        let vm = QuizViewModel(quizService: servicesAssembly.quizService)
+        let vm = QuizViewModel(servicesAssembly: servicesAssembly)
         vm.coordinator = self
         vm.setQuiz(quiz, record: record)
         currentQuizViewModel = vm

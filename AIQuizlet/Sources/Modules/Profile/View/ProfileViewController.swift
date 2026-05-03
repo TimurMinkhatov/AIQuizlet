@@ -39,25 +39,25 @@ final class ProfileViewController: UIViewController {
     }()
 
     private lazy var totalTestsCard = StatCardView(
-        title: L10n.Profile.Stats.totalQuizzes,
+        title: "Всего тестов",
         systemImage: "book",
         tintColor: .systemBlue
     )
 
     private lazy var avgScoreCard = StatCardView(
-        title: L10n.Profile.Stats.averageScore,
+        title: "Средний балл",
         systemImage: "chart.line.uptrend.xyaxis",
         tintColor: .systemGreen
     )
 
     private lazy var bestScoreCard = StatCardView(
-        title: L10n.Profile.Stats.bestScore,
+        title: "Лучший результат",
         systemImage: "trophy",
         tintColor: .systemYellow
     )
 
     private lazy var completedCard = StatCardView(
-        title: L10n.Profile.Stats.totalCompleted,
+        title: "Пройдено вопросов",
         systemImage: "checkmark.circle",
         tintColor: .systemPurple
     )
@@ -98,18 +98,18 @@ final class ProfileViewController: UIViewController {
     private lazy var clearDataButton = makeSettingsButton(
         image: "trash",
         color: .systemRed,
-        text: L10n.Profile.DeleteData.button
+        text: "Очистить данные"
     )
 
     private lazy var logoutButton = makeSettingsButton(
         image: "rectangle.portrait.and.arrow.right",
         color: .label,
-        text: L10n.Profile.Logout.button
+        text: "Выйти"
     )
 
     private lazy var versionLabel: UILabel = {
         let label = UILabel()
-        label.text = L10n.Profile.version("1.0.0")
+        label.text = "Версия 1.0.0"
         label.font = .systemFont(ofSize: Constants.versionFontSize)
         label.textColor = .white
         label.textAlignment = .center
@@ -134,7 +134,7 @@ extension ProfileViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = L10n.Profile.title
+        title = "Профиль"
         setupLayout()
         setupActions()
         bindViewModel()
@@ -228,8 +228,8 @@ private extension ProfileViewController {
     }
 
     func setupActions() {
-        clearDataButton.addTarget(self, action: #selector(clearDataTapped), for: .touchUpInside)
-        logoutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
+        clearDataButton.addTarget(self, action: #selector(clearDataTapped), for: UIControl.Event.touchUpInside)
+        logoutButton.addTarget(self, action: #selector(logoutTapped), for: UIControl.Event.touchUpInside)
 
         themeSelectorView.onThemeSelected = { [weak self] style in
             self?.view.window?.overrideUserInterfaceStyle = style
@@ -242,11 +242,11 @@ private extension ProfileViewController {
         viewModel.onError = { [weak self] error in
             guard let self else { return }
             let alert = UIAlertController(
-                title: L10n.Common.Error.title,
+                title: "Ошибка",
                 message: error,
                 preferredStyle: .alert
             )
-            alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
+            alert.addAction(UIAlertAction(title: "ОК", style: .default))
             present(alert, animated: true)
         }
     }
@@ -276,12 +276,12 @@ private extension ProfileViewController {
 
     @objc func clearDataTapped() {
         let alert = UIAlertController(
-            title: L10n.Profile.DeleteData.title,
-            message: L10n.Profile.DeleteData.message,
+            title: "Очистка данных",
+            message: "Вы уверены, что хотите удалить все тесты?",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: L10n.Profile.DeleteData.cancel, style: .cancel))
-        alert.addAction(UIAlertAction(title: L10n.Profile.DeleteData.confirmButton, style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
             self?.viewModel.clearData()
         })
         present(alert, animated: true)
@@ -289,12 +289,12 @@ private extension ProfileViewController {
 
     @objc func logoutTapped() {
         let alert = UIAlertController(
-            title: L10n.Profile.Logout.title,
-            message: L10n.Profile.Logout.message,
+            title: "Выход",
+            message: "Вы действительно хотите выйти из аккаунта?",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: L10n.Profile.Logout.cancel, style: .cancel))
-        alert.addAction(UIAlertAction(title: L10n.Profile.Logout.confirmButton, style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Выход", style: .destructive) { [weak self] _ in
             self?.viewModel.logout()
         })
         present(alert, animated: true)

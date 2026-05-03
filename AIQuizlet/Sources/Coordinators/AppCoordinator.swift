@@ -22,10 +22,10 @@ final class AppCoordinator: Coordinator {
 
     // MARK: - Init
     
-    init(navigationController: UINavigationController, window: UIWindow?, modelContainer: ModelContainer) {
+    init(navigationController: UINavigationController, window: UIWindow?, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.window = window
-        self.servicesAssembly = ServicesAssembly(modelContainer: modelContainer)
+        self.servicesAssembly = servicesAssembly
     }
 
     // MARK: - Public Methods
@@ -41,7 +41,7 @@ final class AppCoordinator: Coordinator {
     func showAuth() {
         children.removeAll()
         
-        let authCoordinator = AuthCoordinator(navigationController: navigationController, assembly: servicesAssembly)
+        let authCoordinator = AuthCoordinator(navigationController: navigationController, servicesAssembly: servicesAssembly)
         authCoordinator.parentCoordinator = self
         children.append(authCoordinator)
         authCoordinator.start()
@@ -55,7 +55,7 @@ final class AppCoordinator: Coordinator {
         
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
-            assembly: servicesAssembly
+            servicesAssembly: servicesAssembly
         )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)

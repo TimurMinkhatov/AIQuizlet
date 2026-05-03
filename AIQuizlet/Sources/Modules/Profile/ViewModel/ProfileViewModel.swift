@@ -13,15 +13,15 @@ final class ProfileViewModel {
     // MARK: - Properties
     
     weak var coordinator: ProfileCoordinator?
-    private let assembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     var onError: ((String) -> Void)?
     var email: String = AuthService.shared.currentUser?.email ?? "Unknown"
     
     
     // MARK: - Init
     
-    init(assembly: ServicesAssembly) {
-        self.assembly = assembly
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
     }
     
     // MARK: - Public Methods
@@ -32,11 +32,11 @@ final class ProfileViewModel {
     }
     
     func fetchStats() async throws -> (totalQuizzes: Int, avgScore: Double, bestScores: Double, totalQuestions: Int) {
-        if let user = try await assembly.firestoreService.fetchUser() {
+        if let user = try await servicesAssembly.firestoreService.fetchUser() {
             return (user.totalQuizzes, user.averageScore, user.bestScore, user.totalCompleted)
         }
         
-        let results = try assembly.storageService.fetchResults()
+        let results = try servicesAssembly.storageService.fetchResults()
         let totalQuizzes = results.count
         let avgScore = results.isEmpty ? 0.0 : results.map { $0.percentage }.reduce(0.0, +) / Double(totalQuizzes)
         let bestScores = results.map(\.percentage).max() ?? 0.0
@@ -46,9 +46,9 @@ final class ProfileViewModel {
     
     func clearData() {
         do {
-            try assembly.storageService.deleteAll()
+            try servicesAssembly.storageService.deleteAll()
             Task {
-                try? await assembly.firestoreService.deleteAllData()
+                try? await servicesAssembly.firestoreService.deleteAllData()
             }
         } catch {
             onError?(error.localizedDescription)
