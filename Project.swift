@@ -12,6 +12,8 @@ let project = Project(
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(
                 with: [
+                    "NSCameraUsageDescription": "Нам нужен доступ к камере, чтобы вы могли сфотографировать конспект для создания теста.",
+                    "NSPhotoLibraryUsageDescription": "Нам нужен доступ к галерее, чтобы вы могли выбрать готовое фото конспекта для создания теста.",
                     "CFBundleShortVersionString": "1.0.0",
                     "CFBundleVersion": "1",
                     "UILaunchStoryboardName": "LaunchScreen",
