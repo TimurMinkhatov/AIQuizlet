@@ -7,4 +7,4 @@ strings:
       params:
         enumName: L10n
         publicAccess: true
-        bundle: LocalizationService.shared.bundle
+        lookupFunction: "LocalizationService.localizedString(key:table:fallbackValue:)"

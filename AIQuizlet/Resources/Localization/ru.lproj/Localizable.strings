@@ -33,7 +33,7 @@
 "quiz.textInput.placeholder" = "Вставьте текст лекции, заметки или учебник...";
 "quiz.textInput.minLength" = "Минимальная рекомендуемая длина — 50 символов";
 "quiz.textInput.questionCount" = "Количество вопросов";
-"quiz.textInput.characterCount" = "%d / 5000 символов";
+"quiz.textInput.characterCount" = "%d / %d символов";
 "quiz.textInput.paste.button" = "Вставить";
 "quiz.textInput.generate.button" = "Сгенерировать тест";
 "quiz.question.counter" = "Вопрос %d из %d";
@@ -45,6 +45,7 @@
 "quiz.question.title" = "Вопрос %d: %@";
 "quiz.answer.option" = "Вариант %@ — %@";
 "quiz.explanation.default" = "Правильный ответ на основе предоставленного текста.";
+"quiz.textInput.generating" = "Генерация...";
 
 // MARK: - Result
 "result.tryAgain.button" = "Пройти заново";

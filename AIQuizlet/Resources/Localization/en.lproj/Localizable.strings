@@ -33,7 +33,7 @@
 "quiz.textInput.placeholder" = "Paste lecture text, notes or textbook...";
 "quiz.textInput.minLength" = "Minimum recommended length is 50 characters";
 "quiz.textInput.questionCount" = "Number of questions";
-"quiz.textInput.characterCount" = "%d / 5000 characters";
+"quiz.textInput.characterCount" = "%d / %d characters";
 "quiz.textInput.paste.button" = "Paste";
 "quiz.textInput.generate.button" = "Generate test";
 "quiz.question.counter" = "Question %d of %d";
@@ -45,6 +45,7 @@
 "quiz.question.title" = "Question %d: %@";
 "quiz.answer.option" = "Option %@ — %@";
 "quiz.explanation.default" = "Correct answer based on the provided text.";
+"quiz.textInput.generating" = "Generating...";
 
 // MARK: - Result
 "result.tryAgain.button" = "Try Again";

@@ -94,7 +94,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var characterCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "0 / \(Constants.maxCharacters) символов"
+        label.text = L10n.Quiz.TextInput.characterCount(0, Constants.maxCharacters)
         label.font = .systemFont(ofSize: 13)
         label.textColor = .secondaryLabel
         return label
@@ -314,7 +314,7 @@ private extension TextInputViewController {
                 case .loading:
                     self.generateButton.isEnabled = false
                     self.generateButton.configuration?.showsActivityIndicator = true
-                    self.generateButton.configuration?.title = "Генерация..."
+                    self.generateButton.configuration?.title = L10n.Quiz.TextInput.generating
                 case .idle:
                     self.generateButton.isEnabled = true
                     self.generateButton.configuration?.showsActivityIndicator = false
@@ -370,7 +370,7 @@ private extension TextInputViewController {
     func updateTextInput(with text: String) {
         let count = text.count
         placeholderLabel.isHidden = !text.isEmpty
-        characterCountLabel.text = "\(count) / \(Constants.maxCharacters) символов"
+        characterCountLabel.text = L10n.Quiz.TextInput.characterCount(0, Constants.maxCharacters)
         generateButton.isEnabled = count >= 50 && count <= Constants.maxCharacters
         view.setNeedsLayout()
         view.layoutIfNeeded()

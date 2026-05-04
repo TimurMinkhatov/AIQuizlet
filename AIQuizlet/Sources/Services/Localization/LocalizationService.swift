@@ -28,7 +28,7 @@ final class LocalizationService {
             NotificationCenter.default.post(name: .languageDidChange, object: newValue)
         }
     }
-    
+
     var bundle: Bundle {
         guard let path = Bundle.main.path(forResource: currentLanguage, ofType: "lproj"),
               let bundle = Bundle(path: path) else {
@@ -43,12 +43,13 @@ final class LocalizationService {
 
     // MARK: - Public Methods
 
-    func localizedString(for key: String) -> String {
-        guard let path = Bundle.main.path(forResource: currentLanguage, ofType: "lproj"),
+    static func localizedString(key: String, table: String, fallbackValue: String) -> String {
+        guard let path = Bundle.main.path(forResource: shared.currentLanguage, ofType: "lproj"),
               let bundle = Bundle(path: path) else {
-            return NSLocalizedString(key, comment: "")
+            return fallbackValue
         }
-        return bundle.localizedString(forKey: key, value: nil, table: nil)
+        let result = bundle.localizedString(forKey: key, value: fallbackValue, table: table)
+        return result
     }
 }
 
