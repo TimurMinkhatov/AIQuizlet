@@ -12,7 +12,7 @@ final class EmptyStateView: UIView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .secondarySystemGroupedBackground
         view.layer.cornerRadius = 24
         return view
     }()
@@ -38,7 +38,7 @@ final class EmptyStateView: UIView {
         let label = UILabel()
         label.text = L10n.Home.Empty.title
         label.font = .systemFont(ofSize: 18, weight: .semibold)
-        label.textColor = .black
+        label.textColor = .label
         label.textAlignment = .center
         return label
     }()
@@ -55,6 +55,11 @@ final class EmptyStateView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        updateCardBackground()
+
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: EmptyStateView, _) in
+            self?.updateCardBackground()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -95,5 +100,9 @@ final class EmptyStateView: UIView {
         }
     }
     
-    
+    func updateCardBackground() {
+        containerView.backgroundColor =        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+    }
 }

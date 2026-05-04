@@ -13,9 +13,9 @@ enum TabBarPage: Int, CaseIterable {
     
     var pageTitle: String {
         switch self {
-        case .home: return "Главная"
-        case .history: return "История тестов"
-        case .profile: return "Профиль"
+        case .home: return L10n.TabBar.home
+        case .history: return L10n.TabBar.history
+        case .profile: return L10n.TabBar.profile
         }
     }
     

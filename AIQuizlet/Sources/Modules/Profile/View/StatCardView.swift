@@ -45,12 +45,16 @@ final class StatCardView: UIView {
 
     init(title: String, systemImage: String, tintColor: UIColor = .systemIndigo) {
         super.init(frame: .zero)
-        backgroundColor = .secondarySystemGroupedBackground
+        updateCardBackground()
         layer.cornerRadius = 16
         iconImageView.image = UIImage(systemName: systemImage)
         iconImageView.tintColor = tintColor
         titleLabel.text = title
         setupLayout()
+        
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: StatCardView, _) in
+            self?.updateCardBackground()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -67,6 +71,12 @@ final class StatCardView: UIView {
 // MARK: - Private Methods
 
 private extension StatCardView {
+    
+    private func updateCardBackground() {
+        backgroundColor = traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+    }
 
     func setupLayout() {
         headerStack.addArrangedSubview(iconImageView)

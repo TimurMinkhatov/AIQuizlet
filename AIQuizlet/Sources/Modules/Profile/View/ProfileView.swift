@@ -62,7 +62,6 @@ final class ProfileView: UIView {
 
     private lazy var profileCardView: UIView = {
         let view = UIView()
-        view.backgroundColor = .secondarySystemGroupedBackground
         view.layer.cornerRadius = Constants.cardCornerRadius
         return view
     }()
@@ -72,6 +71,12 @@ final class ProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
+        updateCardBackground()
+
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: ProfileView, _) in
+            self?.updateCardBackground()
+            self?.updateAvatarBackground()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -88,18 +93,35 @@ final class ProfileView: UIView {
 // MARK: - Lifecycle
 
 extension ProfileView {
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         profileContainerView.layoutIfNeeded()
         avatarGradientLayer.frame = profileContainerView.bounds
         avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
+        updateAvatarBackground()
     }
 }
 
 // MARK: - Private Methods
 
 private extension ProfileView {
+    
+    func updateAvatarBackground() {
+        if traitCollection.userInterfaceStyle == .dark {
+            avatarGradientLayer.isHidden = true
+            profileContainerView.backgroundColor = .systemGray3
+        } else {
+            avatarGradientLayer.isHidden = false
+            profileContainerView.backgroundColor = .clear
+        }
+    }
+
+    func updateCardBackground() {
+        profileCardView.backgroundColor = traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+    }
 
     func setupLayout() {
         addSubview(profileCardView)

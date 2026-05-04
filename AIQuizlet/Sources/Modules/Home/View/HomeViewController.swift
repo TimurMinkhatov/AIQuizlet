@@ -39,15 +39,16 @@ final class HomeViewController: UIViewController {
         setupActions()
         renderRecentTests()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        updateBackground()
+        
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (vc: HomeViewController, _) in
+            self?.updateBackground()
+        }
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        view.applyGradient(colors: [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
-        ])
+        updateBackground()
     }
 }
 
@@ -83,6 +84,24 @@ private extension HomeViewController {
             tests.prefix(3).forEach { test in
                 homeView.addTestResult(test)
             }
+        }
+    }
+}
+
+// MARK: - Private Methods
+
+private extension HomeViewController {
+    private func updateBackground() {
+        let style = traitCollection.userInterfaceStyle
+        homeView.updateForTheme(style)
+        if style == .dark {
+            view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+        } else {
+            view.applyGradient(colors: [
+                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
+                UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
+            ])
         }
     }
 }

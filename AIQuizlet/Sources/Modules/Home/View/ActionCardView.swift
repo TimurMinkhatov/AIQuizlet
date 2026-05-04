@@ -30,7 +30,7 @@ class ActionCardView: UIView {
         let label = UILabel()
         label.numberOfLines = 2
         label.font = .systemFont(ofSize: 18, weight: .semibold)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -76,7 +76,7 @@ class ActionCardView: UIView {
         self.addGestureRecognizer(tap)
         self.isUserInteractionEnabled = true
         
-        backgroundColor = .white
+        backgroundColor = .secondarySystemGroupedBackground
         layer.cornerRadius = 24
         
         addSubview(iconContainerView)

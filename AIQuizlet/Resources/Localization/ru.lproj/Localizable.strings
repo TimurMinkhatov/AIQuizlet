@@ -46,6 +46,7 @@
 "quiz.answer.option" = "Вариант %@ — %@";
 "quiz.explanation.default" = "Правильный ответ на основе предоставленного текста.";
 "quiz.textInput.generating" = "Генерация...";
+"quiz.question.continue" = "Продолжить";
 
 // MARK: - Result
 "result.tryAgain.button" = "Пройти заново";
@@ -91,3 +92,9 @@
 "common.loading" = "Загрузка...";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
+
+// MARK: - TabBar
+
+"tabBar.home" = "Главная";
+"tabBar.history" = "История тестов";
+"tabBar.profile" = "Профиль";

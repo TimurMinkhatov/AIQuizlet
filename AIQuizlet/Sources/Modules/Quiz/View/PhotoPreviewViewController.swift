@@ -43,8 +43,8 @@ final class PhotoPreviewViewController: UIViewController {
     }
     
     func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        let alert = UIAlertController(title: L10n.Common.Error.title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
         self.present(alert, animated: true)
     }
 }

@@ -19,7 +19,7 @@ final class HomeView: UIView {
         let label = UILabel()
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.text = L10n.Home.greeting
-        label.textColor = .white
+        label.textColor = .label
         return label
     }()
     
@@ -27,7 +27,7 @@ final class HomeView: UIView {
         let label = UILabel()
         label.text = L10n.Home.RecentQuizzes.title
         label.font = .systemFont(ofSize: 20, weight: .semibold)
-        label.textColor = .white
+        label.textColor = .systemBackground
         return label
     }()
     
@@ -83,6 +83,11 @@ final class HomeView: UIView {
         super.init(frame: .zero)
         setupUI()
         setupConstraints()
+        updateCardBackground()
+        
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: HomeView, _) in
+            self?.updateCardBackground()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -102,6 +107,20 @@ final class HomeView: UIView {
     
     func updateEmptyState(isEmpty: Bool) {
         emptyStateView.isHidden = !isEmpty
+    }
+    
+    func updateForTheme(_ style: UIUserInterfaceStyle) {
+        if style == .dark {
+            backgroundColor = .systemGroupedBackground
+            welcomeLabel.textColor = .label
+            recentTitleLabel.textColor = .label
+            profileButton.tintColor = .label
+        } else {
+            backgroundColor = .clear
+            welcomeLabel.textColor = .white
+            recentTitleLabel.textColor = .white
+            profileButton.tintColor = .white.withAlphaComponent(0.8)
+        }
     }
 }
 
@@ -147,5 +166,16 @@ private extension HomeView {
         profileButton.snp.makeConstraints { make in
             make.size.equalTo(44)
         }
+    }
+    
+    func updateCardBackground() {
+        photoCard.backgroundColor = traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+        
+        textCard.backgroundColor = traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+        
     }
 }

@@ -16,7 +16,7 @@ final class ServicesAssembly {
     let authService: AuthService
     let quizService: QuizService
     let cameraService: CameraService
-//    let firestoreService: FirestoreService
+    let firestoreService: FirestoreService
 
 
     // MARK: - Init
@@ -26,7 +26,7 @@ final class ServicesAssembly {
         self.authService = AuthService.shared
         self.quizService = QuizService(networkManager: NetworkManager())
         self.cameraService = CameraService()
-//        self.firestoreService = FirestoreService()
+        self.firestoreService = FirestoreService()
 
     }
 }

@@ -202,6 +202,8 @@ public enum L10n {
       public static var button: String { return L10n.tr("Localizable", "quiz.next.button", fallback: "Next") }
     }
     public enum Question {
+      /// Continue
+      public static var `continue`: String { return L10n.tr("Localizable", "quiz.question.continue", fallback: "Continue") }
       /// Question %d of %d
       public static func counter(_ p1: Int, _ p2: Int) -> String {
         return L10n.tr("Localizable", "quiz.question.counter", p1, p2, fallback: "Question %d of %d")
@@ -259,6 +261,14 @@ public enum L10n {
       /// Try Again
       public static var button: String { return L10n.tr("Localizable", "result.tryAgain.button", fallback: "Try Again") }
     }
+  }
+  public enum TabBar {
+    /// History
+    public static var history: String { return L10n.tr("Localizable", "tabBar.history", fallback: "History") }
+    /// Home
+    public static var home: String { return L10n.tr("Localizable", "tabBar.home", fallback: "Home") }
+    /// Profile
+    public static var profile: String { return L10n.tr("Localizable", "tabBar.profile", fallback: "Profile") }
   }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length

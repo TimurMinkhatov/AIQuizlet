@@ -60,8 +60,8 @@ private extension TabBarCoordinator {
             homeCoordinator.start()
         case .history:
             let historyViewController = UIViewController()
-            historyViewController.view.backgroundColor = .white
-            historyViewController.title = "История"
+            historyViewController.view.backgroundColor = .secondarySystemGroupedBackground
+            historyViewController.title = L10n.TabBar.history
             nav.setViewControllers([historyViewController], animated: false)
         case .profile:
             let profileCoordinator = ProfileCoordinator(navigationController: nav, assembly: assembly)
@@ -74,20 +74,18 @@ private extension TabBarCoordinator {
     func prepareTabBarController(with controllers: [UIViewController]) {
         tabBarController.setViewControllers(controllers, animated: false)
         tabBarController.selectedIndex = TabBarPage.home.rawValue
-        tabBarController.tabBar.backgroundColor = .white
-        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1) 
+        tabBarController.tabBar.backgroundColor = .secondarySystemGroupedBackground
+        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
         navigationController.viewControllers = [tabBarController]
         navigationController.setNavigationBarHidden(true, animated: false)
         setupAppearance()
     }
     
     func setupAppearance() {
-        if #available(iOS 15.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            appearance.backgroundColor = .white
-            tabBarController.tabBar.standardAppearance = appearance
-            tabBarController.tabBar.scrollEdgeAppearance = appearance
-        }
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .secondarySystemGroupedBackground
+        tabBarController.tabBar.standardAppearance = appearance
+        tabBarController.tabBar.scrollEdgeAppearance = appearance
     }
 }

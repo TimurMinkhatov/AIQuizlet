@@ -143,7 +143,7 @@ final class PhotoPreviewView: UIView {
             .forEach { $0.opacity = isLoading ? 0 : 1 }
         continueButton.backgroundColor = isLoading ? .white.withAlphaComponent(0.1) : .clear
         
-        continueButton.configuration?.title = isLoading ? "" : "Продолжить"
+        continueButton.configuration?.title = isLoading ? "" : L10n.Quiz.Question.continue
             continueButton.configuration?.image = isLoading ? nil : UIImage(systemName: "checkmark")
     }
 }

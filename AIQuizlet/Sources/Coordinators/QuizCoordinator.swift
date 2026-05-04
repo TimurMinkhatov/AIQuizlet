@@ -61,7 +61,7 @@ extension QuizCoordinator {
     }
 
     func showQuiz(quiz: Quiz) {
-        let vm = QuizViewModel(quizService: servicesAssembly.quizService)
+        let vm = QuizViewModel(assembly: servicesAssembly)
         vm.setQuiz(quiz)
         let vc = QuizViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true

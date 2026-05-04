@@ -45,14 +45,14 @@ extension HomeCoordinator {
     }
     
     func showTextInput() {
-        let quizCoordinator = QuizCoordinator(navigationController: navigationController, assembly: assembly)
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController, servicesAssembly: assembly)
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.start()
     }
     
     func showPhotoInput() {
-        let quizCoordinator = QuizCoordinator(navigationController: navigationController)
+        let quizCoordinator = QuizCoordinator(navigationController: navigationController, servicesAssembly: assembly)
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.showPhotoFlow()

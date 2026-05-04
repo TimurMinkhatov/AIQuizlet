@@ -38,7 +38,13 @@ private extension TextInputViewController {
                 UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
                 UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
             ]
-            static let border = UIColor.systemBlue
+            static var border: UIColor {
+                return UIColor { traits in
+                    traits.userInterfaceStyle == .dark
+                        ? UIColor.systemGray4
+                        : UIColor.systemBlue
+                }
+            }
             static let background = UIColor.systemGroupedBackground
             static let inactiveButton = UIColor.systemGray3
         }
@@ -70,7 +76,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var textContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .secondarySystemGroupedBackground
         view.layer.cornerRadius = Constants.Layout.textViewCornerRadius
         view.layer.borderWidth = Constants.Layout.borderWidth
         view.layer.borderColor = Constants.Colors.border.cgColor
@@ -81,7 +87,7 @@ final class TextInputViewController: UIViewController {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15)
         textView.textColor = .label
-        textView.backgroundColor = .clear
+        textView.backgroundColor = .systemBackground
         textView.delegate = self
         return textView
     }()
@@ -184,8 +190,15 @@ final class TextInputViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         setupQuestionButtons()
+        DispatchQueue.main.async {
+            self.updateGradients()
+        }
         setupActions()
         bindViewModel()
+        
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (vc: TextInputViewController, _) in
+            self?.textContainerView.layer.borderColor = Constants.Colors.border.cgColor
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -309,7 +322,7 @@ private extension TextInputViewController {
                 button.backgroundColor = .systemIndigo
                 button.setTitleColor(.white, for: .normal)
             } else {
-                button.backgroundColor = .white
+                button.backgroundColor = .secondarySystemGroupedBackground
                 button.setTitleColor(.label, for: .normal)
             }
 
@@ -366,7 +379,7 @@ private extension TextInputViewController {
                 button.applyGradient(colors: Constants.Colors.gradient, cornerRadius: Constants.Layout.questionButtonCornerRadius)
                 button.setTitleColor(.white, for: .normal)
             } else {
-                button.backgroundColor = .white
+                button.backgroundColor = .secondarySystemGroupedBackground
                 button.setTitleColor(.label, for: .normal)
             }
         }

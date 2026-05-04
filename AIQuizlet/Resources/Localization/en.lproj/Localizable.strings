@@ -46,6 +46,7 @@
 "quiz.answer.option" = "Option %@ — %@";
 "quiz.explanation.default" = "Correct answer based on the provided text.";
 "quiz.textInput.generating" = "Generating...";
+"quiz.question.continue" = "Continue";
 
 // MARK: - Result
 "result.tryAgain.button" = "Try Again";
@@ -91,3 +92,9 @@
 "common.loading" = "Loading...";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
+
+// MARK: - TabBar
+
+"tabBar.home" = "Home";
+"tabBar.history" = "History";
+"tabBar.profile" = "Profile";

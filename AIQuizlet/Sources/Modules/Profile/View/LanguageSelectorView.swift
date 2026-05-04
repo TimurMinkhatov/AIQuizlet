@@ -2,9 +2,6 @@
 //  LanguageSelectorView.swift
 //  AIQuizlet
 //
-//  Created by Timur Minkhatov on 29/04/2026.
-//  Copyright © 2026 t-bank-practice-team. All rights reserved.
-//
 
 import UIKit
 import SnapKit
@@ -25,7 +22,7 @@ final class LanguageSelectorView: UIView {
         label.font = .systemFont(ofSize: 17, weight: .semibold)
         return label
     }()
-    
+
     private lazy var buttonStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [russianButton, englishButton])
         stack.axis = .horizontal
@@ -33,7 +30,7 @@ final class LanguageSelectorView: UIView {
         stack.distribution = .fillEqually
         return stack
     }()
-    
+
     private lazy var russianButton = makeLanguageButton(title: L10n.Profile.Language.russian)
     private lazy var englishButton = makeLanguageButton(title: L10n.Profile.Language.english)
 
@@ -41,13 +38,19 @@ final class LanguageSelectorView: UIView {
 
     init() {
         super.init(frame: .zero)
-        backgroundColor = .secondarySystemGroupedBackground
         layer.cornerRadius = 16
         setupLayout()
         setupActions()
         let currentLanguage = LocalizationService.shared.currentLanguage
         selectButton(currentLanguage == "en" ? englishButton : russianButton)
+        updateCardBackground()
+
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: LanguageSelectorView, _) in
+            self?.updateCardBackground()
+            self?.refreshInactiveButtons()
+        }
     }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -57,6 +60,27 @@ final class LanguageSelectorView: UIView {
 
 private extension LanguageSelectorView {
 
+    func inactiveButtonColor() -> UIColor {
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "364153").withAlphaComponent(0.5)
+            : .systemGray5
+    }
+
+    func updateCardBackground() {
+        backgroundColor = traitCollection.userInterfaceStyle == .dark
+            ? UIColor(hex: "1e2939")
+            : .secondarySystemGroupedBackground
+    }
+
+    func refreshInactiveButtons() {
+        [russianButton, englishButton].forEach {
+            guard $0 != selectedButton else { return }
+            var config = $0.configuration
+            config?.background.backgroundColor = inactiveButtonColor()
+            $0.configuration = config
+        }
+    }
+
     func makeLanguageButton(title: String) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.title = title
@@ -65,7 +89,7 @@ private extension LanguageSelectorView {
         config.imagePadding = 8
         config.baseForegroundColor = .label
         config.background.cornerRadius = 10
-        config.background.backgroundColor = .systemGray5
+        config.background.backgroundColor = inactiveButtonColor()
         return UIButton(configuration: config)
     }
 
@@ -73,7 +97,7 @@ private extension LanguageSelectorView {
         [russianButton, englishButton].forEach {
             var config = $0.configuration
             config?.baseForegroundColor = .label
-            config?.background.backgroundColor = .systemGray5
+            config?.background.backgroundColor = inactiveButtonColor()
             $0.configuration = config
         }
         var config = button.configuration
@@ -84,12 +108,11 @@ private extension LanguageSelectorView {
     }
 
     func setupLayout() {
-
         addSubview(titleLabel)
         addSubview(buttonStack)
 
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
+            $0.top.leading.trailing.equalToSuperview().inset(20)
         }
 
         buttonStack.snp.makeConstraints {
