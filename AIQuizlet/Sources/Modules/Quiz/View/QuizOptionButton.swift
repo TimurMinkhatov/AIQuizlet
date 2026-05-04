@@ -10,7 +10,7 @@ import SnapKit
 
 final class QuizOptionButton: UIControl {
     
-    // MARK: enum State
+    // MARK: Enums
     
     enum State {
         case normal
@@ -18,6 +18,14 @@ final class QuizOptionButton: UIControl {
         case correct
         case wrong
     }
+    
+    private enum Constants {
+        static let labelLeading = 16
+        static let labelTrailing = 8
+        static let iconImageViewTrailing = 16
+        static let iconImageViewSize = 20
+    }
+    
     
     // MARK: - UI Elements
     
@@ -61,30 +69,41 @@ final class QuizOptionButton: UIControl {
     
     func updateState(_ state: State) {
         iconImageView.isHidden = (state == .normal || state == .selected)
-        label.textColor = .label
         backgroundColor = .white
+        label.font = (state == .selected)
+            ? .systemFont(ofSize: 15, weight: .bold)
+            : .systemFont(ofSize: 15, weight: .medium)
+        layer.borderWidth = (state == .selected) ? 3 : 1.5
         
         switch state {
         case .normal:
-            layer.borderColor = UIColor.systemGray4.cgColor
+            applyResultStyle(background: .white, border: .systemGray4, icon: "", tint: .clear)
+            label.textColor = .black
             layer.borderWidth = 1
             
         case .selected:
-            layer.borderColor = UIColor.systemBlue.cgColor
-            layer.borderWidth = 2
-            backgroundColor = UIColor.systemBlue.withAlphaComponent(0.05)
+            applyResultStyle(background: .systemBlue.withAlphaComponent(0.05), border: .systemBlue, icon: "", tint: .clear)
             
         case .correct:
-            backgroundColor = UIColor(red: 232/255, green: 255/255, blue: 238/255, alpha: 1)
-            layer.borderColor = UIColor.systemGreen.cgColor
-            iconImageView.image = UIImage(systemName: "checkmark.circle.fill")
+            applyResultStyle(
+                background: UIColor(red: 232/255, green: 255/255, blue: 238/255, alpha: 1),
+                border: .systemGreen,
+                icon: "checkmark.circle.fill",
+                tint: .systemGreen
+            )
+            layer.borderWidth = 1
+            label.textColor = .black
             iconImageView.tintColor = .systemGreen
             
         case .wrong:
-            backgroundColor = UIColor(red: 255/255, green: 232/255, blue: 232/255, alpha: 1)
-            layer.borderColor = UIColor.systemRed.cgColor
-            iconImageView.image = UIImage(systemName: "xmark.circle.fill")
+            applyResultStyle(
+                background: UIColor(red: 255/255, green: 232/255, blue: 232/255, alpha: 1),
+                border: .systemRed,
+                icon: "xmark.circle.fill",
+                tint: .systemRed
+            )
             iconImageView.tintColor = .systemRed
+            label.textColor = .black
         }
     }
 }
@@ -106,16 +125,23 @@ private extension QuizOptionButton {
     }
     
     func setupConstraints() {
-        label.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(16)
-            make.centerY.equalToSuperview()
-            make.trailing.equalTo(iconImageView.snp.leading).offset(-8)
+        label.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(Constants.labelLeading)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalTo(iconImageView.snp.leading).offset(-Constants.labelTrailing)
         }
         
-        iconImageView.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(16)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(20)
+        iconImageView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(Constants.iconImageViewTrailing)
+            $0.centerY.equalToSuperview()
+            $0.size.equalTo(Constants.iconImageViewSize)
         }
+    }
+    
+    func applyResultStyle(background: UIColor, border: UIColor, icon: String, tint: UIColor) {
+        self.backgroundColor = background
+        self.layer.borderColor = border.cgColor
+        self.iconImageView.image = UIImage(systemName: icon)
+        self.iconImageView.tintColor = tint
     }
 }

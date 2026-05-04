@@ -9,19 +9,56 @@
 import UIKit
 import SnapKit
 
+// MARK: - Constants
+
+private extension TextInputViewController {
+    enum Constants {
+        static let maxCharacters: Int = 5000
+        static let minCharacters: Int = 50
+        static let questionCounts: [Int] = [5, 10, 15, 20]
+
+        enum Layout {
+            static let textViewCornerRadius: CGFloat = 12
+            static let buttonCornerRadius: CGFloat = 12
+            static let questionButtonCornerRadius: CGFloat = 10
+            static let textViewHeight: CGFloat = 220
+            static let bottomButtonHeight: CGFloat = 50
+            static let questionButtonHeight: CGFloat = 44
+            static let standardInset: CGFloat = 16
+            static let elementSpacing: CGFloat = 24
+            static let smallSpacing: CGFloat = 12
+            static let textViewInternalInset: CGFloat = 4
+            static let placeholderTopOffset: CGFloat = 12
+            static let placeholderSideInset: CGFloat = 8
+            static let borderWidth: CGFloat = 1.5
+        }
+
+        enum Colors {
+            static let gradient = [
+                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+            ]
+            static let border = UIColor.systemBlue
+            static let background = UIColor.systemGroupedBackground
+            static let inactiveButton = UIColor.systemGray3
+        }
+
+        enum Images {
+            static let sparkles = UIImage(systemName: "sparkles")
+            static let clipboard = UIImage(systemName: "clipboard")
+        }
+    }
+}
+
 // MARK: - TextInputViewController
 
 final class TextInputViewController: UIViewController {
 
     // MARK: - Properties
-
     private let viewModel: TextInputViewModel
-    private let generateButtonGradient = CAGradientLayer()
-    private let activeQuestionGradient = CAGradientLayer()
     private var questionButtons: [UIButton] = []
 
     // MARK: - UI Components
-
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
@@ -34,9 +71,9 @@ final class TextInputViewController: UIViewController {
     private lazy var textContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = Constants.textViewCornerRadius
-        view.layer.borderWidth = 1.5
-        view.layer.borderColor = UIColor.systemBlue.cgColor
+        view.layer.cornerRadius = Constants.Layout.textViewCornerRadius
+        view.layer.borderWidth = Constants.Layout.borderWidth
+        view.layer.borderColor = Constants.Colors.border.cgColor
         return view
     }()
 
@@ -103,10 +140,10 @@ final class TextInputViewController: UIViewController {
     private lazy var pasteButton: UIButton = {
         var config = UIButton.Configuration.bordered()
         config.title = L10n.Quiz.TextInput.Paste.button
-        config.image = UIImage(systemName: "clipboard")
+        config.image = Constants.Images.clipboard
         config.imagePadding = 8
         config.baseForegroundColor = .label
-        config.background.cornerRadius = Constants.buttonCornerRadius
+        config.background.cornerRadius = Constants.Layout.buttonCornerRadius
         config.background.strokeColor = .systemGray4
         config.background.strokeWidth = 1
         config.background.backgroundColor = .clear
@@ -116,11 +153,11 @@ final class TextInputViewController: UIViewController {
     private lazy var generateButton: UIButton = {
         var config = UIButton.Configuration.filled()
         config.title = L10n.Quiz.TextInput.Generate.button
-        config.image = UIImage(systemName: "sparkles")
+        config.image = Constants.Images.sparkles
         config.imagePadding = 8
         config.baseForegroundColor = .white
-        config.background.cornerRadius = Constants.buttonCornerRadius
-        config.background.backgroundColor = .systemGray3
+        config.background.cornerRadius = Constants.Layout.buttonCornerRadius
+        config.background.backgroundColor = Constants.Colors.inactiveButton
         let button = UIButton(configuration: config)
         button.isEnabled = false
         return button
@@ -135,36 +172,29 @@ final class TextInputViewController: UIViewController {
     }()
 
     // MARK: - Init
-
     init(viewModel: TextInputViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { fatalError() }
 
     // MARK: - Lifecycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
         setupQuestionButtons()
         setupActions()
         bindViewModel()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        questionCountStackView.layoutIfNeeded()
         updateGradients()
     }
 }
 
 // MARK: - UITextViewDelegate
-
 extension TextInputViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         updateTextInput(with: textView.text ?? "")
@@ -172,15 +202,12 @@ extension TextInputViewController: UITextViewDelegate {
 }
 
 // MARK: - Actions
-
 private extension TextInputViewController {
-    
     @objc func questionCountTapped(_ sender: UIButton) {
         questionButtons.forEach {
             $0.backgroundColor = .white
             $0.setTitleColor(.label, for: .normal)
         }
-        activeQuestionGradient.removeFromSuperlayer()
         viewModel.update(questionCount: sender.tag)
         view.setNeedsLayout()
         view.layoutIfNeeded()
@@ -196,32 +223,25 @@ private extension TextInputViewController {
     @objc func generateTapped() {
         viewModel.generateQuiz()
     }
-    
+
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
 }
 
 // MARK: - Setup Logic
-
 private extension TextInputViewController {
-    
     func setupLayout() {
         title = L10n.Quiz.TextInput.title
-        view.backgroundColor = UIColor.systemGroupedBackground
+        view.backgroundColor = Constants.Colors.background
         navigationController?.navigationBar.tintColor = .black
 
-        view.addSubview(scrollView)
+        view.addSubviews(scrollView, bottomStackView)
         scrollView.addSubview(contentView)
-        textContainerView.addSubview(textView)
-        textContainerView.addSubview(placeholderLabel)
-        contentView.addSubview(textContainerView)
-        contentView.addSubview(questionCountTitleLabel)
-        contentView.addSubview(questionCountStackView)
-        contentView.addSubview(characterCountLabel)
+        textContainerView.addSubviews(textView, placeholderLabel)
+        contentView.addSubviews(textContainerView, questionCountTitleLabel, questionCountStackView, characterCountLabel)
         bottomStackView.addArrangedSubview(pasteButton)
         bottomStackView.addArrangedSubview(generateButton)
-        view.addSubview(bottomStackView)
 
         setupConstraints()
     }
@@ -229,7 +249,7 @@ private extension TextInputViewController {
     func setupConstraints() {
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(bottomStackView.snp.top).offset(-12)
+            $0.bottom.equalTo(bottomStackView.snp.top).offset(-Constants.Layout.smallSpacing)
         }
 
         contentView.snp.makeConstraints {
@@ -238,41 +258,41 @@ private extension TextInputViewController {
         }
 
         textContainerView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalToSuperview().offset(Constants.Layout.standardInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
         }
 
         placeholderLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(12)
-            $0.leading.trailing.equalToSuperview().inset(8)
+            $0.top.equalToSuperview().offset(Constants.Layout.placeholderTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.placeholderSideInset)
         }
 
         textView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(4)
-            $0.height.greaterThanOrEqualTo(Constants.textViewHeight)
+            $0.edges.equalToSuperview().inset(Constants.Layout.textViewInternalInset)
+            $0.height.greaterThanOrEqualTo(Constants.Layout.textViewHeight)
         }
 
         questionCountTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(textContainerView.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(textContainerView.snp.bottom).offset(Constants.Layout.elementSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
         }
 
         questionCountStackView.snp.makeConstraints {
-            $0.top.equalTo(questionCountTitleLabel.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(Constants.questionButtonHeight)
+            $0.top.equalTo(questionCountTitleLabel.snp.bottom).offset(Constants.Layout.smallSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
+            $0.height.equalTo(Constants.Layout.questionButtonHeight)
         }
 
         characterCountLabel.snp.makeConstraints {
-            $0.top.equalTo(questionCountStackView.snp.bottom).offset(12)
-            $0.leading.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(16)
+            $0.top.equalTo(questionCountStackView.snp.bottom).offset(Constants.Layout.smallSpacing)
+            $0.leading.equalToSuperview().inset(Constants.Layout.standardInset)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.standardInset)
         }
 
         bottomStackView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
-            $0.height.equalTo(Constants.bottomButtonHeight)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.standardInset)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(Constants.Layout.standardInset)
+            $0.height.equalTo(Constants.Layout.bottomButtonHeight)
         }
     }
 
@@ -281,7 +301,7 @@ private extension TextInputViewController {
             let button = UIButton()
             button.setTitle("\(count)", for: .normal)
             button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
-            button.layer.cornerRadius = Constants.questionButtonCornerRadius
+            button.layer.cornerRadius = Constants.Layout.questionButtonCornerRadius
             button.tag = count
             button.addTarget(self, action: #selector(questionCountTapped(_:)), for: .touchUpInside)
 
@@ -316,7 +336,8 @@ private extension TextInputViewController {
                     self.generateButton.configuration?.showsActivityIndicator = true
                     self.generateButton.configuration?.title = L10n.Quiz.TextInput.generating
                 case .idle:
-                    self.generateButton.isEnabled = true
+                    self.generateButton.isEnabled = false
+                    self.generateButton.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
                     self.generateButton.configuration?.showsActivityIndicator = false
                     self.generateButton.configuration?.title = L10n.Quiz.TextInput.Generate.button
                 case .error(let message):
@@ -330,39 +351,23 @@ private extension TextInputViewController {
     }
 
     func updateGradients() {
-        let colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
-
-        generateButtonGradient.colors = colors
-        generateButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
-        generateButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
-        generateButtonGradient.frame = generateButton.bounds
-        generateButtonGradient.cornerRadius = Constants.buttonCornerRadius
-
         if generateButton.isEnabled {
             generateButton.configuration?.background.backgroundColor = .clear
-            if generateButtonGradient.superlayer == nil {
-                generateButton.layer.insertSublayer(generateButtonGradient, at: 0)
-            }
-            generateButtonGradient.opacity = 1.0
+            generateButton.applyGradient(colors: Constants.Colors.gradient, cornerRadius: Constants.Layout.buttonCornerRadius)
         } else {
-            generateButtonGradient.opacity = 0.0
-            generateButton.configuration?.background.backgroundColor = .systemGray3
+            generateButton.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            generateButton.configuration?.background.backgroundColor = Constants.Colors.inactiveButton
         }
 
-        if let activeButton = questionButtons.first(where: { $0.tag == viewModel.questionCount }) {
-            activeQuestionGradient.colors = colors
-            activeQuestionGradient.startPoint = CGPoint(x: 0, y: 0.5)
-            activeQuestionGradient.endPoint = CGPoint(x: 1, y: 0.5)
-            activeQuestionGradient.frame = activeButton.bounds
-            activeQuestionGradient.cornerRadius = Constants.questionButtonCornerRadius
-            activeButton.backgroundColor = .clear
-            activeButton.setTitleColor(.white, for: .normal)
-            if activeQuestionGradient.superlayer == nil {
-                activeButton.layer.insertSublayer(activeQuestionGradient, at: 0)
+        questionButtons.forEach { button in
+            button.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+
+            if button.tag == viewModel.questionCount {
+                button.applyGradient(colors: Constants.Colors.gradient, cornerRadius: Constants.Layout.questionButtonCornerRadius)
+                button.setTitleColor(.white, for: .normal)
+            } else {
+                button.backgroundColor = .white
+                button.setTitleColor(.label, for: .normal)
             }
         }
     }
@@ -370,8 +375,8 @@ private extension TextInputViewController {
     func updateTextInput(with text: String) {
         let count = text.count
         placeholderLabel.isHidden = !text.isEmpty
-        characterCountLabel.text = L10n.Quiz.TextInput.characterCount(0, Constants.maxCharacters)
-        generateButton.isEnabled = count >= 50 && count <= Constants.maxCharacters
+        characterCountLabel.text = L10n.Quiz.TextInput.characterCount(count, Constants.maxCharacters)
+        generateButton.isEnabled = count >= Constants.minCharacters && count <= Constants.maxCharacters
         view.setNeedsLayout()
         view.layoutIfNeeded()
         if count > Constants.maxCharacters {
@@ -382,23 +387,12 @@ private extension TextInputViewController {
 
     func showError(message: String) {
         guard presentedViewController == nil else { return }
-        let alert = UIAlertController(title: L10n.Common.Error.title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: L10n.Common.cancel, style: .default))
+        let alert = UIAlertController(
+            title: L10n.Common.Error.title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
         present(alert, animated: true)
-    }
-}
-
-// MARK: - Constants
-
-private extension TextInputViewController {
-    enum Constants {
-        static let textViewCornerRadius: CGFloat = 12
-        static let buttonCornerRadius: CGFloat = 12
-        static let questionButtonCornerRadius: CGFloat = 10
-        static let textViewHeight: CGFloat = 220
-        static let bottomButtonHeight: CGFloat = 50
-        static let questionButtonHeight: CGFloat = 44
-        static let maxCharacters: Int = 5000
-        static let questionCounts: [Int] = [5, 10, 15, 20]
     }
 }
