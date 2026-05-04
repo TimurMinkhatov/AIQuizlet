@@ -91,8 +91,8 @@ public enum L10n {
     }
   }
   public enum Home {
-    /// Hello! 👋
-    public static let greeting = L10n.tr("Localizable", "home.greeting", fallback: "Hello! 👋")
+    /// Hello!
+    public static let greeting = L10n.tr("Localizable", "home.greeting", fallback: "Hello!")
     public enum CreateFromPhoto {
       /// Take a photo of your notes and get a ready test
       public static let subtitle = L10n.tr("Localizable", "home.createFromPhoto.subtitle", fallback: "Take a photo of your notes and get a ready test")
@@ -266,19 +266,7 @@ public enum L10n {
 
 extension L10n {
   private static func tr(_ table: String, _ key: String, _ args: CVarArg..., fallback value: String) -> String {
-    let format = BundleToken.bundle.localizedString(forKey: key, value: value, table: table)
+    let format = LocalizationService.shared.bundle.localizedString(forKey: key, value: value, table: table)
     return String(format: format, locale: Locale.current, arguments: args)
   }
 }
-
-// swiftlint:disable convenience_type
-private final class BundleToken {
-  static let bundle: Bundle = {
-    #if SWIFT_PACKAGE
-    return Bundle.module
-    #else
-    return Bundle(for: BundleToken.self)
-    #endif
-  }()
-}
-// swiftlint:enable convenience_type

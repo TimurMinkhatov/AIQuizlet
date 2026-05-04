@@ -45,9 +45,9 @@ final class LanguageSelectorView: UIView {
         layer.cornerRadius = 16
         setupLayout()
         setupActions()
-        selectButton(russianButton)
+        let currentLanguage = LocalizationService.shared.currentLanguage
+        selectButton(currentLanguage == "en" ? englishButton : russianButton)
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

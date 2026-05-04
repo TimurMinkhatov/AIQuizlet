@@ -7,3 +7,4 @@ strings:
       params:
         enumName: L10n
         publicAccess: true
+        bundle: LocalizationService.shared.bundle

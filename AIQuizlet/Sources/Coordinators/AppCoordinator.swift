@@ -51,7 +51,7 @@ final class AppCoordinator: Coordinator {
     
     func showMainFlow() {
         children.removeAll()
-        
+
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
             assembly: assembly
@@ -59,5 +59,8 @@ final class AppCoordinator: Coordinator {
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
         tabBarCoordinator.start()
+
+        window?.rootViewController = navigationController  
+        window?.makeKeyAndVisible()
     }
 }

@@ -89,12 +89,12 @@ private extension ThemeSelectorView {
         addSubview(buttonStack)
 
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
+            $0.top.leading.trailing.equalToSuperview().inset(20)
         }
 
         buttonStack.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12)
-            $0.leading.trailing.bottom.equalToSuperview().inset(16)
+            $0.leading.trailing.bottom.equalToSuperview().inset(20)
             $0.height.equalTo(64)
         }
     }

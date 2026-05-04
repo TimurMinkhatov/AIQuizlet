@@ -197,6 +197,7 @@ private extension ProfileViewController {
         themeSelectorView.snp.makeConstraints {
             $0.top.equalTo(statsStack.snp.bottom).offset(Constants.sectionSpacing)
             $0.leading.trailing.equalToSuperview().inset(Constants.horizontalInset)
+            $0.height.equalTo(Constants.themeSelectorHeight)
         }
 
         languageSelectorView.snp.makeConstraints {
@@ -235,7 +236,11 @@ private extension ProfileViewController {
             self?.view.window?.overrideUserInterfaceStyle = style
         }
 
-        languageSelectorView.onLanguageSelected = { _ in }
+        languageSelectorView.onLanguageSelected = { language in
+            LocalizationService.shared.currentLanguage = language
+            print("Language changed to: \(language)")
+            print("Current: \(LocalizationService.shared.currentLanguage)")
+        }
     }
 
     func bindViewModel() {
@@ -314,5 +319,6 @@ private extension ProfileViewController {
         static let actionsCornerRadius: CGFloat = 16
         static let versionFontSize: CGFloat = 13
         static let versionBottomInset: CGFloat = 24
+        static let themeSelectorHeight: CGFloat = 150
     }
 }
