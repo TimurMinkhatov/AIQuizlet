@@ -139,12 +139,16 @@ extension ProfileViewController {
         setupActions()
         bindViewModel()
         profileView.configure(with: viewModel)
-        updateUI()
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         gradientLayer.frame = view.bounds
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        updateUI()
     }
 }
 

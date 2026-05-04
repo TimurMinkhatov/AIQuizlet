@@ -6,10 +6,12 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
-
 //
 //  QuestionAnalysisCell.swift
 //  AIQuizlet
+//
+//  Created by Azamat Zakirov on 02.05.2026.
+//  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
 import UIKit
@@ -17,14 +19,53 @@ import SnapKit
 
 final class QuestionAnalysisCell: UITableViewCell {
     
+    // MARK: - Constants
+    
+    private enum Constants {
+        enum Layout {
+            static let cornerRadius: CGFloat = 12
+            static let borderWidth: CGFloat = 1
+            static let defaultSpacing: CGFloat = 16
+            static let smallSpacing: CGFloat = 12
+            static let iconSize: CGFloat = 24
+            static let chevronSize: CGFloat = 16
+            static let optionHeight: CGFloat = 48
+            static let mainContainerVerticalInset: CGFloat = 6
+            static let explanationLabelInset: CGFloat = 12
+            static let dividerHeight: CGFloat = 1
+        }
+        
+        enum Animation {
+            static let duration: TimeInterval = 0.3
+        }
+        
+        enum Colors {
+            static let border = UIColor.systemGray5.cgColor
+            static let chevron = UIColor.systemGray3
+            static let divider = UIColor.systemGray6
+            static let explanationBg = UIColor(red: 235/255, green: 243/255, blue: 255/255, alpha: 1)
+            static let explanationBorder = UIColor(red: 215/255, green: 230/255, blue: 250/255, alpha: 1).cgColor
+            static let explanationText = UIColor(red: 45/255, green: 65/255, blue: 85/255, alpha: 1)
+        }
+        
+        enum Strings {
+            static let questionPrefix = "Вопрос"
+            static let explanationPrefix = "Объяснение: "
+            static let checkmarkIcon = "checkmark.circle"
+            static let xmarkIcon = "xmark.circle"
+            static let chevronIcon = "chevron.down"
+            static let fatalErrorInit = "init(coder:) has not been implemented"
+        }
+    }
+    
     // MARK: - UI Elements
     
     private let mainContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.layer.cornerRadius = 12
-        view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor.systemGray5.cgColor
+        view.layer.cornerRadius = Constants.Layout.cornerRadius
+        view.layer.borderWidth = Constants.Layout.borderWidth
+        view.layer.borderColor = Constants.Colors.border
         view.clipsToBounds = true
         return view
     }()
@@ -32,7 +73,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     private let headerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = Constants.Layout.smallSpacing
         stack.alignment = .center
         return stack
     }()
@@ -49,20 +90,20 @@ final class QuestionAnalysisCell: UITableViewCell {
     private let rootStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 16
+        stack.spacing = Constants.Layout.defaultSpacing
         return stack
     }()
     
     private let chevronIcon: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "chevron.down"))
-        iv.tintColor = .systemGray3
+        let iv = UIImageView(image: UIImage(systemName: Constants.Strings.chevronIcon))
+        iv.tintColor = Constants.Colors.chevron
         iv.contentMode = .scaleAspectFit
         return iv
     }()
     
     private let dividerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.systemGray6
+        view.backgroundColor = Constants.Colors.divider
         view.isHidden = true
         return view
     }()
@@ -70,7 +111,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     private let detailsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 16
+        stack.spacing = Constants.Layout.defaultSpacing
         stack.isHidden = true
         return stack
     }()
@@ -92,17 +133,17 @@ final class QuestionAnalysisCell: UITableViewCell {
     
     private let explanationContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(red: 235/255, green: 243/255, blue: 255/255, alpha: 1)
-        view.layer.cornerRadius = 12
-        view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor(red: 215/255, green: 230/255, blue: 250/255, alpha: 1).cgColor
+        view.backgroundColor = Constants.Colors.explanationBg
+        view.layer.cornerRadius = Constants.Layout.cornerRadius
+        view.layer.borderWidth = Constants.Layout.borderWidth
+        view.layer.borderColor = Constants.Colors.explanationBorder
         return view
     }()
     
     private let explanationLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.textColor = UIColor(red: 45/255, green: 65/255, blue: 85/255, alpha: 1)
+        label.textColor = Constants.Colors.explanationText
         return label
     }()
     
@@ -114,84 +155,95 @@ final class QuestionAnalysisCell: UITableViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError(Constants.Strings.fatalErrorInit)
     }
 
     // MARK: - Configuration
     
-    func configure(with question: QuestionRecord, index: Int, isExpanded: Bool) {
-        questionTitleLabel.text = "Вопрос \(index + 1)"
+    func configure(with question: QuestionRecord, userAnswerIndex: Int, index: Int, isExpanded: Bool) {
+        let isCorrect = userAnswerIndex == question.correctAnswer
         
-        let isCorrect = question.userAnswerIndex == question.correctAnswer
-        statusIcon.image = UIImage(systemName: isCorrect ? "checkmark.circle" : "xmark.circle")
+        configureHeader(index: index, isCorrect: isCorrect, isExpanded: isExpanded)
+        
+        if isExpanded {
+            configureDetails(question: question, userAnswerIndex: userAnswerIndex, index: index)
+        }
+        
+        updateConstraints(isExpanded: isExpanded)
+    }
+}
+
+// MARK: - Private Methods
+
+private extension QuestionAnalysisCell {
+    
+    func configureHeader(index: Int, isCorrect: Bool, isExpanded: Bool) {
+        questionTitleLabel.text = "\(Constants.Strings.questionPrefix) \(index + 1)"
+        statusIcon.image = UIImage(systemName: isCorrect ? Constants.Strings.checkmarkIcon : Constants.Strings.xmarkIcon)
         statusIcon.tintColor = isCorrect ? .systemGreen : .systemRed
         
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: Constants.Animation.duration) {
             self.chevronIcon.transform = isExpanded ? CGAffineTransform(rotationAngle: .pi) : .identity
         }
         
         dividerView.isHidden = !isExpanded
         detailsStack.isHidden = !isExpanded
+    }
+    
+    func configureDetails(question: QuestionRecord, userAnswerIndex: Int, index: Int) {
+        fullQuestionLabel.text = "\(Constants.Strings.questionPrefix) \(index + 1): \(question.text)"
+        optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
-        if isExpanded {
-            fullQuestionLabel.text = "Вопрос \(index + 1): \(question.text)"
+        question.answers.enumerated().forEach { answerIndex, text in
+            let optionButton = QuizOptionButton()
+            optionButton.title = text
+            optionButton.isUserInteractionEnabled = false
             
-            optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-            
-            question.answers.enumerated().forEach { answerIndex, text in
-                let optionButton = QuizOptionButton()
-                optionButton.title = text
-                optionButton.isUserInteractionEnabled = false
-                
-                if answerIndex == question.correctAnswer {
-                    optionButton.updateState(.correct)
-                } else if answerIndex == question.userAnswerIndex {
-                    optionButton.updateState(.wrong)
-                } else {
-                     optionButton.updateState(.normal)
-                }
-                
-                optionsStack.addArrangedSubview(optionButton)
-                optionButton.snp.makeConstraints { $0.height.equalTo(48) }
-            }
-            
-            if let explanation = question.explanation, !explanation.isEmpty {
-                explanationContainer.isHidden = false
-                
-                let boldText = "Объяснение: "
-                let normalText = explanation
-                
-                let attributedString = NSMutableAttributedString(string: boldText, attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .bold)
-                ])
-                attributedString.append(NSAttributedString(string: normalText, attributes: [
-                    .font: UIFont.systemFont(ofSize: 14, weight: .regular)
-                ]))
-                
-                explanationLabel.attributedText = attributedString
+            if answerIndex == question.correctAnswer {
+                optionButton.updateState(.correct)
+            } else if answerIndex == userAnswerIndex {
+                optionButton.updateState(.wrong)
             } else {
-                explanationContainer.isHidden = true
+                 optionButton.updateState(.normal)
             }
+            
+            optionsStack.addArrangedSubview(optionButton)
+            optionButton.snp.makeConstraints { $0.height.equalTo(Constants.Layout.optionHeight) }
         }
         
-        mainContainer.snp.remakeConstraints {
-                $0.top.equalToSuperview().inset(6)
-                $0.bottom.equalToSuperview().inset(6)
-                $0.leading.trailing.equalToSuperview().inset(16)
-                
-                if isExpanded {
-                    $0.bottom.equalTo(detailsStack.snp.bottom).offset(16)
-                } else {
-                    $0.bottom.equalTo(headerStack.snp.bottom).offset(16)
-                }
-            }
+        setupExplanation(question.explanation)
     }
-}
-
-// MARK: - Setup
-
-private extension QuestionAnalysisCell {
     
+    func setupExplanation(_ explanation: String?) {
+        if let explanation = explanation, !explanation.isEmpty {
+            explanationContainer.isHidden = false
+            
+            let attributedString = NSMutableAttributedString(string: Constants.Strings.explanationPrefix, attributes: [
+                .font: UIFont.systemFont(ofSize: 14, weight: .bold)
+            ])
+            attributedString.append(NSAttributedString(string: explanation, attributes: [
+                .font: UIFont.systemFont(ofSize: 14, weight: .regular)
+            ]))
+            
+            explanationLabel.attributedText = attributedString
+        } else {
+            explanationContainer.isHidden = true
+        }
+    }
+    
+    func updateConstraints(isExpanded: Bool) {
+        mainContainer.snp.remakeConstraints {
+            $0.top.equalToSuperview().inset(Constants.Layout.mainContainerVerticalInset)
+            $0.bottom.equalToSuperview().inset(Constants.Layout.mainContainerVerticalInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.defaultSpacing)
+            
+            if isExpanded {
+                $0.bottom.equalTo(detailsStack.snp.bottom).offset(Constants.Layout.defaultSpacing)
+            } else {
+                $0.bottom.equalTo(headerStack.snp.bottom).offset(Constants.Layout.defaultSpacing)
+            }
+        }
+    }
     
     func setupUI() {
         backgroundColor = .clear
@@ -199,11 +251,8 @@ private extension QuestionAnalysisCell {
         
         contentView.addSubview(mainContainer)
         mainContainer.addSubviews(rootStack, headerStack, dividerView, detailsStack)
-        
         headerStack.addArrangedSubviews(statusIcon, questionTitleLabel, UIView(), chevronIcon)
-        
         detailsStack.addArrangedSubviews(fullQuestionLabel, optionsStack, explanationContainer)
-
         explanationContainer.addSubview(explanationLabel)
         
         setupConstraints()
@@ -211,36 +260,36 @@ private extension QuestionAnalysisCell {
     
     func setupConstraints() {
         mainContainer.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(6)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.bottom.equalToSuperview().inset(Constants.Layout.mainContainerVerticalInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.defaultSpacing)
         }
                 
         headerStack.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(24)
+            $0.top.leading.trailing.equalToSuperview().inset(Constants.Layout.defaultSpacing)
+            $0.height.equalTo(Constants.Layout.iconSize)
         }
         
         statusIcon.snp.makeConstraints {
-            $0.size.equalTo(24)
+            $0.size.equalTo(Constants.Layout.iconSize)
         }
         
         chevronIcon.snp.makeConstraints {
-            $0.size.equalTo(16)
+            $0.size.equalTo(Constants.Layout.chevronSize)
         }
         
         dividerView.snp.makeConstraints {
-            $0.top.equalTo(headerStack.snp.bottom).offset(16)
+            $0.top.equalTo(headerStack.snp.bottom).offset(Constants.Layout.defaultSpacing)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(1)
+            $0.height.equalTo(Constants.Layout.dividerHeight)
         }
         
         detailsStack.snp.makeConstraints {
-            $0.top.equalTo(dividerView.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(dividerView.snp.bottom).offset(Constants.Layout.defaultSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.defaultSpacing)
         }
         
         explanationLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(12)
+            $0.edges.equalToSuperview().inset(Constants.Layout.explanationLabelInset)
         }
     }
 }

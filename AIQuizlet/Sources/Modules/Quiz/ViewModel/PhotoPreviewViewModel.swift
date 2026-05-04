@@ -57,7 +57,6 @@ final class PhotoPreviewViewModel {
                                 answers: $0.answers,
                                 correctAnswer: $0.correctAnswer,
                                 explanation: $0.explanation,
-                                userAnswerIndex: -1
                             )
                         }
                         
@@ -96,7 +95,6 @@ private extension PhotoPreviewViewModel {
                 answers: $0.answers,
                 correctAnswer: $0.correctAnswer,
                 explanation: $0.explanation,
-                userAnswerIndex: -1
             )
         }
         

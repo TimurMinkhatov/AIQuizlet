@@ -17,14 +17,12 @@ class QuestionRecord {
     var answers: [String]
     var correctAnswer: Int
     var explanation: String?
-    var userAnswerIndex: Int
     
-    init(id: UUID = UUID(), text: String, answers: [String], correctAnswer: Int, explanation: String? = nil, userAnswerIndex: Int) {
+    init(id: UUID = UUID(), text: String, answers: [String], correctAnswer: Int, explanation: String? = nil) {
         self.id = id
         self.text = text
         self.answers = answers
         self.correctAnswer = correctAnswer
         self.explanation = explanation
-        self.userAnswerIndex = userAnswerIndex
     }
 }

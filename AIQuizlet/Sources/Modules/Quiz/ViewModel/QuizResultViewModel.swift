@@ -47,8 +47,14 @@ final class QuizResultViewModel {
     
     var expandedIndexSet = Set<Int>()
     
+    // MARK: - Methods
+    
     func getQuestion(at index: Int) -> QuestionRecord {
         quizResult.quiz.questions[index]
+    }
+    
+    func getUserAnswer(at index: Int) -> Int {
+        return quizResult.userAnswers.first(where: { $0.questionIndex == index })?.selectedAnswer ?? -1
     }
     
     func retryQuiz() {

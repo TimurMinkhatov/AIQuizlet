@@ -41,7 +41,6 @@ final class QuizCoordinator: Coordinator {
                 answers: $0.answers,
                 correctAnswer: $0.correctAnswer,
                 explanation: $0.explanation,
-                userAnswerIndex: -1
             )
         }
         

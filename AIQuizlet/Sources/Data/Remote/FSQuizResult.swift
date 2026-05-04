@@ -16,6 +16,7 @@ struct FSQuizResult: Codable {
     let correctCount: Int
     let totalQuestions: Int
     let completedAt: Date
+    let answers: [FSAnswer]
 
     var asDictionary: [String: Any] {
         return [
@@ -24,7 +25,8 @@ struct FSQuizResult: Codable {
             "score": score,
             "correctCount": correctCount,
             "totalQuestions": totalQuestions,
-            "completedAt": completedAt
+            "completedAt": completedAt,
+            "answers": answers.map { $0.asDictionary }
         ]
     }
 }
