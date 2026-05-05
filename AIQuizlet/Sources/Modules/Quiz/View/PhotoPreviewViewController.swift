@@ -12,6 +12,7 @@ import SnapKit
 final class PhotoPreviewViewController: UIViewController {
 
     // MARK: - Properties
+    
     private let viewModel: PhotoPreviewViewModel
     private let previewView: PhotoPreviewView
 
@@ -34,6 +35,11 @@ final class PhotoPreviewViewController: UIViewController {
         setupUI()
         setupActions()
         bindViewModel()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     // MARK: - Public Methods

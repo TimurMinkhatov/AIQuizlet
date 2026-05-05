@@ -19,7 +19,7 @@ final class PhotoPreviewViewModel {
     
     var onLoadingStateChanged: ((Bool) -> Void)?
     var onErrorOccurred: ((String) -> Void)?
-    var onSuccess: ((Quiz) -> Void)?
+    var onSuccess: ((Quiz, QuizRecord) -> Void)?
     
     // MARK: - Init
     
@@ -49,9 +49,14 @@ final class PhotoPreviewViewModel {
             Task {
                 do {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
+                    
                     await MainActor.run {
+                        let questionRecords = quiz.questions.toQuestionRecords()
+                        let record = QuizRecord(title: quiz.title, questions: questionRecords)
+                        
                         self.onLoadingStateChanged?(false)
-                        self.coordinator?.showQuiz(quiz: quiz)
+
+                        self.coordinator?.showQuiz(quiz: quiz, record: record)
                     }
                 } catch {
                     await MainActor.run {
@@ -69,13 +74,24 @@ final class PhotoPreviewViewModel {
     // MARK: - Private Methods
     
 private extension PhotoPreviewViewModel {
-        
     func handleError(_ message: String) {
         onLoadingStateChanged?(false)
         onErrorOccurred?(message)
     }
     
     func handleSuccess(quiz: Quiz) {
-        coordinator?.showQuiz(quiz: quiz)
+        
+        let questionRecord = quiz.questions.enumerated().map { index, question in
+            QuestionRecord(
+                orderIndex: index,
+                text: question.text,
+                answers: question.answers,
+                correctAnswer: question.correctAnswer,
+                explanation: question.explanation,
+            )
+        }
+        
+        let record = QuizRecord(title: quiz.title, questions: questionRecord)
+        coordinator?.showQuiz(quiz: quiz, record: record)
     }
 }

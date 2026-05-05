@@ -14,12 +14,13 @@ final class TabBarCoordinator: Coordinator {
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
-    let assembly: ServicesAssembly
     
-    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
+    private let servicesAssembly: ServicesAssembly
+    
+    init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
-        self.assembly = assembly
+        self.servicesAssembly = servicesAssembly
     }
     
     func start() {
@@ -54,7 +55,7 @@ private extension TabBarCoordinator {
         
         switch page {
         case .home:
-            let homeCoordinator = HomeCoordinator(navigationController: nav, assembly: assembly)
+            let homeCoordinator = HomeCoordinator(navigationController: nav, servicesAssembly: servicesAssembly)
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()
@@ -64,7 +65,7 @@ private extension TabBarCoordinator {
             historyViewController.title = "История"
             nav.setViewControllers([historyViewController], animated: false)
         case .profile:
-            let profileCoordinator = ProfileCoordinator(navigationController: nav, assembly: assembly)
+            let profileCoordinator = ProfileCoordinator(navigationController: nav, servicesAssembly: servicesAssembly)
             profileCoordinator.parentCoordinator = self
             children.append(profileCoordinator)
             profileCoordinator.start()
@@ -75,7 +76,7 @@ private extension TabBarCoordinator {
         tabBarController.setViewControllers(controllers, animated: false)
         tabBarController.selectedIndex = TabBarPage.home.rawValue
         tabBarController.tabBar.backgroundColor = .white
-        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1) 
+        tabBarController.tabBar.tintColor = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
         navigationController.viewControllers = [tabBarController]
         navigationController.setNavigationBarHidden(true, animated: false)
         setupAppearance()

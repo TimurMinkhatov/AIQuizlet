@@ -15,13 +15,13 @@ final class AuthCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    let assembly: ServicesAssembly
+    let servicesAssembly: ServicesAssembly
 
     // MARK: - Init
 
-    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
+    init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
-        self.assembly = assembly
+        self.servicesAssembly = servicesAssembly
     }
 
     // MARK: - Coordinator
@@ -44,7 +44,10 @@ final class AuthCoordinator: Coordinator {
 private extension AuthCoordinator {
 
     func showAuth(state: AuthState = .login) {
-        let vm = AuthViewModel(assembly: assembly)
+        let vm = AuthViewModel(
+            authService: servicesAssembly.authService,
+            firestoreService: servicesAssembly.firestoreService
+        )
         vm.coordinator = self
         let vc = AuthViewController(viewModel: vm)
         navigationController.setViewControllers([vc], animated: false)

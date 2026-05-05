@@ -5,6 +5,7 @@
 //  Created by Timur Minkhatov on 01/04/2026.
 //  Copyright © 2026 t-bank-team-practice. All rights reserved.
 //
+
 import UIKit
 import FirebaseAuth
 import SwiftData
@@ -16,15 +17,15 @@ final class AppCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    let assembly: ServicesAssembly
     private var window: UIWindow?
+    private let servicesAssembly: ServicesAssembly
 
     // MARK: - Init
     
-    init(navigationController: UINavigationController, window: UIWindow?, assembly: ServicesAssembly) {
+    init(navigationController: UINavigationController, window: UIWindow?, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.window = window
-        self.assembly = assembly
+        self.servicesAssembly = servicesAssembly
     }
 
     // MARK: - Public Methods
@@ -40,7 +41,7 @@ final class AppCoordinator: Coordinator {
     func showAuth() {
         children.removeAll()
         
-        let authCoordinator = AuthCoordinator(navigationController: navigationController, assembly: assembly)
+        let authCoordinator = AuthCoordinator(navigationController: navigationController, servicesAssembly: servicesAssembly)
         authCoordinator.parentCoordinator = self
         children.append(authCoordinator)
         authCoordinator.start()
@@ -54,7 +55,7 @@ final class AppCoordinator: Coordinator {
         
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
-            assembly: assembly
+            servicesAssembly: servicesAssembly
         )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)

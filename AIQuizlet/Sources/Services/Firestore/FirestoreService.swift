@@ -25,18 +25,20 @@ extension FirestoreService {
     
     func createUser(email: String) async throws {
         guard let userId else { return }
-        let document =  try await db.collection("users").document(userId).getDocument()
+        let document = try await db.collection("users").document(userId).getDocument()
         guard !document.exists else { return }
         
-        let user = FSUser(
-            userId: userId,
-            email: email,
-            totalQuizzes: 0,
-            averageScore: 0.0,
-            bestScore: 0.0,
-            totalCompleted: 0
-        )
-        try await db.collection("users").document(userId).setData(user.asDictionary)
+        let initialStats = UserStats.initial()
+        let userData: [String: Any] = [
+            "userId": userId,
+            "email": email,
+            "totalQuizzes": initialStats.totalQuizzes,
+            "totalCompleted": initialStats.totalCompleted,
+            "averageScore": initialStats.averageScore,
+            "bestScore": initialStats.bestScore
+        ]
+        
+        try await db.collection("users").document(userId).setData(userData)
     }
     
     func saveQuiz(quiz: FSQuiz) async throws {
@@ -48,7 +50,7 @@ extension FirestoreService {
         guard let userId else { return }
         try await db.collection("users").document(userId).collection("quizResults").document(quizResult.id).setData(quizResult.asDictionary)
         
-        try await updateUserStats(result: quizResult)
+        try await updateUserStats(with: quizResult)
     }
     
     func fetchQuizzes() async throws -> [FSQuiz] {
@@ -76,6 +78,30 @@ extension FirestoreService {
         return try Firestore.Decoder().decode(FSUser.self, from: data)
     }
     
+    func fetchUserStats() async throws -> UserStats? {
+        guard let userId else { return nil }
+        
+        let document = try await db.collection("users").document(userId).getDocument()
+        guard let data = document.data() else { return nil }
+        return UserStats(from: data)
+    }
+    
+    func listenToUserStats(completion: @escaping (UserStats?) -> Void) -> ListenerRegistration? {
+        guard let userId else {
+            completion(nil)
+            return nil
+        }
+        
+        return db.collection("users").document(userId).addSnapshotListener { snapshot, _ in
+            guard let data = snapshot?.data() else {
+                completion(nil)
+                return
+            }
+            let stats = UserStats(from: data)
+            completion(stats)
+        }
+    }
+    
     func fetchQuizResults() async throws -> [FSQuizResult] {
         guard let userId else { return []}
         
@@ -88,21 +114,22 @@ extension FirestoreService {
     func deleteAllData() async throws {
         guard let userId else { return }
         
-        let quizzes = try await db.collection("users")
-            .document(userId)
-            .collection("quizzes")
-            .getDocuments()
+        let batch = db.batch()
+        let quizzes = try await db.collection("users").document(userId).collection("quizzes").getDocuments()
         for doc in quizzes.documents {
-            try await doc.reference.delete()
+            batch.deleteDocument(doc.reference)
         }
         
-        let results = try await db.collection("users")
-            .document(userId)
-            .collection("quizResults")
-            .getDocuments()
+        let results = try await db.collection("users").document(userId).collection("quizResults").getDocuments()
         for doc in results.documents {
-            try await doc.reference.delete()
+            batch.deleteDocument(doc.reference)
         }
+        
+        try await batch.commit()
+        
+        let initialStats = UserStats.initial()
+        let userRef = db.collection("users").document(userId)
+        try await userRef.updateData(initialStats.toDictionary())
     }
 }
 
@@ -110,24 +137,28 @@ extension FirestoreService {
 
 private extension FirestoreService {
     
-    func updateUserStats(result: FSQuizResult) async throws {
+    func updateUserStats(with result: FSQuizResult) async throws {
         guard let userId else { return }
-        
         let userRef = db.collection("users").document(userId)
-        let document = try await userRef.getDocument()
-        guard var userData = document.data() else { return }
         
-        let totalQuizzes = (userData["totalQuizzes"] as? Int ?? 0) + 1
-        let totalCompleted = (userData["totalCompleted"] as? Int ?? 0) + result.totalQuestions
-        let currentAvg = (userData["averageScore"] as? Double ?? 0.0)
-        let newAvg = (currentAvg * Double(totalQuizzes - 1) + Double(result.score)) / Double(totalQuizzes)
-        let bestScore = max(userData["bestScore"] as? Double ?? 0.0, result.score)
-        
-        try await userRef.updateData([
-            "totalQuizzes": totalQuizzes,
-            "totalCompleted": totalCompleted,
-            "averageScore": newAvg,
-            "bestScore": bestScore
-        ])
+        let _ = try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            let document: DocumentSnapshot
+            do {
+                try document = transaction.getDocument(userRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+            
+            guard let userData = document.data() else { return nil }
+            
+            let currentStats = UserStats(from: userData)
+            
+            let updatedStats = currentStats.updatedWith(newResult: result)
+            
+            transaction.updateData(updatedStats.toDictionary(), forDocument: userRef)
+            
+            return nil
+        }
     }
 }

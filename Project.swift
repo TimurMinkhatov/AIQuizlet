@@ -48,9 +48,7 @@ let project = Project(
             ],
             dependencies: [
                 .external(name: "Moya"),
-                .external(name: "SnapKit"),
- 		.external(name: "FirebaseAuth"),
-    		.external(name: "FirebaseFirestore"),
+                .external(name: "SnapKit")
             ],
             settings: .settings(
                 base: [
