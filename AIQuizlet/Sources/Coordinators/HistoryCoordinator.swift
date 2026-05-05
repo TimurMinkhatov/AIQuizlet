@@ -17,7 +17,7 @@ final class HistoryCoordinator: Coordinator {
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
     
-    // MARK: - Initialization
+    // MARK: - Init
     
     init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
@@ -27,27 +27,31 @@ final class HistoryCoordinator: Coordinator {
     // MARK: - Public Methods
     
     func start() {
-        let viewModel = HistoryViewModel(servicesAssembly: servicesAssembly)
-        viewModel.coordinator = self
-        let viewController = HistoryViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: false)
+        Task { @MainActor in
+            let viewModel = HistoryViewModel(servicesAssembly: servicesAssembly)
+            viewModel.coordinator = self
+            let viewController = HistoryViewController(viewModel: viewModel)
+            navigationController.pushViewController(viewController, animated: false)
+        }
     }
     
     func showResultDetail(for result: QuizResult) {
-        let viewModel = QuizResultViewModel(
-            quizResult: result,
-            isFromHistory: true,
-            onRetry: { [weak self] quizRecord in
-                self?.startRetryQuiz(with: quizRecord)
-            },
-            onHome: { [weak self] in
-                self?.navigateToHome()
-            }
-        )
-        
-        let viewController = QuizResultViewController(viewModel: viewModel)
-        viewController.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(viewController, animated: true)
+        Task { @MainActor in
+            let viewModel = QuizResultViewModel(
+                quizResult: result,
+                isFromHistory: true,
+                onRetry: { [weak self] quizRecord in
+                    self?.startRetryQuiz(with: quizRecord)
+                },
+                onHome: { [weak self] in
+                    self?.navigateToHome()
+                }
+            )
+            
+            let viewController = QuizResultViewController(viewModel: viewModel)
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController.pushViewController(viewController, animated: true)
+        }
     }
     
     // MARK: - Private Methods
@@ -69,4 +73,3 @@ final class HistoryCoordinator: Coordinator {
         quizCoordinator.startQuiz(with: quiz)
     }
 }
-

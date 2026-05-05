@@ -46,7 +46,10 @@ final class ProfileViewModel {
             return (user.stats.totalQuizzes, user.stats.averageScore, user.stats.bestScore, user.stats.totalCompleted)
         }
         
-        let results = try storageService.fetchResults()
+        guard let userId = authService.currentUser?.uid, !userId.isEmpty else {
+            return (0, 0, 0, 0)
+        }
+        let results = try storageService.fetchResults().filter { $0.userId == userId }
         let totalQuizzes = results.count
         let avgScore = results.isEmpty ? 0.0 : results.map { $0.percentage }.reduce(0.0, +) / Double(totalQuizzes)
         let bestScores = results.map(\.percentage).max() ?? 0.0

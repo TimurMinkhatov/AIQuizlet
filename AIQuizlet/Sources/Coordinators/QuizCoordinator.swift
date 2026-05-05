@@ -34,12 +34,26 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        let questionRecords = quiz.questions.toQuestionRecords()
-        let quizRecord = QuizRecord(
-            title: quiz.title,
-            questions: questionRecords
-        )
-        showQuiz(quiz: quiz, record: quizRecord)
+        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+            return
+        }
+        let questionRecords = quiz.questions.map { question in
+            QuestionRecord(
+                orderIndex: 0,
+                text: question.text,
+                answers: question.answers,
+                correctAnswer: question.correctAnswer,
+                explanation: question.explanation
+            )
+        }
+        let record = QuizRecord(
+                userId: currentUserId,
+                title: quiz.title,
+                questions: questionRecords
+            )
+        DispatchQueue.main.async { [weak self] in
+            self?.showQuiz(quiz: quiz, record: record)
+        }
     }
 
     func didCapturePhoto(_ image: UIImage) {
