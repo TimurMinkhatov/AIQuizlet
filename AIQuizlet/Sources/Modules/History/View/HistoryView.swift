@@ -103,6 +103,8 @@ final class HistoryView: UITableViewCell {
         updateStatusColor(percentage: percentage)
     }
     
+    
+    
     // MARK: - Private Methods
     
     private func updateStatusColor(percentage: Double) {
