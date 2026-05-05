@@ -326,7 +326,7 @@ private extension QuizViewController {
                     self.render(question: data.question, number: data.currentNumber)
                     self.showResultUI(with: data)
                 case .finished(let score, let total):
-                    print("Тест завершен: \(score) из \(total)")
+                    break
                 case .idle: break
                 }
             }

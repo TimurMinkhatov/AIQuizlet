@@ -90,6 +90,7 @@ final class HistoryViewController: UIViewController {
         bindViewModel()
         setupActions()
         hideKeyboardWhenTappedAround()
+
     }
     
     override func viewDidLayoutSubviews() {
