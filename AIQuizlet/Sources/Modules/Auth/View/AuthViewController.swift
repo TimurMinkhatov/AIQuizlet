@@ -34,12 +34,10 @@ final class AuthViewController: UIViewController {
 
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0.5, y: 0)
-        layer.endPoint = CGPoint(x: 0.5, y: 1)
+        view.applyGradient(colors: [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+        ], startPoint: CGPoint(x: 0.5, y: 0), endPoint: CGPoint(x: 0.5, y: 1), cornerRadius: 10)
         return layer
     }()
 

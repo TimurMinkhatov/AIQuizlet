@@ -140,10 +140,15 @@ extension ProfileViewController {
         bindViewModel()
         profileView.configure(with: viewModel)
         updateUI()
-        updateBackground()
+        updateGradient(for: traitCollection.userInterfaceStyle)
 
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (vc: ProfileViewController, _) in
-            self?.updateBackground()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let style = notification.object as? UIUserInterfaceStyle else { return }
+            self?.updateGradient(for: style)
         }
     }
 
@@ -238,8 +243,8 @@ private extension ProfileViewController {
         clearDataButton.addTarget(self, action: #selector(clearDataTapped), for: .touchUpInside)
         logoutButton.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
 
-        themeSelectorView.onThemeSelected = { [weak self] style in
-            self?.view.window?.overrideUserInterfaceStyle = style
+        themeSelectorView.onThemeSelected = { style in
+            ThemeManager.shared.apply(style: style)
         }
 
         languageSelectorView.onLanguageSelected = { language in
@@ -285,21 +290,16 @@ private extension ProfileViewController {
         return button
     }
 
-    func updateBackground() {
-        if traitCollection.userInterfaceStyle == .dark {
-            gradientLayer.isHidden = true
-            view.backgroundColor = UIColor(hex: "0a0a0a")
-            versionLabel.textColor = .secondaryLabel
-            actionsCardView.backgroundColor = UIColor(hex: "1e2939")
-            updateButtonColors()
-        } else {
-            gradientLayer.isHidden = false
-            view.backgroundColor = .clear
-            versionLabel.textColor = .white
-            actionsCardView.backgroundColor = .secondarySystemGroupedBackground
-            updateButtonColors()        }
-    }
+
     
+    func updateGradient(for style: UIUserInterfaceStyle) {
+        gradientLayer.isHidden = style == .dark
+        view.backgroundColor = style == .dark ? AppColors.background : .clear
+        versionLabel.textColor = style == .dark ? .secondaryLabel : .white
+        actionsCardView.backgroundColor = AppColors.cardBackground
+        updateButtonColors()
+    }
+
     private func updateButtonColors() {
         let isDark = traitCollection.userInterfaceStyle == .dark
         logoutButton.configuration?.baseForegroundColor = isDark ? .white : .label

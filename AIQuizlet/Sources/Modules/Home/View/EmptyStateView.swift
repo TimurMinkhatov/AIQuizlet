@@ -12,7 +12,7 @@ final class EmptyStateView: UIView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .secondarySystemGroupedBackground
+        view.backgroundColor = AppColors.cardBackground
         view.layer.cornerRadius = 24
         return view
     }()
@@ -55,10 +55,12 @@ final class EmptyStateView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        updateCardBackground()
-
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: EmptyStateView, _) in
-            self?.updateCardBackground()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.containerView.backgroundColor = AppColors.cardBackground
         }
     }
     
@@ -98,11 +100,5 @@ final class EmptyStateView: UIView {
             make.leading.trailing.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().offset(-30)
         }
-    }
-    
-    func updateCardBackground() {
-        containerView.backgroundColor =        traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "1e2939")
-            : .secondarySystemGroupedBackground
     }
 }

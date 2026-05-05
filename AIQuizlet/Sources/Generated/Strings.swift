@@ -201,6 +201,12 @@ public enum L10n {
       /// Next
       public static var button: String { return L10n.tr("Localizable", "quiz.next.button", fallback: "Next") }
     }
+    public enum Photo {
+      public enum Retake {
+        /// Retake
+        public static var button: String { return L10n.tr("Localizable", "quiz.photo.retake.button", fallback: "Retake") }
+      }
+    }
     public enum Question {
       /// Continue
       public static var `continue`: String { return L10n.tr("Localizable", "quiz.question.continue", fallback: "Continue") }

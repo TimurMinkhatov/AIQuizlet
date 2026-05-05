@@ -5,6 +5,7 @@
 //  Created by Azamat Zakirov on 13.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
+
 import UIKit
 
 final class RecentTestCardView: UIView {
@@ -15,6 +16,13 @@ final class RecentTestCardView: UIView {
     init(test: RecentTest) {
         super.init(frame: .zero)
         setupView(test: test)
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.backgroundColor = AppColors.cardBackground
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -22,7 +30,7 @@ final class RecentTestCardView: UIView {
     }
     
     private func setupView(test: RecentTest) {
-        backgroundColor = .white
+        backgroundColor = AppColors.cardBackground
         layer.cornerRadius = 16
         
         titleLabel.text = test.title

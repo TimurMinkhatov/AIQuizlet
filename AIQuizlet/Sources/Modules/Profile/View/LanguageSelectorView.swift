@@ -39,14 +39,19 @@ final class LanguageSelectorView: UIView {
     init() {
         super.init(frame: .zero)
         layer.cornerRadius = 16
+        backgroundColor = AppColors.cardBackground
         setupLayout()
         setupActions()
         let currentLanguage = LocalizationService.shared.currentLanguage
         selectButton(currentLanguage == "en" ? englishButton : russianButton)
-        updateCardBackground()
 
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: LanguageSelectorView, _) in
-            self?.updateCardBackground()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let style = notification.object as? UIUserInterfaceStyle else { return }
+            self?.backgroundColor = AppColors.cardBackground
             self?.refreshInactiveButtons()
         }
     }
@@ -60,27 +65,6 @@ final class LanguageSelectorView: UIView {
 
 private extension LanguageSelectorView {
 
-    func inactiveButtonColor() -> UIColor {
-        traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "364153").withAlphaComponent(0.5)
-            : .systemGray5
-    }
-
-    func updateCardBackground() {
-        backgroundColor = traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "1e2939")
-            : .secondarySystemGroupedBackground
-    }
-
-    func refreshInactiveButtons() {
-        [russianButton, englishButton].forEach {
-            guard $0 != selectedButton else { return }
-            var config = $0.configuration
-            config?.background.backgroundColor = inactiveButtonColor()
-            $0.configuration = config
-        }
-    }
-
     func makeLanguageButton(title: String) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.title = title
@@ -89,7 +73,7 @@ private extension LanguageSelectorView {
         config.imagePadding = 8
         config.baseForegroundColor = .label
         config.background.cornerRadius = 10
-        config.background.backgroundColor = inactiveButtonColor()
+        config.background.backgroundColor = AppColors.inactiveButton
         return UIButton(configuration: config)
     }
 
@@ -97,7 +81,7 @@ private extension LanguageSelectorView {
         [russianButton, englishButton].forEach {
             var config = $0.configuration
             config?.baseForegroundColor = .label
-            config?.background.backgroundColor = inactiveButtonColor()
+            config?.background.backgroundColor = AppColors.inactiveButton
             $0.configuration = config
         }
         var config = button.configuration
@@ -105,6 +89,15 @@ private extension LanguageSelectorView {
         config?.background.backgroundColor = .systemBlue
         button.configuration = config
         selectedButton = button
+    }
+
+    func refreshInactiveButtons() {
+        [russianButton, englishButton].forEach {
+            guard $0 != selectedButton else { return }
+            var config = $0.configuration
+            config?.background.backgroundColor = AppColors.inactiveButton
+            $0.configuration = config
+        }
     }
 
     func setupLayout() {

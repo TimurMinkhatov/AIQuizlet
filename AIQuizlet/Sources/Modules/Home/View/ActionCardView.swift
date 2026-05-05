@@ -76,7 +76,7 @@ class ActionCardView: UIView {
         self.addGestureRecognizer(tap)
         self.isUserInteractionEnabled = true
         
-        backgroundColor = .secondarySystemGroupedBackground
+        backgroundColor = AppColors.cardBackground
         layer.cornerRadius = 24
         
         addSubview(iconContainerView)
@@ -93,6 +93,14 @@ class ActionCardView: UIView {
         layer.shadowOpacity = 0.08
         layer.shadowOffset = CGSize(width: 0, height: 4)
         layer.shadowRadius = 12
+        
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.backgroundColor = AppColors.cardBackground
+        }
         
     }
     

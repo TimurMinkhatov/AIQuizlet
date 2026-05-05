@@ -32,32 +32,14 @@ final class QuizViewController: UIViewController {
         label.textAlignment = .center
         return label
     }()
-    
-    private lazy var cardView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 24
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOpacity = 0.05
-        view.layer.shadowRadius = 20
-        view.layer.shadowOffset = CGSize(width: 0, height: 10)
-        return view
-    }()
-    
+
     private lazy var cardScrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.showsVerticalScrollIndicator = false
         scroll.alwaysBounceVertical = true
         return scroll
     }()
-    
-    private lazy var questionLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        label.textColor = .black
-        return label
-    }()
+
     
     private lazy var optionsStack: UIStackView = {
         let stack = UIStackView()
@@ -66,29 +48,48 @@ final class QuizViewController: UIViewController {
         return stack
     }()
     
+    private lazy var explanationLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 15, weight: .medium)
+        label.textColor = .secondaryLabel
+        return label
+    }()
+    
+    private lazy var cardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = AppColors.cardBackground
+        view.layer.cornerRadius = 24
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.05
+        view.layer.shadowRadius = 20
+        view.layer.shadowOffset = CGSize(width: 0, height: 10)
+        return view
+    }()
+
+    private lazy var questionLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .label
+        return label
+    }()
+
     private lazy var explanationView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = AppColors.explanationBackground
         view.layer.cornerRadius = 12
         view.layer.borderWidth = 1
         view.layer.borderColor = UIColor.systemGray5.cgColor
         view.isHidden = true
         return view
     }()
-    
+
     private lazy var explanationTitleLabel: UILabel = {
         let label = UILabel()
         label.text = L10n.Quiz.Explanation.title
         label.font = .systemFont(ofSize: 16, weight: .bold)
-        label.textColor = .black
-        return label
-    }()
-    
-    private lazy var explanationLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 15, weight: .medium)
-        label.textColor = .secondaryLabel
+        label.textColor = .label
         return label
     }()
     
@@ -125,6 +126,16 @@ final class QuizViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         bindViewModel()
+        
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.cardView.backgroundColor = AppColors.cardBackground
+            self?.explanationView.backgroundColor = AppColors.cardBackground
+            self?.view.backgroundColor = AppColors.background
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -161,7 +172,7 @@ private extension QuizViewController {
 private extension QuizViewController {
     
     func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = AppColors.explanationBackground
         navigationItem.backButtonDisplayMode = .minimal
         navigationController?.navigationBar.tintColor = .black
         
@@ -277,11 +288,7 @@ private extension QuizViewController {
         guard bounds.width > 0 else { return nil }
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = bounds
-        gradientLayer.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
+        gradientLayer.colors = AppColors.backgroundGradient.map { $0.cgColor }
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         
@@ -341,16 +348,11 @@ private extension QuizViewController {
     }
     
     func updateNextButtonGradient() {
-        nextButtonGradient.colors = [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor,
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1).cgColor
-        ]
+        nextButtonGradient.colors = AppColors.backgroundGradient.map { $0.cgColor }
         nextButtonGradient.startPoint = CGPoint(x: 0, y: 0.5)
         nextButtonGradient.endPoint = CGPoint(x: 1, y: 0.5)
         nextButtonGradient.frame = nextButton.bounds
         nextButtonGradient.cornerRadius = 16
-        
         if nextButtonGradient.superlayer == nil {
             nextButton.layer.insertSublayer(nextButtonGradient, at: 0)
         }

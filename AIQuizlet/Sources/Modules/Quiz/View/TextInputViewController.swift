@@ -38,13 +38,7 @@ private extension TextInputViewController {
                 UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
                 UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
             ]
-            static var border: UIColor {
-                return UIColor { traits in
-                    traits.userInterfaceStyle == .dark
-                        ? UIColor.systemGray4
-                        : UIColor.systemBlue
-                }
-            }
+            static let border = AppColors.border
             static let background = UIColor.systemGroupedBackground
             static let inactiveButton = UIColor.systemGray3
         }
@@ -196,8 +190,13 @@ final class TextInputViewController: UIViewController {
         setupActions()
         bindViewModel()
         
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (vc: TextInputViewController, _) in
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
             self?.textContainerView.layer.borderColor = Constants.Colors.border.cgColor
+            self?.updateGradients()
         }
     }
 
@@ -218,7 +217,7 @@ extension TextInputViewController: UITextViewDelegate {
 private extension TextInputViewController {
     @objc func questionCountTapped(_ sender: UIButton) {
         questionButtons.forEach {
-            $0.backgroundColor = .white
+            $0.backgroundColor = AppColors.cardBackground
             $0.setTitleColor(.label, for: .normal)
         }
         viewModel.update(questionCount: sender.tag)
@@ -379,7 +378,7 @@ private extension TextInputViewController {
                 button.applyGradient(colors: Constants.Colors.gradient, cornerRadius: Constants.Layout.questionButtonCornerRadius)
                 button.setTitleColor(.white, for: .normal)
             } else {
-                button.backgroundColor = .secondarySystemGroupedBackground
+                button.backgroundColor = AppColors.questionButtonInactive
                 button.setTitleColor(.label, for: .normal)
             }
         }

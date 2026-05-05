@@ -71,11 +71,14 @@ final class ProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
-        updateCardBackground()
 
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: ProfileView, _) in
-            self?.updateCardBackground()
-            self?.updateAvatarBackground()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let style = notification.object as? UIUserInterfaceStyle else { return }
+            self?.updateGradient(for: style)
         }
     }
 
@@ -99,30 +102,13 @@ extension ProfileView {
         profileContainerView.layoutIfNeeded()
         avatarGradientLayer.frame = profileContainerView.bounds
         avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
-        updateAvatarBackground()
+        profileCardView.backgroundColor = AppColors.cardBackground
     }
 }
 
 // MARK: - Private Methods
 
 private extension ProfileView {
-    
-    func updateAvatarBackground() {
-        if traitCollection.userInterfaceStyle == .dark {
-            avatarGradientLayer.isHidden = true
-            profileContainerView.backgroundColor = .systemGray3
-        } else {
-            avatarGradientLayer.isHidden = false
-            profileContainerView.backgroundColor = .clear
-        }
-    }
-
-    func updateCardBackground() {
-        profileCardView.backgroundColor = traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "1e2939")
-            : .secondarySystemGroupedBackground
-    }
-
     func setupLayout() {
         addSubview(profileCardView)
         profileCardView.addSubview(profileContainerView)
@@ -152,6 +138,12 @@ private extension ProfileView {
         profileCardView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+    
+    private func updateGradient(for style: UIUserInterfaceStyle) {
+        avatarGradientLayer.isHidden = style == .dark
+        profileContainerView.backgroundColor = style == .dark ? .systemGray3 : .clear
+        profileCardView.backgroundColor = AppColors.cardBackground
     }
 }
 

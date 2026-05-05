@@ -47,6 +47,7 @@
 "quiz.explanation.default" = "Correct answer based on the provided text.";
 "quiz.textInput.generating" = "Generating...";
 "quiz.question.continue" = "Continue";
+"quiz.photo.retake.button" = "Retake";
 
 // MARK: - Result
 "result.tryAgain.button" = "Try Again";

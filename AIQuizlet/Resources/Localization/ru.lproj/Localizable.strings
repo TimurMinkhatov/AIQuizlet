@@ -47,6 +47,8 @@
 "quiz.explanation.default" = "Правильный ответ на основе предоставленного текста.";
 "quiz.textInput.generating" = "Генерация...";
 "quiz.question.continue" = "Продолжить";
+"quiz.question.count.title" = "Количество вопросов";
+"quiz.photo.retake.button" = "Переснять";
 
 // MARK: - Result
 "result.tryAgain.button" = "Пройти заново";

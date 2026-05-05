@@ -32,13 +32,17 @@ final class ThemeSelectorView: UIView {
     init() {
         super.init(frame: .zero)
         layer.cornerRadius = 16
+        backgroundColor = AppColors.cardBackground
         setupLayout()
         setupActions()
         selectButton(lightButton)
-        updateCardBackground()
 
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: ThemeSelectorView, _) in
-            self?.updateCardBackground()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            self?.backgroundColor = AppColors.cardBackground
             self?.refreshInactiveButtons()
         }
     }
@@ -52,23 +56,11 @@ final class ThemeSelectorView: UIView {
 
 private extension ThemeSelectorView {
 
-    func inactiveButtonColor() -> UIColor {
-        traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "364153").withAlphaComponent(0.5)
-            : .systemGray5
-    }
-
-    func updateCardBackground() {
-        backgroundColor = traitCollection.userInterfaceStyle == .dark
-            ? UIColor(hex: "1e2939")
-            : .secondarySystemGroupedBackground
-    }
-
     func refreshInactiveButtons() {
         [lightButton, darkButton, systemButton].forEach {
             guard $0 != selectedButton else { return }
             var config = $0.configuration
-            config?.background.backgroundColor = inactiveButtonColor()
+            config?.background.backgroundColor = AppColors.inactiveButton
             $0.configuration = config
         }
     }
@@ -81,7 +73,7 @@ private extension ThemeSelectorView {
         config.imagePadding = 4
         config.baseForegroundColor = .label
         config.background.cornerRadius = 10
-        config.background.backgroundColor = inactiveButtonColor()
+        config.background.backgroundColor = AppColors.inactiveButton
         var titleAttr = AttributedString(title)
         titleAttr.font = .systemFont(ofSize: 12)
         config.attributedTitle = titleAttr
@@ -92,7 +84,7 @@ private extension ThemeSelectorView {
         [lightButton, darkButton, systemButton].forEach {
             var config = $0.configuration
             config?.baseForegroundColor = .label
-            config?.background.backgroundColor = inactiveButtonColor()
+            config?.background.backgroundColor = AppColors.inactiveButton
             $0.configuration = config
         }
         var config = button.configuration

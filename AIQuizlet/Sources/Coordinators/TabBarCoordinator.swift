@@ -83,8 +83,8 @@ private extension TabBarCoordinator {
     
     func setupAppearance() {
         let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .secondarySystemGroupedBackground
+        appearance.backgroundColor = AppColors.tabBar
+        tabBarController.tabBar.backgroundColor = AppColors.tabBar
         tabBarController.tabBar.standardAppearance = appearance
         tabBarController.tabBar.scrollEdgeAppearance = appearance
     }
