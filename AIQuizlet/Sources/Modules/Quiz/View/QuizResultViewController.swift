@@ -61,7 +61,6 @@ final class QuizResultViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationController?.setNavigationBarHidden(!viewModel.isFromHistory, animated: true)
         contentView.drawCircularProgress(percentage: viewModel.viewState.percentage)
     }
 }
@@ -128,7 +127,7 @@ private extension QuizResultViewController {
     }
     
     func setupNavigation() {
-        navigationItem.hidesBackButton = !viewModel.isFromHistory
+        navigationItem.hidesBackButton = true
     }
     
     func setupTargets() {
