@@ -14,22 +14,33 @@ final class QuizResultView: UIView {
     // MARK: - Constants
     
     private enum Constants {
-        static let buttonHeight: CGFloat = 52
-        static let buttonCornerRadius: CGFloat = 12
-        static let circularRadius: CGFloat = 60
-        static let haloRadius: CGFloat = 80
-        static let trackLineWidth: CGFloat = 12
-        
         enum Layout {
-            static let headerHeight: CGFloat = 380
+            static let headerHeight: CGFloat = 400
             static let footerHeight: CGFloat = 120
-            static let percentageLabelTopOffset: CGFloat = 40
+            static let percentageLabelTopOffset: CGFloat = 16
             static let statusLabelTopOffset: CGFloat = 8
             static let scoreDescriptionTopOffset: CGFloat = 4
             static let progressContainerTopOffset: CGFloat = 30
             static let progressContainerSize: CGFloat = 180
             static let buttonStackTopOffset: CGFloat = 16
             static let buttonStackHorizontalInset: CGFloat = 24
+            
+            static let trackLineWidth: CGFloat = 12
+            static let buttonHeight: CGFloat = 52
+            static let buttonCornerRadius: CGFloat = 12
+            
+            static let percentageFontSize: CGFloat = 56
+            static let statusFontSize: CGFloat = 20
+            static let descriptionFontSize: CGFloat = 14
+            static let buttonFontSize: CGFloat = 15
+            static let buttonImagePadding: CGFloat = 8
+            
+            static let haloRadiusOffset: CGFloat = 20
+            static let circularRadiusOffset: CGFloat = 10
+            static let progressGap: CGFloat = 0.12
+            static let startAngle: CGFloat = -.pi / 2
+            static let borderWidth: CGFloat = 4.0
+            static let lineWidthMultiplier: CGFloat = 1.5
         }
         
         enum Colors {
@@ -44,12 +55,24 @@ final class QuizResultView: UIView {
                 UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
                 UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
             ]
+            static let redProgress = UIColor(red: 235/255, green: 77/255, blue: 75/255, alpha: 1)
+            static let greenProgress = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
+            
+            static let haloAlpha: CGFloat = 0.08
+            static let descriptionAlpha: CGFloat = 0.8
         }
         
         enum Strings {
             static let retryTitle = "Пройти заново"
             static let homeTitle = "На главную"
             static let cellIdentifier = "AnalysisCell"
+            static let retryIcon = "arrow.clockwise"
+            static let homeIcon = "house"
+        }
+        
+        enum Logic {
+            static let passPercentageThreshold: Double = 50.0
+            static let maxPercentage: Double = 100.0
         }
     }
     
@@ -75,14 +98,14 @@ final class QuizResultView: UIView {
     
     private lazy var percentageLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 56, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Layout.percentageFontSize, weight: .bold)
         label.textAlignment = .center
         return label
     }()
 
     private lazy var statusLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Layout.statusFontSize, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         return label
@@ -90,8 +113,8 @@ final class QuizResultView: UIView {
 
     private lazy var scoreDescriptionLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .white.withAlphaComponent(0.8)
+        label.font = .systemFont(ofSize: Constants.Layout.descriptionFontSize, weight: .regular)
+        label.textColor = .white.withAlphaComponent(Constants.Colors.descriptionAlpha)
         label.textAlignment = .center
         return label
     }()
@@ -113,7 +136,7 @@ final class QuizResultView: UIView {
     private lazy var buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 16
+        stack.spacing = Constants.Layout.buttonStackTopOffset
         stack.distribution = .fillEqually
         return stack
     }()
@@ -121,7 +144,7 @@ final class QuizResultView: UIView {
     lazy var retryButton: UIButton = {
         makeButton(
             title: Constants.Strings.retryTitle,
-            systemImage: "arrow.clockwise",
+            systemImage: Constants.Strings.retryIcon,
             backgroundColor: Constants.Colors.retryButtonBg
         )
     }()
@@ -129,7 +152,7 @@ final class QuizResultView: UIView {
     lazy var homeButton: UIButton = {
         makeButton(
             title: Constants.Strings.homeTitle,
-            systemImage: "house",
+            systemImage: Constants.Strings.homeIcon,
             backgroundColor: Constants.Colors.homeButtonBg
         )
     }()
@@ -158,7 +181,7 @@ final class QuizResultView: UIView {
             colors: Constants.Colors.homeGradient,
             startPoint: CGPoint(x: 0, y: 0.5),
             endPoint: CGPoint(x: 1, y: 0.5),
-            cornerRadius: Constants.buttonCornerRadius
+            cornerRadius: Constants.Layout.buttonCornerRadius
         )
     }
 
@@ -168,39 +191,62 @@ final class QuizResultView: UIView {
         percentageLabel.text = percentageText
         statusLabel.text = statusText
         scoreDescriptionLabel.text = description
-        percentageLabel.textColor = (percentage < 50) ? .systemRed : .systemGreen
+        percentageLabel.textColor = (percentage < Constants.Logic.passPercentageThreshold) ? .systemRed : .systemGreen
     }
     
     func drawCircularProgress(percentage: Double) {
         progressContainer.layer.sublayers?.filter { $0 is CAShapeLayer }.forEach { $0.removeFromSuperlayer() }
 
         let center = CGPoint(x: progressContainer.bounds.midX, y: progressContainer.bounds.midY)
+        let maxAvailableRadius = min(progressContainer.bounds.width, progressContainer.bounds.height) / 2
+
+        let dynamicHaloRadius = maxAvailableRadius + Constants.Layout.haloRadiusOffset
+        let dynamicCircularRadius = maxAvailableRadius - Constants.Layout.trackLineWidth - Constants.Layout.circularRadiusOffset
         
-        let haloPath = UIBezierPath(arcCenter: center, radius: Constants.haloRadius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
+        let haloPath = UIBezierPath(arcCenter: center, radius: dynamicHaloRadius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
         let haloLayer = CAShapeLayer()
         haloLayer.path = haloPath.cgPath
-        haloLayer.fillColor = UIColor.white.withAlphaComponent(0.1).cgColor
+        haloLayer.fillColor = UIColor.white.withAlphaComponent(Constants.Colors.haloAlpha).cgColor
         progressContainer.layer.addSublayer(haloLayer)
 
-        let circularPath = UIBezierPath(arcCenter: center, radius: Constants.circularRadius, startAngle: -CGFloat.pi / 2, endAngle: 1.5 * CGFloat.pi, clockwise: true)
+        let p = CGFloat(percentage / Constants.Logic.maxPercentage)
         
-        let trackLayer = CAShapeLayer()
-        trackLayer.path = circularPath.cgPath
-        trackLayer.strokeColor = UIColor.systemRed.cgColor
-        trackLayer.lineWidth = Constants.trackLineWidth
-        trackLayer.fillColor = UIColor.clear.cgColor
-        trackLayer.lineCap = .round
-        
-        let progressLayer = CAShapeLayer()
-        progressLayer.path = circularPath.cgPath
-        progressLayer.strokeColor = UIColor.systemGreen.cgColor
-        progressLayer.lineWidth = Constants.trackLineWidth
-        progressLayer.fillColor = UIColor.clear.cgColor
-        progressLayer.lineCap = .round
-        progressLayer.strokeEnd = CGFloat(percentage / 100)
-        
-        progressContainer.layer.addSublayer(trackLayer)
-        progressContainer.layer.addSublayer(progressLayer)
+        let addSegment = { (start: CGFloat, end: CGFloat, color: CGColor) in
+            let angleOffset = (Constants.Layout.borderWidth / 2) / dynamicCircularRadius
+            let borderPath = UIBezierPath(arcCenter: center, radius: dynamicCircularRadius, startAngle: start - angleOffset, endAngle: end + angleOffset, clockwise: true)
+            
+            let borderLayer = CAShapeLayer()
+            borderLayer.path = borderPath.cgPath
+            borderLayer.strokeColor = UIColor.white.cgColor
+            borderLayer.lineWidth = (Constants.Layout.trackLineWidth * Constants.Layout.lineWidthMultiplier) + Constants.Layout.borderWidth
+            borderLayer.fillColor = UIColor.clear.cgColor
+            borderLayer.lineCap = .butt
+            self.progressContainer.layer.addSublayer(borderLayer)
+            
+            let path = UIBezierPath(arcCenter: center, radius: dynamicCircularRadius, startAngle: start, endAngle: end, clockwise: true)
+            
+            let colorLayer = CAShapeLayer()
+            colorLayer.path = path.cgPath
+            colorLayer.strokeColor = color
+            colorLayer.lineWidth = Constants.Layout.trackLineWidth * Constants.Layout.lineWidthMultiplier
+            colorLayer.fillColor = UIColor.clear.cgColor
+            colorLayer.lineCap = .butt
+            self.progressContainer.layer.addSublayer(colorLayer)
+        }
+
+        if p <= 0.0 {
+            addSegment(0, 2 * .pi, Constants.Colors.redProgress.cgColor)
+        } else if p >= 1.0 {
+            addSegment(0, 2 * .pi, Constants.Colors.greenProgress.cgColor)
+        } else {
+            let greenStart = Constants.Layout.startAngle + (Constants.Layout.progressGap / 2)
+            let greenEnd = Constants.Layout.startAngle + (2 * .pi * p) - (Constants.Layout.progressGap / 2)
+            addSegment(greenStart, greenEnd, Constants.Colors.greenProgress.cgColor)
+            
+            let redStart = Constants.Layout.startAngle + (2 * .pi * p) + (Constants.Layout.progressGap / 2)
+            let redEnd = Constants.Layout.startAngle + 2 * .pi - (Constants.Layout.progressGap / 2)
+            addSegment(redStart, redEnd, Constants.Colors.redProgress.cgColor)
+        }
     }
 }
 
@@ -211,13 +257,13 @@ private extension QuizResultView {
     func makeButton(title: String, systemImage: String, backgroundColor: UIColor) -> UIButton {
         var config = UIButton.Configuration.filled()
         var container = AttributeContainer()
-        container.font = .systemFont(ofSize: 15, weight: .semibold)
+        container.font = .systemFont(ofSize: Constants.Layout.buttonFontSize, weight: .semibold)
         config.attributedTitle = AttributedString(title, attributes: container)
         config.image = UIImage(systemName: systemImage)
-        config.imagePadding = 8
+        config.imagePadding = Constants.Layout.buttonImagePadding
         config.baseBackgroundColor = backgroundColor
         config.baseForegroundColor = .white
-        config.background.cornerRadius = Constants.buttonCornerRadius
+        config.background.cornerRadius = Constants.Layout.buttonCornerRadius
         return UIButton(configuration: config)
     }
     
@@ -259,7 +305,7 @@ private extension QuizResultView {
         buttonStack.snp.makeConstraints {
             $0.top.equalToSuperview().offset(Constants.Layout.buttonStackTopOffset)
             $0.leading.trailing.equalToSuperview().inset(Constants.Layout.buttonStackHorizontalInset)
-            $0.height.equalTo(Constants.buttonHeight)
+            $0.height.equalTo(Constants.Layout.buttonHeight)
         }
     }
 }

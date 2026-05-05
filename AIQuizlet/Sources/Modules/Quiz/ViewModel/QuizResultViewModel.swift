@@ -6,17 +6,28 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
+//
+//  QuizResultViewModel.swift
+//  AIQuizlet
+//
+
+import Foundation
+
 final class QuizResultViewModel {
     
     // MARK: - Properties
     
     private let quizResult: QuizResult
+    
+    private let sortedQuestions: [QuestionRecord]
+    
     var onDataLoaded: (() -> Void)?
     var onRetry: (() -> Void)?
     var onHome: (() -> Void)?
     
     init(quizResult: QuizResult) {
         self.quizResult = quizResult
+        self.sortedQuestions = quizResult.quiz.questions.sorted { $0.orderIndex < $1.orderIndex }
     }
     
     // MARK: - Properties UI
@@ -38,7 +49,7 @@ final class QuizResultViewModel {
     }
     
     var numberOfQuestions: Int {
-        quizResult.quiz.questions.count
+        sortedQuestions.count
     }
     
     var percentageValue: Double {
@@ -50,7 +61,7 @@ final class QuizResultViewModel {
     // MARK: - Methods
     
     func getQuestion(at index: Int) -> QuestionRecord {
-        quizResult.quiz.questions[index]
+        return sortedQuestions[index]
     }
     
     func getUserAnswer(at index: Int) -> Int {

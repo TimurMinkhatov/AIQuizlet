@@ -36,6 +36,11 @@ final class PhotoPreviewViewController: UIViewController {
         setupActions()
         bindViewModel()
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
 
     // MARK: - Public Methods
 

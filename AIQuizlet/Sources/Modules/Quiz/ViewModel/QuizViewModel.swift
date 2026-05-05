@@ -109,12 +109,13 @@ final class QuizViewModel {
     func restart() {
         guard let quiz = quiz else { return }
             
-        let questionRecords = quiz.questions.map {
+        let questionRecords = quiz.questions.enumerated().map { index, question in
             QuestionRecord(
-                text: $0.text,
-                answers: $0.answers,
-                correctAnswer: $0.correctAnswer,
-                explanation: $0.explanation
+                orderIndex: index,
+                text: question.text,
+                answers: question.answers,
+                correctAnswer: question.correctAnswer,
+                explanation: question.explanation
             )
         }
             

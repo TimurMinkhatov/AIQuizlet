@@ -51,12 +51,13 @@ final class PhotoPreviewViewModel {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
                     
                     await MainActor.run {
-                        let questionRecords = quiz.questions.map {
+                        let questionRecords = quiz.questions.enumerated().map { index, question in
                             QuestionRecord(
-                                text: $0.text,
-                                answers: $0.answers,
-                                correctAnswer: $0.correctAnswer,
-                                explanation: $0.explanation,
+                                orderIndex: index,
+                                text: question.text,
+                                answers: question.answers,
+                                correctAnswer: question.correctAnswer,
+                                explanation: question.explanation,
                             )
                         }
                         
@@ -89,12 +90,13 @@ private extension PhotoPreviewViewModel {
     
     func handleSuccess(quiz: Quiz) {
         
-        let questionRecord = quiz.questions.map {
+        let questionRecord = quiz.questions.enumerated().map { index, question in
             QuestionRecord(
-                text: $0.text,
-                answers: $0.answers,
-                correctAnswer: $0.correctAnswer,
-                explanation: $0.explanation,
+                orderIndex: index,
+                text: question.text,
+                answers: question.answers,
+                correctAnswer: question.correctAnswer,
+                explanation: question.explanation,
             )
         }
         
