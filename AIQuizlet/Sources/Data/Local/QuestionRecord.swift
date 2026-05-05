@@ -13,13 +13,15 @@ import Foundation
 class QuestionRecord {
     
     var id: UUID
+    var orderIndex: Int
     var text: String
     var answers: [String]
     var correctAnswer: Int
     var explanation: String?
     
-    init(id: UUID = UUID(), text: String, answers: [String], correctAnswer: Int, explanation: String? = nil) {
+    init(id: UUID = UUID(), orderIndex: Int , text: String, answers: [String], correctAnswer: Int, explanation: String? = nil) {
         self.id = id
+        self.orderIndex = orderIndex
         self.text = text
         self.answers = answers
         self.correctAnswer = correctAnswer

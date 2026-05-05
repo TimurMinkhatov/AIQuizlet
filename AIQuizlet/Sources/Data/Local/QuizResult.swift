@@ -17,13 +17,15 @@ final class QuizResult {
     var score: Int
     var totalQuestions: Int
     var quiz: QuizRecord
+    @Relationship(deleteRule: .cascade) var userAnswers: [AnswerRecord]
     
-    init(id: UUID = UUID(), date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord) {
+    init(id: UUID = UUID(), date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord, userAnswers: [AnswerRecord]) {
         self.id = id
         self.date = date
         self.score = score
         self.totalQuestions = totalQuestions
         self.quiz = quiz
+        self.userAnswers = userAnswers
     }
     
     var percentage: Double {

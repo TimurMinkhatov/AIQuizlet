@@ -21,14 +21,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let container = createModelContainer()
-        let assembly = ServicesAssembly(modelContainer: container)
+        let servicesAssembly = ServicesAssembly(modelContainer: container)
 
         window = UIWindow(windowScene: windowScene)
         let navigationController = UINavigationController()
         appCoordinator = AppCoordinator(
             navigationController: navigationController,
             window: window,
-            assembly: assembly
+            servicesAssembly: servicesAssembly
         )
         appCoordinator?.start()
         window?.rootViewController = navigationController

@@ -16,6 +16,7 @@ final class QuizCoordinator: Coordinator {
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
+    private weak var currentQuizViewModel: QuizViewModel?
 
     // MARK: - Init
 
@@ -33,7 +34,14 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        showQuiz(quiz: quiz)
+        
+        let questionRecords = quiz.questions.toQuestionRecords()
+        
+        let quizRecord = QuizRecord(
+            title: quiz.title,
+            questions: questionRecords
+        )
+        showQuiz(quiz: quiz, record: quizRecord)
     }
 
     func didCapturePhoto(_ image: UIImage) {
@@ -60,9 +68,14 @@ extension QuizCoordinator {
         navigationController.pushViewController(vc, animated: true)
     }
 
-    func showQuiz(quiz: Quiz) {
-        let vm = QuizViewModel(assembly: servicesAssembly)
-        vm.setQuiz(quiz)
+    func showQuiz(quiz: Quiz, record: QuizRecord) {
+        let vm = QuizViewModel(
+            quizService: servicesAssembly.quizService,
+            firestoreService: servicesAssembly.firestoreService
+        )
+        vm.coordinator = self
+        vm.setQuiz(quiz, record: record)
+        currentQuizViewModel = vm
         let vc = QuizViewController(viewModel: vm)
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
@@ -70,6 +83,39 @@ extension QuizCoordinator {
     
     func didRequestRetake() {
         navigationController.popViewController(animated: true)
+    }
+    
+    func showResult(with result: QuizResult) {
+        do {
+            try servicesAssembly.storageService.saveQuizResult(result)
+        } catch {
+            DispatchQueue.main.async {
+                let alert = UIAlertController(
+                    title: "Ошибка",
+                    message: "Не удалось сохранить результат викторины: \(error.localizedDescription)",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.navigationController.present(alert, animated: true)
+            }
+        }
+        let vm = QuizResultViewModel(quizResult: result)
+        let vc = QuizResultViewController(viewModel: vm)
+        
+        vm.onHome = { [weak self] in
+            self?.navigationController.popToRootViewController(animated: true)
+        }
+        
+        vm.onRetry = { [weak self] in
+            self?.currentQuizViewModel?.restart()
+            self?.navigationController.popViewController(animated: true)
+        }
+        vc.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func finishFlow() {
+        navigationController.popToRootViewController(animated: true)
     }
 }
 

@@ -10,22 +10,51 @@ import Foundation
 import FirebaseAuth
 
 final class QuizViewModel {
+    
+    // MARK: - Models
+        
+    struct QuestionDisplayData {
+        let question: Question
+        let currentNumber: Int
+        let total: Int
+    }
+        
+    struct ResultDisplayData {
+        let isCorrect: Bool
+        let correctIndex: Int
+        let selectedIndex: Int
+        let question: Question
+        let isLastQuestion: Bool
+        let currentNumber: Int
+        let total: Int
+    }
+        
+    struct FinishDisplayData {
+        let score: Int
+        let total: Int
+    }
 
     // MARK: - State Enum
 
     enum State {
         case idle
         case showingQuestion(question: Question, currentNumber: Int, total: Int)
-        case showingResult(isCorrect: Bool, correctIndex: Int, question: Question)
+        case showingResult(data: ResultDisplayData)
         case finished(score: Int, total: Int)
     }
 
     // MARK: - Properties
+    
+    weak var coordinator: QuizCoordinator?
+    private var currentQuizRecord: QuizRecord?
+    
+    private var userAnswers: [Int: Int] = [:]
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
-    private var correctAnswersCount = 0
-    private let assembly: ServicesAssembly
+    private let quizService: QuizServiceProtocol
+    private let firestoreService: FirestoreService
+
     
     private(set) var state: State = .idle {
         didSet {
@@ -43,17 +72,20 @@ final class QuizViewModel {
 
     // MARK: - Init
 
-    init(assembly: ServicesAssembly) {
-        self.assembly = assembly
+    init(quizService: QuizServiceProtocol, firestoreService: FirestoreService) {
+        self.quizService = quizService
+        self.firestoreService = firestoreService
     }
 
     // MARK: - Public Methods
 
-    func setQuiz(_ quiz: Quiz) {
+    func setQuiz(_ quiz: Quiz, record: QuizRecord? = nil) {
         self.quiz = quiz
+        self.currentQuizRecord = record
         self.currentQuestionIndex = 0
-        self.correctAnswersCount = 0
-        showCurrentQuestion()
+        self.userAnswers.removeAll()
+        restoreCurrentQuestionState()
+        
         Task {
             try? await saveQuiz(quiz)
         }
@@ -63,15 +95,59 @@ final class QuizViewModel {
         guard let quiz = quiz, currentQuestionIndex < quiz.questions.count else { return }
         let question = quiz.questions[currentQuestionIndex]
         
+        userAnswers[currentQuestionIndex] = index
+        
         let isCorrect = (index == question.correctAnswer)
-        if isCorrect {
-            correctAnswersCount += 1
-        }
-        state = .showingResult(isCorrect: isCorrect, correctIndex: question.correctAnswer, question: question)
+        let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
+        
+        let data = ResultDisplayData(
+            isCorrect: isCorrect,
+            correctIndex: question.correctAnswer,
+            selectedIndex: index,
+            question: question,
+            isLastQuestion: isLastQuestion,
+            currentNumber: currentQuestionIndex + 1,
+            total: quiz.questions.count
+        )
+        
+        state = .showingResult(data: data)
     }
 
     func nextQuestion() {
         currentQuestionIndex += 1
+        guard let total = quiz?.questions.count else {
+            return
+        }
+        if currentQuestionIndex < total {
+            showCurrentQuestion()
+        } else {
+            finishQuiz()
+        }
+    }
+    
+    func goBack() {
+        if currentQuestionIndex > 0 {
+            currentQuestionIndex -= 1
+            restoreCurrentQuestionState()
+        } else {
+            coordinator?.didRequestRetake()
+        }
+    }
+    
+    func restart() {
+        guard let quiz = quiz else { return }
+            
+        let questionRecords = quiz.questions.toQuestionRecords()
+            
+        let newRecord = QuizRecord(
+            title: quiz.title,
+            questions: questionRecords
+        )
+            
+        self.currentQuizRecord = newRecord
+        self.currentQuestionIndex = 0
+        self.userAnswers.removeAll()
+            
         showCurrentQuestion()
     }
 }
@@ -91,24 +167,96 @@ private extension QuizViewModel {
                 total: quiz.questions.count
             )
         } else {
-            let score = Double(correctAnswersCount) / Double(quiz.questions.count) * 100
-            state = .finished(score: correctAnswersCount, total: quiz.questions.count)
-            Task {
-                try? await saveQuizResult(score: score, total: quiz.questions.count)
-            }
+            finishQuiz()
         }
     }
     
-    private func saveQuizResult(score: Double, total: Int) async throws {
+    func finishQuiz() {
+        guard let quiz = quiz, let record = currentQuizRecord else { return }
+        
+        var finalScore = 0
+        var localAnswerRecords: [AnswerRecord] = []
+        var remoteAnswers: [FSAnswer] = []
+        
+        for (index, question) in quiz.questions.enumerated() {
+            if let selectedIndex = userAnswers[index] {
+                let isCorrect = (selectedIndex == question.correctAnswer)
+                if isCorrect {
+                    finalScore += 1
+                }
+                
+                localAnswerRecords.append(AnswerRecord(
+                    questionIndex: index,
+                    selectedAnswer: selectedIndex,
+                    isCorrect: isCorrect
+                ))
+                
+                remoteAnswers.append(FSAnswer(
+                    questionIndex: index,
+                    selectedAnswer: selectedIndex,
+                    isCorrect: isCorrect
+                ))
+            }
+        }
+        
+        let result = QuizResult(
+            score: finalScore,
+            totalQuestions: quiz.questions.count,
+            quiz: record,
+            userAnswers: localAnswerRecords
+        )
+        
+        coordinator?.showResult(with: result)
+        
+        let scorePercentage = Double(finalScore) / Double(quiz.questions.count) * 100
+        Task {
+            try? await saveQuizResult(
+                score: scorePercentage,
+                total: quiz.questions.count,
+                correctCount: finalScore,
+                answers: remoteAnswers
+            )
+        }
+    }
+    
+    func restoreCurrentQuestionState() {
+        guard let quiz = quiz else { return }
+        let question = quiz.questions[currentQuestionIndex]
+        
+        if let userAnswer = userAnswers[currentQuestionIndex] {
+            let isCorrect = (userAnswer == question.correctAnswer)
+            let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
+            let data = ResultDisplayData(
+                isCorrect: isCorrect,
+                correctIndex: question.correctAnswer,
+                selectedIndex: userAnswer,
+                question: question,
+                isLastQuestion: isLastQuestion,
+                currentNumber: currentQuestionIndex + 1,
+                total: quiz.questions.count
+            )
+                    
+            state = .showingResult(data: data)
+        } else {
+            state = .showingQuestion(
+                question: question,
+                currentNumber: currentQuestionIndex + 1,
+                total: quiz.questions.count
+            )
+        }
+    }
+    
+    private func saveQuizResult(score: Double, total: Int, correctCount: Int, answers: [FSAnswer]) async throws {
         let result = FSQuizResult(
             id: UUID().uuidString,
             userId: Auth.auth().currentUser?.uid ?? "",
             score: score,
-            correctCount: correctAnswersCount,
+            correctCount: correctCount,
             totalQuestions: total,
-            completedAt: Date()
+            completedAt: Date(),
+            answers: answers
         )
-        try await assembly.firestoreService.saveQuizResult(quizResult: result)
+        try await firestoreService.saveQuizResult(quizResult: result)
     }
     
     private func saveQuiz(_ quiz: Quiz) async throws {
@@ -126,6 +274,6 @@ private extension QuizViewModel {
                 )
             }
         )
-        try await assembly.firestoreService.saveQuiz(quiz: fsQuiz)
+        try await firestoreService.saveQuiz(quiz: fsQuiz)
     }
 }

@@ -23,18 +23,7 @@ final class StorageService {
     
     // MARK: - Public Methods
     
-    func saveQuizResult(quiz: Quiz, score: Int) throws {
-        let questions = quiz.questions.map {
-            QuestionRecord(
-                text: $0.text,
-                answers: $0.answers,
-                correctAnswer: $0.correctAnswer,
-                explanation: $0.explanation
-            )
-        }
-        let quizRecord = QuizRecord(title: quiz.title, questions: questions)
-        let result = QuizResult(score: score, totalQuestions: quiz.questions.count, quiz: quizRecord)
-        modelContext.insert(quizRecord)
+    func saveQuizResult(_ result: QuizResult) throws {
         modelContext.insert(result)
         try modelContext.save()
     }

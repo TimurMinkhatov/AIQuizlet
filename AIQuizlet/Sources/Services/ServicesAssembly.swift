@@ -18,7 +18,6 @@ final class ServicesAssembly {
     let cameraService: CameraService
     let firestoreService: FirestoreService
 
-
     // MARK: - Init
 
     init(modelContainer: ModelContainer) {
@@ -27,6 +26,5 @@ final class ServicesAssembly {
         self.quizService = QuizService(networkManager: NetworkManager())
         self.cameraService = CameraService()
         self.firestoreService = FirestoreService()
-
     }
 }

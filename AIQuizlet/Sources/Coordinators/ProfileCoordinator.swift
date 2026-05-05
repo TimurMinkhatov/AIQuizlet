@@ -15,13 +15,13 @@ final class ProfileCoordinator: Coordinator {
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
-    let assembly: ServicesAssembly
+    private let servicesAssembly: ServicesAssembly
     
     // MARK: - Init
     
-    init(navigationController: UINavigationController, assembly: ServicesAssembly) {
+    init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
-        self.assembly = assembly
+        self.servicesAssembly = servicesAssembly
     }
     
     // MARK: - Coordinator
@@ -43,7 +43,11 @@ final class ProfileCoordinator: Coordinator {
 private extension ProfileCoordinator {
     
     func showProfile() {
-        let vm = ProfileViewModel(assembly: assembly)
+        let vm = ProfileViewModel(
+            firestoreService: servicesAssembly.firestoreService,
+            storageService: servicesAssembly.storageService,
+            authService: servicesAssembly.authService
+        )
         vm.coordinator = self
         let vc = ProfileViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
