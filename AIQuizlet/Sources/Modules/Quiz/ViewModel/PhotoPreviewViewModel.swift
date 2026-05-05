@@ -51,16 +51,7 @@ final class PhotoPreviewViewModel {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
                     
                     await MainActor.run {
-                        let questionRecords = quiz.questions.enumerated().map { index, question in
-                            QuestionRecord(
-                                orderIndex: index,
-                                text: question.text,
-                                answers: question.answers,
-                                correctAnswer: question.correctAnswer,
-                                explanation: question.explanation,
-                            )
-                        }
-                        
+                        let questionRecords = quiz.questions.toQuestionRecords()
                         let record = QuizRecord(title: quiz.title, questions: questionRecords)
                         
                         self.onLoadingStateChanged?(false)

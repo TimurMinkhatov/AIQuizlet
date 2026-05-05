@@ -11,6 +11,16 @@ import SnapKit
 
 final class QuizResultView: UIView {
     
+    // MARK: - ViewState
+        
+    struct ViewState {
+        let scoreText: String
+        let statusText: String
+        let descriptionText: String
+        let percentage: Double
+        let questionsCount: Int
+    }
+    
     // MARK: - Constants
     
     private enum Constants {
@@ -187,11 +197,11 @@ final class QuizResultView: UIView {
 
     // MARK: - Public Methods
     
-    func configure(percentageText: String, statusText: String, description: String, percentage: Double) {
-        percentageLabel.text = percentageText
-        statusLabel.text = statusText
-        scoreDescriptionLabel.text = description
-        percentageLabel.textColor = (percentage < Constants.Logic.passPercentageThreshold) ? .systemRed : .systemGreen
+    func configure(with viewState: ViewState) {
+        percentageLabel.text = viewState.scoreText
+        statusLabel.text = viewState.statusText
+        scoreDescriptionLabel.text = viewState.descriptionText
+        percentageLabel.textColor = (viewState.percentage < Constants.Logic.passPercentageThreshold) ? .systemRed : .systemGreen
     }
     
     func drawCircularProgress(percentage: Double) {

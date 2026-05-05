@@ -12,7 +12,7 @@ import SnapKit
 final class PhotoPreviewViewController: UIViewController {
 
     // MARK: - Properties
-    weak var coordinator: QuizCoordinator?
+    
     private let viewModel: PhotoPreviewViewModel
     private let previewView: PhotoPreviewView
 
@@ -83,12 +83,6 @@ private extension PhotoPreviewViewController {
         viewModel.onErrorOccurred = { [weak self] error in
             DispatchQueue.main.async {
                 self?.showError(error)
-            }
-        }
-        
-        viewModel.onSuccess = { [weak self] quiz, record in
-            DispatchQueue.main.async {
-                self?.coordinator?.showQuiz(quiz: quiz, record: record)
             }
         }
     }

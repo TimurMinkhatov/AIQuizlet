@@ -10,6 +10,7 @@ import UIKit
 import SnapKit
 
 
+
 // MARK: - Constants
 
 private extension QuizViewController {
@@ -320,10 +321,10 @@ private extension QuizViewController {
                     self.resetUI()
                     self.updateProgress(current: current, total: total)
                     self.render(question: question, number: current)
-                case .showingResult(_, let correctIndex, let selectedIndex, let question, let isLastQuestion, let currentNumber, let total):
-                    self.updateProgress(current: currentNumber, total: total)
-                    self.render(question: question, number: currentNumber)
-                    self.showResultUI(correctIndex: correctIndex, selectedIndex: selectedIndex, question: question, isLastQuestion: isLastQuestion)
+                case .showingResult(let data):
+                    self.updateProgress(current: data.currentNumber, total: data.total)
+                    self.render(question: data.question, number: data.currentNumber)
+                    self.showResultUI(with: data)
                 case .finished(let score, let total):
                     print("Тест завершен: \(score) из \(total)")
                 case .idle: break
@@ -372,12 +373,12 @@ private extension QuizViewController {
         cardScrollView.setContentOffset(.zero, animated: false)
     }
     
-    func showResultUI(correctIndex: Int, selectedIndex: Int, question: Question, isLastQuestion: Bool) {
-        self.selectedOptionIndex = selectedIndex
+    func showResultUI(with data: QuizViewModel.ResultDisplayData) {
+        self.selectedOptionIndex = data.selectedIndex
         optionsStack.arrangedSubviews.enumerated().forEach { index, view in
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
-            let resultState: QuizOptionButton.State = (index == correctIndex) ? .correct : .wrong
+            let resultState: QuizOptionButton.State = (index == data.correctIndex) ? .correct : .wrong
             button.updateState(resultState)
             
             if index == selectedOptionIndex {
@@ -385,10 +386,10 @@ private extension QuizViewController {
             }
         }
         
-        explanationLabel.text = question.explanation ?? Constants.Strings.defaultExplanation
+        explanationLabel.text = data.question.explanation ?? Constants.Strings.defaultExplanation
         explanationView.isHidden = false
         
-        let title = isLastQuestion ? Constants.Strings.finishButtonTitle : Constants.Strings.nextButtonTitle
+        let title = data.isLastQuestion ? Constants.Strings.finishButtonTitle : Constants.Strings.nextButtonTitle
         nextButton.setTitle(title, for: .normal)
         nextButton.isHidden = false
         

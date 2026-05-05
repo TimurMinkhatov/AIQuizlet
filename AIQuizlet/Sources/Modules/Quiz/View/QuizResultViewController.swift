@@ -61,7 +61,7 @@ final class QuizResultViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        contentView.drawCircularProgress(percentage: viewModel.percentageValue)
+        contentView.drawCircularProgress(percentage: viewModel.viewState.percentage)
     }
 }
 
@@ -70,7 +70,7 @@ final class QuizResultViewController: UIViewController {
 extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfQuestions
+        return viewModel.viewState.questionsCount
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -141,12 +141,8 @@ private extension QuizResultViewController {
     }
     
     func bindViewModel() {
-        contentView.configure(
-            percentageText: viewModel.scoreText,
-            statusText: viewModel.statusText,
-            description: viewModel.resultDescription,
-            percentage: viewModel.percentageValue
-        )
+        let viewState = viewModel.viewState
+        contentView.configure(with: viewState)
     }
     
     // MARK: - Actions

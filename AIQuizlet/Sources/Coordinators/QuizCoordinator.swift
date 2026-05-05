@@ -35,15 +35,7 @@ final class QuizCoordinator: Coordinator {
 
     func didGenerateQuiz(_ quiz: Quiz) {
         
-        let questionRecords = quiz.questions.enumerated().map { index, question in
-            QuestionRecord(
-                orderIndex: index,
-                text: question.text,
-                answers: question.answers,
-                correctAnswer: question.correctAnswer,
-                explanation: question.explanation,
-            )
-        }
+        let questionRecords = quiz.questions.toQuestionRecords()
         
         let quizRecord = QuizRecord(
             title: quiz.title,
@@ -77,7 +69,10 @@ extension QuizCoordinator {
     }
 
     func showQuiz(quiz: Quiz, record: QuizRecord) {
-        let vm = QuizViewModel(servicesAssembly: servicesAssembly)
+        let vm = QuizViewModel(
+            quizService: servicesAssembly.quizService,
+            firestoreService: servicesAssembly.firestoreService
+        )
         vm.coordinator = self
         vm.setQuiz(quiz, record: record)
         currentQuizViewModel = vm
@@ -94,7 +89,15 @@ extension QuizCoordinator {
         do {
             try servicesAssembly.storageService.saveQuizResult(result)
         } catch {
-            print("Ошибка сохранения результата: \(error)")
+            DispatchQueue.main.async {
+                let alert = UIAlertController(
+                    title: "Ошибка",
+                    message: "Не удалось сохранить результат викторины: \(error.localizedDescription)",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.navigationController.present(alert, animated: true)
+            }
         }
         let vm = QuizResultViewModel(quizResult: result)
         let vc = QuizResultViewController(viewModel: vm)
