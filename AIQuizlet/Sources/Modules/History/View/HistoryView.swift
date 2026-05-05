@@ -11,6 +11,10 @@ import SnapKit
 
 final class HistoryView: UITableViewCell {
     
+    // MARK: - Properties
+        
+    private let dateLabel = UILabel()
+    
     static let identifier = "HistoryCell"
     
     // MARK: - Constants
@@ -35,7 +39,16 @@ final class HistoryView: UITableViewCell {
         }
     }
     
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter
+    }()
+    
     // MARK: - UI Elements
+    
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -90,11 +103,7 @@ final class HistoryView: UITableViewCell {
     func configure(with result: QuizResult) {
         titleLabel.text = result.quiz.title
         
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.locale = Locale(identifier: "ru_RU")
-        let dateString = formatter.string(from: result.date)
-        
+        let dateString = result.date.formattedForHistory()
         subtitleLabel.text = "\(dateString) • \(result.totalQuestions) вопросов"
         
         let percentage = result.percentage

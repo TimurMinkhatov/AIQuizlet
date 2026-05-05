@@ -9,15 +9,22 @@
 import UIKit
 
 final class HistoryCoordinator: Coordinator {
+    
+    // MARK: - Properties
+    
     var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
     
+    // MARK: - Initialization
+    
     init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.servicesAssembly = servicesAssembly
     }
+    
+    // MARK: - Public Methods
     
     func start() {
         let viewModel = HistoryViewModel(servicesAssembly: servicesAssembly)
@@ -27,25 +34,39 @@ final class HistoryCoordinator: Coordinator {
     }
     
     func showResultDetail(for result: QuizResult) {
-        let viewModel = QuizResultViewModel(quizResult: result, isFromHistory: true)
-        let viewController = QuizResultViewController(viewModel: viewModel)
-        
-        viewModel.onHome = { [weak self] in
-            self?.navigationController.popToRootViewController(animated: true)
-            if let tabBarCoordinator = self?.parentCoordinator as? TabBarCoordinator {
-                tabBarCoordinator.tabBarController.selectedIndex = TabBarPage.home.rawValue
+        let viewModel = QuizResultViewModel(
+            quizResult: result,
+            isFromHistory: true,
+            onRetry: { [weak self] quizRecord in
+                self?.startRetryQuiz(with: quizRecord)
+            },
+            onHome: { [weak self] in
+                self?.navigateToHome()
             }
-        }
+        )
         
-        viewModel.onRetry = { [weak self] in
-            guard let self = self else { return }
-            let quizCoordinator = QuizCoordinator(navigationController: self.navigationController, servicesAssembly: self.servicesAssembly)
-            quizCoordinator.parentCoordinator = self
-            self.children.append(quizCoordinator)
-            quizCoordinator.startQuiz(with: result.quiz)
-        }
-        
+        let viewController = QuizResultViewController(viewModel: viewModel)
         viewController.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(viewController, animated: true)
     }
+    
+    // MARK: - Private Methods
+    
+    private func navigateToHome() {
+        navigationController.popToRootViewController(animated: true)
+        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
+            tabBarCoordinator.tabBarController.selectedIndex = TabBarPage.home.rawValue
+        }
+    }
+    
+    private func startRetryQuiz(with quiz: QuizRecord) {
+        let quizCoordinator = QuizCoordinator(
+            navigationController: navigationController,
+            servicesAssembly: servicesAssembly
+        )
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.startQuiz(with: quiz)
+    }
 }
+

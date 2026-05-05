@@ -52,3 +52,12 @@ extension UIViewController {
         view.endEditing(true)
     }
 }
+
+extension Date {
+    func formattedForHistory() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter.string(from: self)
+    }
+}
