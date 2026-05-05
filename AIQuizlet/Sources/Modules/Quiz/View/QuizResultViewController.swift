@@ -57,12 +57,18 @@ final class QuizResultViewController: UIViewController {
         bindViewModel()
         setupNavigation()
         setupTargets()
+        
+        let resultView = view as! QuizResultView
+        resultView.homeButton.addTarget(self, action: #selector(homeTapped), for: .touchUpInside)
+        resultView.retryButton.addTarget(self, action: #selector(retryTapped), for: .touchUpInside)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        navigationController?.setNavigationBarHidden(!viewModel.isFromHistory, animated: true)
         contentView.drawCircularProgress(percentage: viewModel.percentageValue)
     }
+    
 }
 
 // MARK: - UITableViewDataSource & UITableViewDelegate
@@ -127,7 +133,7 @@ private extension QuizResultViewController {
     }
     
     func setupNavigation() {
-        navigationItem.hidesBackButton = true
+        navigationItem.hidesBackButton = !viewModel.isFromHistory
     }
     
     func setupTargets() {

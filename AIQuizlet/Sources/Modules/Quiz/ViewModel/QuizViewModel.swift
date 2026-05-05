@@ -130,6 +130,21 @@ final class QuizViewModel {
             
         showCurrentQuestion()
     }
+    
+    func loadFromRecord(_ record: QuizRecord) {
+        let questions = record.questions.map { questionRecord in
+            Question(
+                text: questionRecord.text,
+                answers: questionRecord.answers,
+                correctAnswer: questionRecord.correctAnswer,
+                explanation: questionRecord.explanation
+            )
+        }
+        
+        let quiz = Quiz(title: record.title, questions: questions)
+        
+        setQuiz(quiz, record: record)
+    }
 }
 
 // MARK: - Private Methods

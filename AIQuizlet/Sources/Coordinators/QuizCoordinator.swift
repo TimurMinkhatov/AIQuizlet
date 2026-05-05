@@ -60,14 +60,14 @@ final class QuizCoordinator: Coordinator {
 // MARK: - Navigation Methods
 
 extension QuizCoordinator {
-
+    
     func showTextInput() {
         let vm = TextInputViewModel(quizService: servicesAssembly.quizService)
         vm.coordinator = self
         let vc = TextInputViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)
     }
-
+    
     func showPhotoFlow() {
         let vm = CameraViewModel(cameraService: servicesAssembly.cameraService)
         vm.coordinator = self
@@ -75,7 +75,7 @@ extension QuizCoordinator {
         vc.hidesBottomBarWhenPushed = true
         navigationController.pushViewController(vc, animated: true)
     }
-
+    
     func showQuiz(quiz: Quiz, record: QuizRecord) {
         let vm = QuizViewModel(servicesAssembly: servicesAssembly)
         vm.coordinator = self
@@ -113,6 +113,15 @@ extension QuizCoordinator {
     
     func finishFlow() {
         navigationController.popToRootViewController(animated: true)
+    }
+    
+    func startQuiz(with record: QuizRecord) {
+        let viewModel = QuizViewModel(servicesAssembly: servicesAssembly)
+        viewModel.coordinator = self
+        let viewController = QuizViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        viewModel.loadFromRecord(record)
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
 

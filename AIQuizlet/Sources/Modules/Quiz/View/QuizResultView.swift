@@ -304,7 +304,7 @@ private extension QuizResultView {
         
         buttonStack.snp.makeConstraints {
             $0.top.equalToSuperview().offset(Constants.Layout.buttonStackTopOffset)
-            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.buttonStackHorizontalInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.Layout.buttonStackHorizontalInset).priority(999)
             $0.height.equalTo(Constants.Layout.buttonHeight)
         }
     }

@@ -18,6 +18,7 @@ final class QuizResultViewModel {
     // MARK: - Properties
     
     private let quizResult: QuizResult
+    let isFromHistory: Bool
     
     private let sortedQuestions: [QuestionRecord]
     
@@ -25,8 +26,9 @@ final class QuizResultViewModel {
     var onRetry: (() -> Void)?
     var onHome: (() -> Void)?
     
-    init(quizResult: QuizResult) {
+    init(quizResult: QuizResult, isFromHistory: Bool = false) {
         self.quizResult = quizResult
+        self.isFromHistory = isFromHistory
         self.sortedQuestions = quizResult.quiz.questions.sorted { $0.orderIndex < $1.orderIndex }
     }
     

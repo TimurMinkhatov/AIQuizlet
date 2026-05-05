@@ -37,8 +37,13 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
         extendedLayoutIncludesOpaqueBars = true
         setupActions()
-        renderRecentTests()
+        bindViewModel()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.fetchRecentTests()
     }
     
     override func viewDidLayoutSubviews() {
@@ -54,18 +59,15 @@ final class HomeViewController: UIViewController {
     }
 }
 
-// MARK: - Actions
+// MARK: - Private Methods
 
 private extension HomeViewController {
     
-    @objc func profileTapped() {
-        viewModel.profileSelected()
+    func bindViewModel() {
+        viewModel.onDataUpdated = { [weak self] in
+            self?.renderRecentTests()
+        }
     }
-}
-
-// MARK: - Setup Logic
-
-private extension HomeViewController {
     
     func setupActions() {
         homeView.photoCard.action = { [weak self] in
@@ -75,17 +77,33 @@ private extension HomeViewController {
             self?.viewModel.textInputSelected()
         }
         homeView.onProfileTap(target: self, action: #selector(profileTapped))
+        homeView.onSeeAllTap(target: self, action: #selector(seeAllTestsTapped))
     }
     
     func renderRecentTests() {
+        homeView.clearRecentTests()
+        
         let tests = viewModel.recentTests
         let isEmpty = tests.isEmpty
+        
         homeView.updateEmptyState(isEmpty: isEmpty)
         
         if !isEmpty {
-            tests.prefix(3).forEach { test in
-                homeView.addTestResult(test)
+            tests.enumerated().forEach { index, test in
+                let card = RecentTestCardView(test: test)
+                card.onTap = { [weak self] in
+                    self?.viewModel.didSelectRecentTest(at: index)
+                }
+                homeView.addTestResult(card)
             }
         }
+    }
+    
+    @objc func seeAllTestsTapped() {
+        viewModel.seeAllRecentTestsSelected()
+    }
+    
+    @objc func profileTapped() {
+        viewModel.profileSelected()
     }
 }

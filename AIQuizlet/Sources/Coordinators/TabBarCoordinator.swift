@@ -34,6 +34,10 @@ final class TabBarCoordinator: Coordinator {
     func showProfileTab() {
         tabBarController.selectedIndex = TabBarPage.profile.rawValue
     }
+    
+    func showHistoryTab() {
+        tabBarController.selectedIndex = TabBarPage.history.rawValue
+    }
 }
 
 // MARK: - Private Methods
@@ -59,11 +63,13 @@ private extension TabBarCoordinator {
             homeCoordinator.parentCoordinator = self
             children.append(homeCoordinator)
             homeCoordinator.start()
+            
         case .history:
-            let historyViewController = UIViewController()
-            historyViewController.view.backgroundColor = .white
-            historyViewController.title = "История"
-            nav.setViewControllers([historyViewController], animated: false)
+            let historyCoordinator = HistoryCoordinator(navigationController: nav, servicesAssembly: servicesAssembly)
+            historyCoordinator.parentCoordinator = self
+            children.append(historyCoordinator)
+            historyCoordinator.start()
+            
         case .profile:
             let profileCoordinator = ProfileCoordinator(navigationController: nav, servicesAssembly: servicesAssembly)
             profileCoordinator.parentCoordinator = self

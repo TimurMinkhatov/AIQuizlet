@@ -27,7 +27,7 @@ final class HomeCoordinator: Coordinator {
     // MARK: - Public Methods
   
     func start() {
-        let viewModel = HomeViewModel()
+        let viewModel = HomeViewModel(servicesAssembly: servicesAssembly)
         viewModel.coordinator = self
         let viewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: false)
@@ -56,5 +56,31 @@ extension HomeCoordinator {
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.showPhotoFlow()
+    }
+    
+    func showHistory() {
+        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
+            tabBarCoordinator.showHistoryTab()
+        }
+    }
+    
+    func showResultDetail(for result: QuizResult) {
+        let viewModel = QuizResultViewModel(quizResult: result, isFromHistory: true)
+        let viewController = QuizResultViewController(viewModel: viewModel)
+        
+        viewModel.onHome = { [weak self] in
+            self?.navigationController.popToRootViewController(animated: true)
+        }
+        
+        viewModel.onRetry = { [weak self] in
+            guard let self = self else { return }
+            let quizCoordinator = QuizCoordinator(navigationController: self.navigationController, servicesAssembly: self.servicesAssembly)
+            quizCoordinator.parentCoordinator = self
+            self.children.append(quizCoordinator)
+            quizCoordinator.startQuiz(with: result.quiz)
+        }
+        
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
