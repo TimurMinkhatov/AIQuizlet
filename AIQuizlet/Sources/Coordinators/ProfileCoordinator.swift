@@ -43,7 +43,11 @@ final class ProfileCoordinator: Coordinator {
 private extension ProfileCoordinator {
     
     func showProfile() {
-        let vm = ProfileViewModel(servicesAssembly: servicesAssembly)
+        let vm = ProfileViewModel(
+            firestoreService: servicesAssembly.firestoreService,
+            storageService: servicesAssembly.storageService,
+            authService: servicesAssembly.authService
+        )
         vm.coordinator = self
         let vc = ProfileViewController(viewModel: vm)
         navigationController.pushViewController(vc, animated: true)

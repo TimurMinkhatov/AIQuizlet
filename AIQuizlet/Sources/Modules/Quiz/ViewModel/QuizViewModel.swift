@@ -10,13 +10,36 @@ import Foundation
 import FirebaseAuth
 
 final class QuizViewModel {
+    
+    // MARK: - Models
+        
+    struct QuestionDisplayData {
+        let question: Question
+        let currentNumber: Int
+        let total: Int
+    }
+        
+    struct ResultDisplayData {
+        let isCorrect: Bool
+        let correctIndex: Int
+        let selectedIndex: Int
+        let question: Question
+        let isLastQuestion: Bool
+        let currentNumber: Int
+        let total: Int
+    }
+        
+    struct FinishDisplayData {
+        let score: Int
+        let total: Int
+    }
 
     // MARK: - State Enum
 
     enum State {
         case idle
         case showingQuestion(question: Question, currentNumber: Int, total: Int)
-        case showingResult(isCorrect: Bool, correctIndex: Int, selectedIndex: Int, question: Question, isLastQuestion: Bool, currentNumber: Int, total: Int)
+        case showingResult(data: ResultDisplayData)
         case finished(score: Int, total: Int)
     }
 
@@ -29,7 +52,9 @@ final class QuizViewModel {
 
     private var quiz: Quiz?
     private var currentQuestionIndex = 0
-    private let servicesAssembly: ServicesAssembly
+    private let quizService: QuizServiceProtocol
+    private let firestoreService: FirestoreService
+
     
     private(set) var state: State = .idle {
         didSet {
@@ -47,8 +72,9 @@ final class QuizViewModel {
 
     // MARK: - Init
 
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
+    init(quizService: QuizServiceProtocol, firestoreService: FirestoreService) {
+        self.quizService = quizService
+        self.firestoreService = firestoreService
     }
 
     // MARK: - Public Methods
@@ -74,7 +100,7 @@ final class QuizViewModel {
         let isCorrect = (index == question.correctAnswer)
         let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
         
-        state = .showingResult(
+        let data = ResultDisplayData(
             isCorrect: isCorrect,
             correctIndex: question.correctAnswer,
             selectedIndex: index,
@@ -83,6 +109,8 @@ final class QuizViewModel {
             currentNumber: currentQuestionIndex + 1,
             total: quiz.questions.count
         )
+        
+        state = .showingResult(data: data)
     }
 
     func nextQuestion() {
@@ -109,15 +137,7 @@ final class QuizViewModel {
     func restart() {
         guard let quiz = quiz else { return }
             
-        let questionRecords = quiz.questions.enumerated().map { index, question in
-            QuestionRecord(
-                orderIndex: index,
-                text: question.text,
-                answers: question.answers,
-                correctAnswer: question.correctAnswer,
-                explanation: question.explanation
-            )
-        }
+        let questionRecords = quiz.questions.toQuestionRecords()
             
         let newRecord = QuizRecord(
             title: quiz.title,
@@ -221,7 +241,7 @@ private extension QuizViewModel {
         if let userAnswer = userAnswers[currentQuestionIndex] {
             let isCorrect = (userAnswer == question.correctAnswer)
             let isLastQuestion = (currentQuestionIndex == quiz.questions.count - 1)
-            state = .showingResult(
+            let data = ResultDisplayData(
                 isCorrect: isCorrect,
                 correctIndex: question.correctAnswer,
                 selectedIndex: userAnswer,
@@ -230,6 +250,8 @@ private extension QuizViewModel {
                 currentNumber: currentQuestionIndex + 1,
                 total: quiz.questions.count
             )
+                    
+            state = .showingResult(data: data)
         } else {
             state = .showingQuestion(
                 question: question,
@@ -249,7 +271,7 @@ private extension QuizViewModel {
             completedAt: Date(),
             answers: answers
         )
-        try await servicesAssembly.firestoreService.saveQuizResult(quizResult: result)
+        try await firestoreService.saveQuizResult(quizResult: result)
     }
     
     private func saveQuiz(_ quiz: Quiz) async throws {
@@ -267,6 +289,6 @@ private extension QuizViewModel {
                 )
             }
         )
-        try await servicesAssembly.firestoreService.saveQuiz(quiz: fsQuiz)
+        try await firestoreService.saveQuiz(quiz: fsQuiz)
     }
 }

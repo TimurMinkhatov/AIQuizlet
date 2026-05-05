@@ -6,11 +6,6 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
-//
-//  QuizResultViewModel.swift
-//  AIQuizlet
-//
-
 import Foundation
 
 final class QuizResultViewModel {
@@ -19,12 +14,26 @@ final class QuizResultViewModel {
     
     private let quizResult: QuizResult
     let isFromHistory: Bool
-    
     private let sortedQuestions: [QuestionRecord]
     
-    var onDataLoaded: (() -> Void)?
     var onRetry: (() -> Void)?
     var onHome: (() -> Void)?
+    
+    var expandedIndexSet = Set<Int>()
+    
+    // MARK: - ViewState
+    
+    var viewState: QuizResultView.ViewState {
+        return QuizResultView.ViewState(
+            scoreText: scoreText,
+            statusText: statusText,
+            descriptionText: resultDescription,
+            percentage: percentageValue,
+            questionsCount: numberOfQuestions
+        )
+    }
+    
+    // MARK: - Init
     
     init(quizResult: QuizResult, isFromHistory: Bool = false) {
         self.quizResult = quizResult
@@ -32,13 +41,13 @@ final class QuizResultViewModel {
         self.sortedQuestions = quizResult.quiz.questions.sorted { $0.orderIndex < $1.orderIndex }
     }
     
-    // MARK: - Properties UI
+    // MARK: - Private Computed Properties
     
-    var scoreText: String {
+    private var scoreText: String {
         "\(Int(quizResult.percentage))%"
     }
     
-    var statusText: String {
+    private var statusText: String {
         let percent = quizResult.percentage
         if percent >= 100 { return "Идеально" }
         if percent >= 80  { return "Отлично" }
@@ -46,21 +55,19 @@ final class QuizResultViewModel {
         return "Можно лучше"
     }
     
-    var resultDescription: String {
+    private var resultDescription: String {
         "\(quizResult.score) из \(quizResult.totalQuestions) правильных ответов"
     }
     
-    var numberOfQuestions: Int {
+    private var numberOfQuestions: Int {
         sortedQuestions.count
     }
     
-    var percentageValue: Double {
+    private var percentageValue: Double {
         quizResult.percentage
     }
     
-    var expandedIndexSet = Set<Int>()
-    
-    // MARK: - Methods
+    // MARK: - Public Methods
     
     func getQuestion(at index: Int) -> QuestionRecord {
         return sortedQuestions[index]

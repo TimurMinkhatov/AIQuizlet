@@ -9,31 +9,13 @@
 import UIKit
 import SnapKit
 
-
-// MARK: - Constants
-
-private extension ProfileView {
-    enum Constants {
-        static let nameFontSize: CGFloat = 20
-        static let emailFontSize: CGFloat = 14
-        static let avatarCornerRadius: CGFloat = 40
-        static let avatarSize: CGFloat = 80
-        static let avatarVerticalInset: CGFloat = 24
-        static let iconSize: CGFloat = 30
-        static let cardCornerRadius: CGFloat = 20
-        static let infoStackSpacing: CGFloat = 4
-        static let infoStackLeadingOffset: CGFloat = 16
-        static let horizontalInset: CGFloat = 16
-    }
-}
-
 final class ProfileView: UIView {
 
     // MARK: - UI Components
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.text = L10n.Profile.title
+        label.text = "Профиль"
         label.font = .systemFont(ofSize: Constants.nameFontSize, weight: .bold)
         return label
     }()
@@ -151,3 +133,19 @@ private extension ProfileView {
     }
 }
 
+// MARK: - Constants
+
+private extension ProfileView {
+    enum Constants {
+        static let nameFontSize: CGFloat = 20
+        static let emailFontSize: CGFloat = 14
+        static let avatarCornerRadius: CGFloat = 40
+        static let avatarSize: CGFloat = 80
+        static let avatarVerticalInset: CGFloat = 24
+        static let iconSize: CGFloat = 30
+        static let cardCornerRadius: CGFloat = 20
+        static let infoStackSpacing: CGFloat = 4
+        static let infoStackLeadingOffset: CGFloat = 16
+        static let horizontalInset: CGFloat = 16
+    }
+}

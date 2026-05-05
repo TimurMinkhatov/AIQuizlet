@@ -23,12 +23,14 @@ final class AuthViewModel {
     private var email: String = ""
     private var password: String = ""
     private var confirmPassword: String = ""
-    private let servicesAssembly: ServicesAssembly
+    private let authService: AuthService
+    private let firestoreService: FirestoreService
     
     // MARK: - Init
     
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
+    init(authService: AuthService, firestoreService: FirestoreService) {
+        self.authService = authService
+        self.firestoreService = firestoreService
     }
     
     // MARK: - Public Methods
@@ -37,7 +39,7 @@ final class AuthViewModel {
         self.email = email
         self.password = password
         guard validateLoginForm() else { return }
-        servicesAssembly.authService.signIn(email: email, password: password) { [weak self] result in
+        authService.signIn(email: email, password: password) { [weak self] result in
             switch result {
             case .success:
                 self?.coordinator?.didFinishAuth()
@@ -52,11 +54,11 @@ final class AuthViewModel {
         self.password = password
         self.confirmPassword = confirmPassword
         guard validateRegisterForm() else { return }
-        servicesAssembly.authService.register(email: email, password: password) { [weak self] result in
+        authService.register(email: email, password: password) { [weak self] result in
             switch result {
             case .success:
                 Task {
-                    try? await self?.servicesAssembly.firestoreService.createUser(email: email)
+                    try? await self?.firestoreService.createUser(email: email)
                 }
                 self?.coordinator?.didFinishAuth()
             case .failure(let error):
