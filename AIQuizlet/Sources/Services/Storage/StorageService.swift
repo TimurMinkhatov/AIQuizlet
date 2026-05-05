@@ -9,7 +9,7 @@
 import SwiftData
 import Foundation
 
-final class StorageService {
+final class StorageService: StorageServiceProtocol {
     
     // MARK: - Properties
     
@@ -48,4 +48,11 @@ final class StorageService {
         try modelContext.delete(model: QuestionRecord.self)
         try modelContext.save()
     }
+}
+
+protocol StorageServiceProtocol {
+    func saveQuizResult(_ quizResult: QuizResult) throws
+    func fetchResults() throws -> [QuizResult]
+    func fetchQuizzes() throws -> [QuizRecord]
+    func deleteAll() throws
 }

@@ -205,6 +205,7 @@ final class TextInputViewController: UIViewController {
         setupQuestionButtons()
         setupActions()
         bindViewModel()
+        hideKeyboardWhenTappedAround()
     }
 
     override func viewDidLayoutSubviews() {
@@ -241,10 +242,6 @@ private extension TextInputViewController {
 
     @objc func generateTapped() {
         viewModel.generateQuiz()
-    }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
 

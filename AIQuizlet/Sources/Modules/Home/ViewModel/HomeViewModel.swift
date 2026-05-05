@@ -8,24 +8,62 @@
 
 import Foundation
 
-// MARK: - RecentTest Model
-
 struct RecentTest {
     let title: String
-    let score: String
+    let date: Date
+    let percentage: Double
 }
-
-// MARK: - HomeViewModel
 
 final class HomeViewModel {
 
     // MARK: - Properties
 
     weak var coordinator: HomeCoordinator?
+    private let servicesAssembly: ServicesAssembly
+    private var fullResults: [QuizResult] = []
+    var recentTests: [RecentTest] = []
+    var onDataUpdated: (() -> Void)?
+
+    // MARK: - Init
     
-    let recentTests: [RecentTest] = []
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+    }
 
     // MARK: - Public Methods
+    
+    func fetchRecentTests() {
+        do {
+            let results = try servicesAssembly.storageService.fetchResults()
+            let sortedResults = results.sorted(by: { $0.date > $1.date })
+            let topThree = Array(sortedResults.prefix(3))
+            
+            self.fullResults = topThree
+            
+            self.recentTests = topThree.map { result in
+                RecentTest(
+                    title: result.quiz.title,
+                    date: result.date,
+                    percentage: result.percentage
+                )
+            }
+            onDataUpdated?()
+        } catch {
+            self.recentTests = []
+            self.fullResults = []
+            onDataUpdated?()
+        }
+    }
+    
+    func seeAllRecentTestsSelected() {
+        coordinator?.showHistory()
+    }
+    
+    func didSelectRecentTest(at index: Int) {
+        guard index < fullResults.count else { return }
+        let selectedResult = fullResults[index]
+        coordinator?.showResultDetail(for: selectedResult)
+    }
 
     func profileSelected() {
         coordinator?.showProfile()

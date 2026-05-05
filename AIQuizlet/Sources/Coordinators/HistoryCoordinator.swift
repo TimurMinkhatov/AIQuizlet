@@ -1,14 +1,14 @@
 //
-//  HomeCoordinator.swift
+//  HistoryCoordinator.swift
 //  AIQuizlet
 //
-//  Created by Timur Minkhatov on 01/04/2026.
-//  Copyright © 2026 t-bank-team-practice. All rights reserved.
+//  Created by Azamat Zakirov on 05.05.2026.
+//  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
 import UIKit
 
-final class HomeCoordinator: Coordinator {
+final class HistoryCoordinator: Coordinator {
     
     // MARK: - Properties
     
@@ -17,7 +17,7 @@ final class HomeCoordinator: Coordinator {
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
     
-    // MARK: - Init
+    // MARK: - Initialization
     
     init(navigationController: UINavigationController, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
@@ -25,49 +25,12 @@ final class HomeCoordinator: Coordinator {
     }
     
     // MARK: - Public Methods
-  
+    
     func start() {
-        let viewModel = HomeViewModel(servicesAssembly: servicesAssembly)
+        let viewModel = HistoryViewModel(servicesAssembly: servicesAssembly)
         viewModel.coordinator = self
-        let viewController = HomeViewController(viewModel: viewModel)
-        navigationController.setViewControllers([viewController], animated: false)
-    }
-}
-
-// MARK: - Navigation
-
-extension HomeCoordinator {
-    
-    func showProfile() {
-        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
-            tabBarCoordinator.showProfileTab()
-        }
-    }
-    
-    func showTextInput() {
-        let quizCoordinator = QuizCoordinator(
-            navigationController: navigationController,
-            servicesAssembly: servicesAssembly
-        )
-        quizCoordinator.parentCoordinator = self
-        children.append(quizCoordinator)
-        quizCoordinator.start()
-    }
-    
-    func showPhotoInput() {
-        let quizCoordinator = QuizCoordinator(
-            navigationController: navigationController,
-            servicesAssembly: servicesAssembly
-        )
-        quizCoordinator.parentCoordinator = self
-        children.append(quizCoordinator)
-        quizCoordinator.showPhotoFlow()
-    }
-    
-    func showHistory() {
-        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
-            tabBarCoordinator.showHistoryTab()
-        }
+        let viewController = HistoryViewController(viewModel: viewModel)
+        navigationController.pushViewController(viewController, animated: false)
     }
     
     func showResultDetail(for result: QuizResult) {
@@ -91,11 +54,12 @@ extension HomeCoordinator {
     
     private func navigateToHome() {
         navigationController.popToRootViewController(animated: true)
+        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
+            tabBarCoordinator.tabBarController.selectedIndex = TabBarPage.home.rawValue
+        }
     }
     
     private func startRetryQuiz(with quiz: QuizRecord) {
-        guard !children.contains(where: { $0 is QuizCoordinator }) else { return }
-        
         let quizCoordinator = QuizCoordinator(
             navigationController: navigationController,
             servicesAssembly: servicesAssembly
@@ -105,3 +69,4 @@ extension HomeCoordinator {
         quizCoordinator.startQuiz(with: quiz)
     }
 }
+

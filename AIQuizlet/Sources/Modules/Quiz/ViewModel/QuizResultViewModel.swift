@@ -13,10 +13,13 @@ final class QuizResultViewModel {
     // MARK: - Properties
     
     private let quizResult: QuizResult
+    let isFromHistory: Bool
     private let sortedQuestions: [QuestionRecord]
     
-    var onRetry: (() -> Void)?
+    var onRetry: ((QuizRecord) -> Void)?
     var onHome: (() -> Void)?
+    
+    var expandedIndexSet = Set<Int>()
     
     // MARK: - ViewState
     
@@ -30,13 +33,19 @@ final class QuizResultViewModel {
         )
     }
     
-    var expandedIndexSet = Set<Int>()
-    
     // MARK: - Init
     
-    init(quizResult: QuizResult) {
+    init(
+        quizResult: QuizResult,
+        isFromHistory: Bool = false,
+        onRetry: ((QuizRecord) -> Void)? = nil,
+        onHome: (() -> Void)? = nil
+    ) {
         self.quizResult = quizResult
+        self.isFromHistory = isFromHistory
         self.sortedQuestions = quizResult.quiz.questions.sorted { $0.orderIndex < $1.orderIndex }
+        self.onRetry = onRetry
+        self.onHome = onHome
     }
     
     // MARK: - Private Computed Properties
@@ -76,7 +85,7 @@ final class QuizResultViewModel {
     }
     
     func retryQuiz() {
-        onRetry?()
+        onRetry?(quizResult.quiz)
     }
     
     func goHome() {

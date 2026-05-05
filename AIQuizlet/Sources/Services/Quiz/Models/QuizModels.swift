@@ -34,14 +34,13 @@ struct Question: Decodable {
     let answers: [String]
     let correctAnswer: Int
     let explanation: String?
-    let userAnswerIndex: Int?
 }
 
 // MARK: - Decoding Logic
 
 extension Question {
     enum CodingKeys: String, CodingKey {
-        case text, answers, correctAnswer, explanation, userAnswerIndex
+        case text, answers, correctAnswer, explanation
     }
 
     init(from decoder: Decoder) throws {
@@ -50,6 +49,5 @@ extension Question {
         self.answers = try container.decode([String].self, forKey: .answers)
         self.correctAnswer = try container.decode(Int.self, forKey: .correctAnswer)
         self.explanation = try container.decodeIfPresent(String.self, forKey: .explanation)
-        self.userAnswerIndex = try container.decodeIfPresent(Int.self, forKey: .userAnswerIndex)
     }
 }

@@ -34,9 +34,7 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        
         let questionRecords = quiz.questions.toQuestionRecords()
-        
         let quizRecord = QuizRecord(
             title: quiz.title,
             questions: questionRecords
@@ -52,33 +50,34 @@ final class QuizCoordinator: Coordinator {
 // MARK: - Navigation Methods
 
 extension QuizCoordinator {
-
+    
     func showTextInput() {
-        let vm = TextInputViewModel(quizService: servicesAssembly.quizService)
-        vm.coordinator = self
-        let vc = TextInputViewController(viewModel: vm)
-        navigationController.pushViewController(vc, animated: true)
+        let viewModel = TextInputViewModel(quizService: servicesAssembly.quizService)
+        viewModel.coordinator = self
+        let viewController = TextInputViewController(viewModel: viewModel)
+        navigationController.pushViewController(viewController, animated: true)
     }
-
+    
     func showPhotoFlow() {
-        let vm = CameraViewModel(cameraService: servicesAssembly.cameraService)
-        vm.coordinator = self
-        let vc = CameraViewController(viewModel: vm)
-        vc.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(vc, animated: true)
+        let viewModel = CameraViewModel(cameraService: servicesAssembly.cameraService)
+        viewModel.coordinator = self
+        let viewController = CameraViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
     }
-
+    
     func showQuiz(quiz: Quiz, record: QuizRecord) {
-        let vm = QuizViewModel(
+        let viewModel = QuizViewModel(
             quizService: servicesAssembly.quizService,
-            firestoreService: servicesAssembly.firestoreService
+            firestoreService: servicesAssembly.firestoreService,
+            storageService: servicesAssembly.storageService
         )
-        vm.coordinator = self
-        vm.setQuiz(quiz, record: record)
-        currentQuizViewModel = vm
-        let vc = QuizViewController(viewModel: vm)
-        vc.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(vc, animated: true)
+        viewModel.coordinator = self
+        viewModel.setQuiz(quiz, record: record)
+        currentQuizViewModel = viewModel
+        let viewController = QuizViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
     }
     
     func didRequestRetake() {
@@ -86,36 +85,37 @@ extension QuizCoordinator {
     }
     
     func showResult(with result: QuizResult) {
-        do {
-            try servicesAssembly.storageService.saveQuizResult(result)
-        } catch {
-            DispatchQueue.main.async {
-                let alert = UIAlertController(
-                    title: "Ошибка",
-                    message: "Не удалось сохранить результат викторины: \(error.localizedDescription)",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.navigationController.present(alert, animated: true)
+        let viewModel = QuizResultViewModel(
+            quizResult: result,
+            onRetry: { [weak self] quizRecord in
+                self?.currentQuizViewModel?.restart()
+                self?.navigationController.popViewController(animated: true)
+            },
+            onHome: { [weak self] in
+                self?.navigationController.popToRootViewController(animated: true)
             }
-        }
-        let vm = QuizResultViewModel(quizResult: result)
-        let vc = QuizResultViewController(viewModel: vm)
+        )
         
-        vm.onHome = { [weak self] in
-            self?.navigationController.popToRootViewController(animated: true)
-        }
-        
-        vm.onRetry = { [weak self] in
-            self?.currentQuizViewModel?.restart()
-            self?.navigationController.popViewController(animated: true)
-        }
-        vc.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(vc, animated: true)
+        let viewController = QuizResultViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
     }
     
     func finishFlow() {
         navigationController.popToRootViewController(animated: true)
+    }
+    
+    func startQuiz(with record: QuizRecord) {
+        let viewModel = QuizViewModel(
+            quizService: servicesAssembly.quizService,
+            firestoreService: servicesAssembly.firestoreService,
+            storageService: servicesAssembly.storageService
+        )
+        viewModel.coordinator = self
+        let viewController = QuizViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        viewModel.loadFromRecord(record)
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
 
@@ -124,12 +124,10 @@ extension QuizCoordinator {
 private extension QuizCoordinator {
     
     func showPhotoPreview(with image: UIImage) {
-        let vm = PhotoPreviewViewModel(image: image)
-        let vc = PhotoPreviewViewController(viewModel: vm)
-        vm.coordinator = self
-        
-        vc.hidesBottomBarWhenPushed = true
-        navigationController.pushViewController(vc, animated: true)
-        
+        let viewModel = PhotoPreviewViewModel(image: image)
+        let viewController = PhotoPreviewViewController(viewModel: viewModel)
+        viewModel.coordinator = self
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
     }
 }
