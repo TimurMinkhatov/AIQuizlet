@@ -189,7 +189,8 @@ final class TextInputViewController: UIViewController {
         }
         setupActions()
         bindViewModel()
-        
+        hideKeyboardWhenTappedAround()
+
         NotificationCenter.default.addObserver(
             forName: .themeDidChange,
             object: nil,
@@ -234,10 +235,6 @@ private extension TextInputViewController {
 
     @objc func generateTapped() {
         viewModel.generateQuiz()
-    }
-
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
 

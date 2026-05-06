@@ -111,6 +111,46 @@ extension FirestoreService {
         }
     }
     
+    func fetchUserQuizzes(userId: String) async throws -> [FSQuiz] {
+        let snapshot = try await db.collection("users")
+            .document(userId)
+            .collection("quizzes")
+            .getDocuments()
+        
+        return try snapshot.documents.compactMap {
+            try Firestore.Decoder().decode(FSQuiz.self, from: $0.data())
+        }
+    }
+    
+    func fetchUserResults(userId: String) async throws -> [FSQuizResult] {
+        let snapshot = try await db.collection("users")
+            .document(userId)
+            .collection("quizResults")
+            .getDocuments()
+        
+        return try snapshot.documents.compactMap {
+            try Firestore.Decoder().decode(FSQuizResult.self, from: $0.data())
+        }
+    }
+    
+    func deleteQuizResult(resultId: String) async throws {
+        guard let userId else { return }
+        try await db.collection("users")
+            .document(userId)
+            .collection("quizResults")
+            .document(resultId)
+            .delete()
+    }
+    
+    func deleteQuiz(quizId: String) async throws {
+        guard let userId else { return }
+        try await db.collection("users")
+            .document(userId)
+            .collection("quizzes")
+            .document(quizId)
+            .delete()
+    }
+    
     func deleteAllData() async throws {
         guard let userId else { return }
         

@@ -9,7 +9,7 @@
 import Foundation
 
 struct FSQuizResult: Codable {
-
+    let quizId: String
     let id: String
     let userId: String
     let score: Double
@@ -20,6 +20,7 @@ struct FSQuizResult: Codable {
 
     var asDictionary: [String: Any] {
         return [
+            "quizId": quizId,
             "id": id,
             "userId": userId,
             "score": score,

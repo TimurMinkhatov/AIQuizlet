@@ -51,8 +51,17 @@ final class PhotoPreviewViewModel {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
                     
                     await MainActor.run {
+                        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+                            self.onLoadingStateChanged?(false)
+                            self.handleError("Не удалось определить пользователя. Войдите в аккаунт и попробуйте снова.")
+                            return
+                        }
                         let questionRecords = quiz.questions.toQuestionRecords()
-                        let record = QuizRecord(title: quiz.title, questions: questionRecords)
+                        let record = QuizRecord(
+                            userId: currentUserId,
+                            title: quiz.title,
+                            questions: questionRecords
+                        )
                         
                         self.onLoadingStateChanged?(false)
 
@@ -80,6 +89,10 @@ private extension PhotoPreviewViewModel {
     }
     
     func handleSuccess(quiz: Quiz) {
+        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+            handleError("Не удалось определить пользователя. Войдите в аккаунт и попробуйте снова.")
+            return
+        }
         
         let questionRecord = quiz.questions.enumerated().map { index, question in
             QuestionRecord(
@@ -91,7 +104,11 @@ private extension PhotoPreviewViewModel {
             )
         }
         
-        let record = QuizRecord(title: quiz.title, questions: questionRecord)
+        let record = QuizRecord(
+            userId: currentUserId,
+            title: quiz.title,
+            questions: questionRecord
+        )
         coordinator?.showQuiz(quiz: quiz, record: record)
     }
 }

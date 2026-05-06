@@ -12,6 +12,7 @@ import Foundation
 @Model
 final class QuizResult {
     
+    var userId: String
     var id: UUID
     var date: Date
     var score: Int
@@ -19,7 +20,8 @@ final class QuizResult {
     var quiz: QuizRecord
     @Relationship(deleteRule: .cascade) var userAnswers: [AnswerRecord]
     
-    init(id: UUID = UUID(), date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord, userAnswers: [AnswerRecord]) {
+    init(userId: String, id: UUID = UUID(), date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord, userAnswers: [AnswerRecord]) {
+        self.userId = userId
         self.id = id
         self.date = date
         self.score = score

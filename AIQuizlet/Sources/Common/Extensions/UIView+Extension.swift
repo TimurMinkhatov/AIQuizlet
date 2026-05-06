@@ -39,3 +39,25 @@ extension UIStackView {
         views.forEach { addArrangedSubview($0) }
     }
 }
+
+extension UIViewController {
+    
+    func hideKeyboardWhenTappedAround() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension Date {
+    func formattedForHistory() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "ru_RU")
+        return formatter.string(from: self)
+    }
+}

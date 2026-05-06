@@ -5,10 +5,38 @@
 //  Created by Azamat Zakirov on 07.04.2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
+
 import UIKit
 import SnapKit
 
 final class HomeView: UIView {
+    
+    // MARK: - Constants
+    
+    private enum Constants {
+        static let mainPadding: CGFloat = 20
+        static let headerHeight: CGFloat = 50
+        static let profileButtonSize: CGFloat = 44
+        static let sectionHeaderHeight: CGFloat = 30
+        static let mainStackSpacing: CGFloat = 20
+        static let scrollViewTopOffset: CGFloat = 80
+        
+        enum Fonts {
+            static let welcome = UIFont.systemFont(ofSize: 24, weight: .bold)
+            static let sectionTitle = UIFont.systemFont(ofSize: 20, weight: .semibold)
+            static let seeAllButton = UIFont.systemFont(ofSize: 14, weight: .medium)
+        }
+        
+        enum Strings {
+            static let welcome = "Привет!"
+            static let recentTests = "Недавние тесты"
+            static let seeAll = "Смотреть все"
+            static let photoCardTitle = "Создать тест по конспекту"
+            static let photoCardSubtitle = "Сфотографируйте конспект и получите готовый тест"
+            static let textCardTitle = "Создать из текста"
+            static let textCardSubtitle = "Вставьте или введите текст лекции"
+        }
+    }
     
     // MARK: - UI Elements
     
@@ -17,18 +45,35 @@ final class HomeView: UIView {
     
     private lazy var welcomeLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 24, weight: .bold)
-        label.text = "Привет!"
+        label.font = Constants.Fonts.welcome
+        label.text = Constants.Strings.welcome
         label.textColor = .white
         return label
     }()
     
     private lazy var recentTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Недавние тесты"
-        label.font = .systemFont(ofSize: 20, weight: .semibold)
+        label.text = Constants.Strings.recentTests
+        label.font = Constants.Fonts.sectionTitle
         label.textColor = .white
         return label
+    }()
+    
+    private lazy var recentTestsHeaderStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fill
+        stack.alignment = .center
+        stack.spacing = 8
+        return stack
+    }()
+    
+    private lazy var seeAllTestsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle(Constants.Strings.seeAll, for: .normal) 
+        button.titleLabel?.font = Constants.Fonts.seeAllButton
+        button.setTitleColor(.white.withAlphaComponent(0.7), for: .normal)
+        return button
     }()
     
     private lazy var profileButton: UIButton = {
@@ -53,13 +98,13 @@ final class HomeView: UIView {
         stack.axis = .vertical
         stack.distribution = .fill
         stack.alignment = .fill
-        stack.spacing = 20
+        stack.spacing = Constants.mainStackSpacing
         return stack
     }()
     
     lazy var photoCard = ActionCardView(
-        title: "Создать тест по конспекту",
-        subtitle: "Сфотографируйте конспект и получите готовый тест",
+        title: Constants.Strings.photoCardTitle,
+        subtitle: Constants.Strings.photoCardSubtitle,
         iconName: "camera",
         gradientColors: [
             UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
@@ -68,8 +113,8 @@ final class HomeView: UIView {
     )
     
     lazy var textCard = ActionCardView(
-        title: "Создать из текста",
-        subtitle: "Вставьте или введите текст лекции",
+        title: Constants.Strings.textCardTitle,
+        subtitle: Constants.Strings.textCardSubtitle,
         iconName: "text.document",
         gradientColors: [
             UIColor(red: 173/255, green: 70/255, blue: 255/255, alpha: 1),
@@ -85,15 +130,12 @@ final class HomeView: UIView {
         setupConstraints()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { fatalError() }
     
     // MARK: - Public Methods
     
-    func addTestResult(_ test: RecentTest) {
-        let card = RecentTestCardView(test: test)
-        mainStackView.addArrangedSubview(card)
+    func addTestResult(_ cardView: UIView) {
+        mainStackView.addArrangedSubview(cardView)
     }
     
     func onProfileTap(target: Any, action: Selector) {
@@ -103,6 +145,31 @@ final class HomeView: UIView {
     func updateEmptyState(isEmpty: Bool) {
         emptyStateView.isHidden = !isEmpty
     }
+    
+    func clearRecentTests() {
+        mainStackView.arrangedSubviews
+            .filter { $0 is RecentTestCardView }
+            .forEach {
+                mainStackView.removeArrangedSubview($0)
+                $0.removeFromSuperview()
+            }
+    }
+    
+    func onSeeAllTap(target: Any, action: Selector) {
+        seeAllTestsButton.addTarget(target, action: action, for: .touchUpInside)
+    }
+    
+    func updateForTheme(_ style: UIUserInterfaceStyle) {
+        let isDark = style == .dark
+        let labelColor: UIColor = isDark ? .label : .white
+        let secondaryColor: UIColor = isDark ? .secondaryLabel : .white.withAlphaComponent(0.7)
+        let iconColor: UIColor = isDark ? .label : .white.withAlphaComponent(0.8)
+
+        welcomeLabel.textColor = labelColor
+        recentTitleLabel.textColor = labelColor
+        seeAllTestsButton.setTitleColor(secondaryColor, for: .normal)
+        profileButton.tintColor = iconColor
+    }
 }
 
 // MARK: - Setup Logic
@@ -111,36 +178,41 @@ private extension HomeView {
     
     func setupUI() {
         backgroundColor = .clear
-        
-        addSubviews(scrollView,headerStackView)
-        
+        addSubviews(scrollView, headerStackView)
         scrollView.addSubview(mainStackView)
         
         headerStackView.addArrangedSubviews(welcomeLabel, profileButton)
-        
-        mainStackView.addArrangedSubviews(photoCard, textCard, recentTitleLabel, emptyStateView)
+        recentTestsHeaderStack.addArrangedSubviews(recentTitleLabel, seeAllTestsButton)
+        mainStackView.addArrangedSubviews(photoCard, textCard, recentTestsHeaderStack, emptyStateView)
     }
 
     func setupConstraints() {
-        headerStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(-5)
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.height.equalTo(50)
+        headerStackView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide).offset(-5)
+            $0.leading.trailing.equalToSuperview().inset(Constants.mainPadding)
+            $0.height.equalTo(Constants.headerHeight)
         }
         
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        recentTitleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        seeAllTestsButton.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        recentTestsHeaderStack.snp.makeConstraints {
+            $0.height.equalTo(Constants.sectionHeaderHeight)
         }
 
-        mainStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
-            make.bottom.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
-            make.width.equalTo(scrollView.snp.width).offset(-40)
+        mainStackView.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(Constants.scrollViewTopOffset)
+            $0.bottom.equalToSuperview().inset(Constants.mainPadding)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width).offset(-(Constants.mainPadding * 2))
         }
         
-        profileButton.snp.makeConstraints { make in
-            make.size.equalTo(44)
+        profileButton.snp.makeConstraints {
+            $0.size.equalTo(Constants.profileButtonSize)
         }
     }
 }

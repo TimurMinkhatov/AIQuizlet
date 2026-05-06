@@ -306,6 +306,18 @@ private extension ProfileViewController {
         button.contentHorizontalAlignment = .left
         return button
     }
+    
+    func updateGradient(for style: UIUserInterfaceStyle) {
+        if style == .dark {
+            gradientLayer.isHidden = true
+            view.backgroundColor = AppColors.appBackground
+        } else {
+            gradientLayer.isHidden = false
+            view.backgroundColor = .clear
+        }
+        versionLabel.textColor = style == .dark ? .secondaryLabel : .white
+        activityIndicator.color = style == .dark ? .label : .white
+    }
 
     @objc func clearDataTapped() {
         let alert = UIAlertController(

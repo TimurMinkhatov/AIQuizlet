@@ -27,7 +27,7 @@ final class HomeCoordinator: Coordinator {
     // MARK: - Public Methods
   
     func start() {
-        let viewModel = HomeViewModel()
+        let viewModel = HomeViewModel(servicesAssembly: servicesAssembly)
         viewModel.coordinator = self
         let viewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: false)
@@ -45,16 +45,63 @@ extension HomeCoordinator {
     }
     
     func showTextInput() {
-        let quizCoordinator = QuizCoordinator(navigationController: navigationController, servicesAssembly: servicesAssembly)
+        let quizCoordinator = QuizCoordinator(
+            navigationController: navigationController,
+            servicesAssembly: servicesAssembly
+        )
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.start()
     }
     
     func showPhotoInput() {
-        let quizCoordinator = QuizCoordinator(navigationController: navigationController, servicesAssembly: servicesAssembly)
+        let quizCoordinator = QuizCoordinator(
+            navigationController: navigationController,
+            servicesAssembly: servicesAssembly
+        )
         quizCoordinator.parentCoordinator = self
         children.append(quizCoordinator)
         quizCoordinator.showPhotoFlow()
+    }
+    
+    func showHistory() {
+        if let tabBarCoordinator = parentCoordinator as? TabBarCoordinator {
+            tabBarCoordinator.showHistoryTab()
+        }
+    }
+    
+    func showResultDetail(for result: QuizResult) {
+        let viewModel = QuizResultViewModel(
+            quizResult: result,
+            isFromHistory: true,
+            onRetry: { [weak self] quizRecord in
+                self?.startRetryQuiz(with: quizRecord)
+            },
+            onHome: { [weak self] in
+                self?.navigateToHome()
+            }
+        )
+        
+        let viewController = QuizResultViewController(viewModel: viewModel)
+        viewController.hidesBottomBarWhenPushed = true
+        navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    // MARK: - Private Methods
+    
+    private func navigateToHome() {
+        navigationController.popToRootViewController(animated: true)
+    }
+    
+    private func startRetryQuiz(with quiz: QuizRecord) {
+        guard !children.contains(where: { $0 is QuizCoordinator }) else { return }
+        
+        let quizCoordinator = QuizCoordinator(
+            navigationController: navigationController,
+            servicesAssembly: servicesAssembly
+        )
+        quizCoordinator.parentCoordinator = self
+        children.append(quizCoordinator)
+        quizCoordinator.startQuiz(with: quiz)
     }
 }

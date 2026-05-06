@@ -130,7 +130,6 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
-            print("Ошибка захвата: \(error)")
             return
         }
         
