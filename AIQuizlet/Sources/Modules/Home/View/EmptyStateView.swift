@@ -29,12 +29,6 @@ final class EmptyStateView: UIView {
             static let title = UIFont.systemFont(ofSize: 18, weight: .semibold)
             static let subtitle = UIFont.systemFont(ofSize: 14)
         }
-
-        enum Strings {
-            static let title = "У вас пока нет тестов"
-            static let subtitle = "Создайте первый тест!"
-            static let iconName = "book"
-        }
     }
 
     // MARK: - UI Elements
@@ -56,7 +50,7 @@ final class EmptyStateView: UIView {
 
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: Constants.Strings.iconName)
+        imageView.image = UIImage(systemName: "book")
         imageView.tintColor = .systemGray
         imageView.contentMode = .scaleAspectFit
         return imageView

@@ -70,7 +70,7 @@ private extension SceneDelegate {
         appCoordinator = AppCoordinator(
             navigationController: navigationController,
             window: window,
-            assembly: assembly
+            servicesAssembly: assembly
         )
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {

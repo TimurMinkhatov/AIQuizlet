@@ -55,7 +55,7 @@ final class AppCoordinator: Coordinator {
 
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
-            servicesAssembly: servicesAssembly
+            assembly: servicesAssembly
         )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)

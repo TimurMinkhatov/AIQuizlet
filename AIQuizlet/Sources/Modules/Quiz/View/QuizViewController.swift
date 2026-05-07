@@ -309,7 +309,7 @@ private extension QuizViewController {
                     self.updateProgress(current: data.currentNumber, total: data.total)
                     self.render(question: data.question, number: data.currentNumber)
                     self.showResultUI(with: data)
-                case .finished(let score, let total):
+                case .finished(_, _):
                     break
                 case .idle: break
                 }

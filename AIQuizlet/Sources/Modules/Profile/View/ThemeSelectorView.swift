@@ -19,7 +19,7 @@ final class ThemeSelectorView: UIView {
         let label = UILabel()
         label.text = L10n.Profile.Theme.title
         label.textColor = .label
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
+        label.font = .systemFont(ofSize: Constants.titleFontSize, weight: .semibold)
         return label
     }()
 
@@ -31,7 +31,7 @@ final class ThemeSelectorView: UIView {
 
     init() {
         super.init(frame: .zero)
-        layer.cornerRadius = 16
+        layer.cornerRadius = Constants.cornerRadius
         backgroundColor = AppColors.cardBackground
         setupLayout()
         setupActions()
@@ -68,14 +68,14 @@ private extension ThemeSelectorView {
     func makeThemeButton(title: String, systemImage: String) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.image = UIImage(systemName: systemImage)?
-            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 16))
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: Constants.buttonIconSize))
         config.imagePlacement = .top
-        config.imagePadding = 4
+        config.imagePadding = Constants.buttonImagePadding
         config.baseForegroundColor = .label
-        config.background.cornerRadius = 10
+        config.background.cornerRadius = Constants.buttonCornerRadius
         config.background.backgroundColor = AppColors.inactiveButton
         var titleAttr = AttributedString(title)
-        titleAttr.font = .systemFont(ofSize: 12)
+        titleAttr.font = .systemFont(ofSize: Constants.buttonTitleFontSize)
         config.attributedTitle = titleAttr
         return UIButton(configuration: config)
     }
@@ -97,20 +97,22 @@ private extension ThemeSelectorView {
     func setupLayout() {
         let buttonStack = UIStackView(arrangedSubviews: [lightButton, darkButton, systemButton])
         buttonStack.axis = .horizontal
-        buttonStack.spacing = 8
+        buttonStack.spacing = Constants.buttonSpacing
         buttonStack.distribution = .fillEqually
 
         addSubview(titleLabel)
         addSubview(buttonStack)
 
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().offset(Constants.contentInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.contentInset)
         }
 
         buttonStack.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(12)
-            $0.leading.trailing.bottom.equalToSuperview().inset(20)
-            $0.height.equalTo(64)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(Constants.titleToButtonSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.contentInset)
+            $0.bottom.equalToSuperview().inset(Constants.contentInset)
+            $0.height.equalTo(Constants.buttonStackHeight)
         }
     }
 
@@ -133,5 +135,22 @@ private extension ThemeSelectorView {
     @objc func systemTapped() {
         selectButton(systemButton)
         onThemeSelected?(.unspecified)
+    }
+}
+
+// MARK: - Constants
+
+private extension ThemeSelectorView {
+    enum Constants {
+        static let cornerRadius: CGFloat = 16
+        static let contentInset: CGFloat = 20
+        static let titleFontSize: CGFloat = 17
+        static let titleToButtonSpacing: CGFloat = 12
+        static let buttonStackHeight: CGFloat = 72
+        static let buttonSpacing: CGFloat = 8
+        static let buttonCornerRadius: CGFloat = 10
+        static let buttonIconSize: CGFloat = 16
+        static let buttonImagePadding: CGFloat = 4
+        static let buttonTitleFontSize: CGFloat = 12
     }
 }

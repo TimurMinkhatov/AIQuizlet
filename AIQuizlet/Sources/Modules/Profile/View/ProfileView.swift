@@ -15,7 +15,7 @@ final class ProfileView: UIView {
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Профиль"
+        label.text = L10n.Profile.title
         label.font = .systemFont(ofSize: Constants.nameFontSize, weight: .bold)
         return label
     }()

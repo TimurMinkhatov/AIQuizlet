@@ -14,9 +14,6 @@ final class HistoryViewController: UIViewController {
     // MARK: - Constants
     
     private enum Constants {
-        static let title = "История тестов"
-        static let searchPlaceholder = "Поиск по названию..."
-        
         enum Layout {
             static let searchFieldCornerRadius: CGFloat = 12
             static let searchFieldHeight: CGFloat = 48
@@ -30,10 +27,6 @@ final class HistoryViewController: UIViewController {
             static let gradientEnd = UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
             static let searchIconTint = UIColor.systemGray
         }
-        
-        enum Icons {
-            static let magnifyingGlass = "magnifyingglass"
-        }
     }
     
     // MARK: - Properties
@@ -44,13 +37,13 @@ final class HistoryViewController: UIViewController {
     
     private lazy var searchField: UITextField = {
         let tf = UITextField()
-        tf.backgroundColor = .white
-        tf.placeholder = Constants.searchPlaceholder
+        tf.backgroundColor = AppColors.historyCard
+        tf.placeholder = L10n.History.Search.placeholder
         tf.layer.cornerRadius = Constants.Layout.searchFieldCornerRadius
         tf.leftViewMode = .always
         
         let iconView = UIView(frame: CGRect(origin: .zero, size: Constants.Layout.searchIconSize))
-        let icon = UIImageView(image: UIImage(systemName: Constants.Icons.magnifyingGlass))
+        let icon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
         icon.tintColor = Constants.Colors.searchIconTint
         icon.frame = Constants.Layout.searchIconFrame
         iconView.addSubview(icon)
@@ -85,24 +78,26 @@ final class HistoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = Constants.title
+        title = L10n.History.title
         setupUI()
         bindViewModel()
         setupActions()
         hideKeyboardWhenTappedAround()
+        updateGradient(for: traitCollection.userInterfaceStyle)
 
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let style = notification.object as? UIUserInterfaceStyle else { return }
+            self?.updateGradient(for: style)
+        }
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        view.applyGradient(colors: [
-            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
-            UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
-        ],
-        startPoint: CGPoint(x: 0.5, y: 0),
-        endPoint: CGPoint(x: 0.5, y: 1)
-        )
+        updateGradient(for: traitCollection.userInterfaceStyle)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -128,6 +123,24 @@ final class HistoryViewController: UIViewController {
         }
     }
     
+    private func updateGradient(for style: UIUserInterfaceStyle) {
+        if style == .dark {
+            view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            view.backgroundColor = AppColors.background
+        } else {
+            view.backgroundColor = .clear
+            view.applyGradient(
+                colors: [
+                    UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+                    UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
+                    UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
+                ],
+                startPoint: CGPoint(x: 0.5, y: 0),
+                endPoint: CGPoint(x: 0.5, y: 1)
+            )
+        }
+    }
+
     @objc private func searchTextChanged(_ textField: UITextField) {
         let query = textField.text ?? ""
         viewModel.search(query: query)

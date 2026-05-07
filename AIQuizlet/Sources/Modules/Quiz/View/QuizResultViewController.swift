@@ -19,12 +19,6 @@ private enum Constants {
         static let titleLeadingOffset: CGFloat = 24
         static let titleBottomOffset: CGFloat = -16
     }
-    
-    enum Strings {
-        static let cellIdentifier = "AnalysisCell"
-        static let headerTitle = "Разбор вопросов"
-        static let fatalErrorInit = "init(coder:) has not been implemented"
-    }
 }
 
 final class QuizResultViewController: UIViewController {
@@ -42,7 +36,7 @@ final class QuizResultViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError(Constants.Strings.fatalErrorInit)
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Lifecycle
@@ -75,7 +69,7 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.Strings.cellIdentifier, for: indexPath) as? QuestionAnalysisCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AnalysisCell", for: indexPath) as? QuestionAnalysisCell else {
             return UITableViewCell()
         }
         
@@ -83,7 +77,7 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
         let userAnswerIndex = viewModel.getUserAnswer(at: indexPath.row)
         let isExpanded = viewModel.expandedIndexSet.contains(indexPath.row)
         
-        cell.contentView.backgroundColor = .white
+        cell.contentView.backgroundColor = AppColors.historyCard
         cell.configure(with: question, userAnswerIndex: userAnswerIndex, index: indexPath.row, isExpanded: isExpanded)
         return cell
     }
@@ -98,7 +92,7 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return createSectionHeader(title: Constants.Strings.headerTitle)
+        return createSectionHeader(title: L10n.Result.Breakdown.title)
     }
 }
 
@@ -108,14 +102,14 @@ private extension QuizResultViewController {
     
     func createSectionHeader(title: String) -> UIView {
         let headerView = UIView()
-        headerView.backgroundColor = .white
+        headerView.backgroundColor = AppColors.historyCard
         headerView.layer.cornerRadius = Constants.Layout.headerCornerRadius
         headerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: Constants.Layout.titleFontSize, weight: .bold)
-        titleLabel.textColor = .black
+        titleLabel.textColor = .label
         
         headerView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints {

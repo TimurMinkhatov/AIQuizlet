@@ -79,6 +79,18 @@ public enum L10n {
   public enum History {
     /// Test History
     public static var title: String { return L10n.tr("Localizable", "history.title", fallback: "Test History") }
+    /// Home
+    public static var toHome: String { return L10n.tr("Localizable", "history.toHome", fallback: "Home") }
+    public enum Create {
+      /// Create first test through the main screen!
+      public static var first: String { return L10n.tr("Localizable", "history.create.first", fallback: "Create first test through the main screen!") }
+    }
+    public enum Item {
+      /// %@ • %d questions
+      public static func info(_ p1: Any, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "history.item.info", String(describing: p1), p2, fallback: "%@ • %d questions")
+      }
+    }
     public enum Questions {
       /// %d questions
       public static func count(_ p1: Int) -> String {
@@ -86,6 +98,8 @@ public enum L10n {
       }
     }
     public enum Search {
+      /// You don't have tests
+      public static var no: String { return L10n.tr("Localizable", "history.search.no", fallback: "You don't have tests") }
       /// Search by title...
       public static var placeholder: String { return L10n.tr("Localizable", "history.search.placeholder", fallback: "Search by title...") }
     }
@@ -110,6 +124,10 @@ public enum L10n {
       public static var subtitle: String { return L10n.tr("Localizable", "home.empty.subtitle", fallback: "Create your first one!") }
       /// No tests yet
       public static var title: String { return L10n.tr("Localizable", "home.empty.title", fallback: "No tests yet") }
+    }
+    public enum Quiz {
+      /// See all
+      public static var watch: String { return L10n.tr("Localizable", "home.quiz.watch", fallback: "See all") }
     }
     public enum RecentQuizzes {
       /// Recent Tests
@@ -181,6 +199,8 @@ public enum L10n {
     }
   }
   public enum Quiz {
+    /// Question
+    public static var question: String { return L10n.tr("Localizable", "quiz.question", fallback: "Question") }
     public enum Answer {
       /// Option %@ — %@
       public static func option(_ p1: Any, _ p2: Any) -> String {
@@ -190,8 +210,8 @@ public enum L10n {
     public enum Explanation {
       /// Correct answer based on the provided text.
       public static var `default`: String { return L10n.tr("Localizable", "quiz.explanation.default", fallback: "Correct answer based on the provided text.") }
-      /// Explanation:
-      public static var title: String { return L10n.tr("Localizable", "quiz.explanation.title", fallback: "Explanation:") }
+      /// Explanation: 
+      public static var title: String { return L10n.tr("Localizable", "quiz.explanation.title", fallback: "Explanation: ") }
     }
     public enum Finish {
       /// Finish Test
@@ -255,6 +275,18 @@ public enum L10n {
     public static func correctCount(_ p1: Int, _ p2: Int) -> String {
       return L10n.tr("Localizable", "result.correctCount", p1, p2, fallback: "%d of %d correct answers")
     }
+    /// Test completed: %d of %d
+    public static func end(_ p1: Int, _ p2: Int) -> String {
+      return L10n.tr("Localizable", "result.end", p1, p2, fallback: "Test completed: %d of %d")
+    }
+    /// Good
+    public static var good: String { return L10n.tr("Localizable", "result.good", fallback: "Good") }
+    /// Great
+    public static var great: String { return L10n.tr("Localizable", "result.great", fallback: "Great") }
+    /// Could be better
+    public static var notBad: String { return L10n.tr("Localizable", "result.notBad", fallback: "Could be better") }
+    /// Perfect
+    public static var perfect: String { return L10n.tr("Localizable", "result.perfect", fallback: "Perfect") }
     public enum Breakdown {
       /// Question Breakdown
       public static var title: String { return L10n.tr("Localizable", "result.breakdown.title", fallback: "Question Breakdown") }

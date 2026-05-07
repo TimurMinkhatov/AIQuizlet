@@ -27,6 +27,7 @@
 "home.recentQuizzes.title" = "Недавние тесты";
 "home.empty.title" = "У вас пока нет тестов";
 "home.empty.subtitle" = "Создайте первый тест!";
+"home.quiz.watch" = "Смотреть все";
 
 // MARK: - Quiz
 "quiz.textInput.title" = "Введите текст";
@@ -37,7 +38,7 @@
 "quiz.textInput.paste.button" = "Вставить";
 "quiz.textInput.generate.button" = "Сгенерировать тест";
 "quiz.question.counter" = "Вопрос %d из %d";
-"quiz.explanation.title" = "Объяснение:";
+"quiz.explanation.title" = "Объяснение: ";
 "quiz.next.button" = "Далее";
 "quiz.finish.button" = "Завершить тест";
 "quiz.result.correct" = "Верно!";
@@ -49,17 +50,27 @@
 "quiz.question.continue" = "Продолжить";
 "quiz.question.count.title" = "Количество вопросов";
 "quiz.photo.retake.button" = "Переснять";
+"quiz.question" = "Вопрос";
 
 // MARK: - Result
 "result.tryAgain.button" = "Пройти заново";
 "result.home.button" = "На главную";
 "result.breakdown.title" = "Разбор вопросов";
 "result.correctCount" = "%d из %d правильных ответов";
+"result.end" = "Тест завершен: %d из %d";
+"result.perfect" = "Идеально";
+"result.great" = "Отлично";
+"result.good" = "Хорошо";
+"result.notBad" = "Можно лучше";
 
 // MARK: - History
 "history.title" = "История тестов";
 "history.search.placeholder" = "Поиск по названию...";
 "history.questions.count" = "%d questions";
+"history.search.no" = "У вас пока нет тестов";
+"history.create.first" = "Создайте первый через\nглавный экран!";
+"history.toHome" = "На главную";
+"history.item.info" = "%@ • %d вопросов";
 
 // MARK: - Profile
 "profile.title" = "Профиль";

@@ -98,6 +98,7 @@ private extension HomeViewController {
         homeView.updateForTheme(style)
         if style == .dark {
             view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            view.backgroundColor = AppColors.background
         } else {
             view.applyGradient(colors: AppColors.backgroundGradient)
         }

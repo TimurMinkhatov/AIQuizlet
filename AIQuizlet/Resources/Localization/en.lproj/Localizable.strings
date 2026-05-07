@@ -27,6 +27,7 @@
 "home.recentQuizzes.title" = "Recent Tests";
 "home.empty.title" = "No tests yet";
 "home.empty.subtitle" = "Create your first one!";
+"home.quiz.watch" = "See all";
 
 // MARK: - Quiz
 "quiz.textInput.title" = "Enter text";
@@ -37,7 +38,7 @@
 "quiz.textInput.paste.button" = "Paste";
 "quiz.textInput.generate.button" = "Generate test";
 "quiz.question.counter" = "Question %d of %d";
-"quiz.explanation.title" = "Explanation:";
+"quiz.explanation.title" = "Explanation: ";
 "quiz.next.button" = "Next";
 "quiz.finish.button" = "Finish Test";
 "quiz.result.correct" = "Correct!";
@@ -48,17 +49,27 @@
 "quiz.textInput.generating" = "Generating...";
 "quiz.question.continue" = "Continue";
 "quiz.photo.retake.button" = "Retake";
+"quiz.question" = "Question";
 
 // MARK: - Result
 "result.tryAgain.button" = "Try Again";
 "result.home.button" = "Home";
 "result.breakdown.title" = "Question Breakdown";
 "result.correctCount" = "%d of %d correct answers";
+"result.end" = "Test completed: %d of %d";
+"result.perfect" = "Perfect";
+"result.great" = "Great";
+"result.good" = "Good";
+"result.notBad" = "Could be better";
 
 // MARK: - History
 "history.title" = "Test History";
 "history.search.placeholder" = "Search by title...";
 "history.questions.count" = "%d questions";
+"history.search.no" = "You don't have tests";
+"history.create.first" = "Create first test through the main screen!";
+"history.toHome" = "Home";
+"history.item.info" = "%@ • %d questions";
 
 // MARK: - Profile
 "profile.title" = "Profile";

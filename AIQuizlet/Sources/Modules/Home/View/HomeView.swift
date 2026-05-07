@@ -26,16 +26,6 @@ final class HomeView: UIView {
             static let sectionTitle = UIFont.systemFont(ofSize: 20, weight: .semibold)
             static let seeAllButton = UIFont.systemFont(ofSize: 14, weight: .medium)
         }
-        
-        enum Strings {
-            static let welcome = "Привет!"
-            static let recentTests = "Недавние тесты"
-            static let seeAll = "Смотреть все"
-            static let photoCardTitle = "Создать тест по конспекту"
-            static let photoCardSubtitle = "Сфотографируйте конспект и получите готовый тест"
-            static let textCardTitle = "Создать из текста"
-            static let textCardSubtitle = "Вставьте или введите текст лекции"
-        }
     }
     
     // MARK: - UI Elements
@@ -46,14 +36,14 @@ final class HomeView: UIView {
     private lazy var welcomeLabel: UILabel = {
         let label = UILabel()
         label.font = Constants.Fonts.welcome
-        label.text = Constants.Strings.welcome
+        label.text = L10n.Home.greeting
         label.textColor = .white
         return label
     }()
     
     private lazy var recentTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.Strings.recentTests
+        label.text = L10n.Home.RecentQuizzes.title
         label.font = Constants.Fonts.sectionTitle
         label.textColor = .white
         return label
@@ -70,7 +60,7 @@ final class HomeView: UIView {
     
     private lazy var seeAllTestsButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle(Constants.Strings.seeAll, for: .normal) 
+        button.setTitle(L10n.Home.Quiz.watch, for: .normal)
         button.titleLabel?.font = Constants.Fonts.seeAllButton
         button.setTitleColor(.white.withAlphaComponent(0.7), for: .normal)
         return button
@@ -103,8 +93,8 @@ final class HomeView: UIView {
     }()
     
     lazy var photoCard = ActionCardView(
-        title: Constants.Strings.photoCardTitle,
-        subtitle: Constants.Strings.photoCardSubtitle,
+        title: L10n.Home.CreateFromPhoto.title,
+        subtitle: L10n.Home.CreateFromPhoto.subtitle,
         iconName: "camera",
         gradientColors: [
             UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
@@ -113,8 +103,8 @@ final class HomeView: UIView {
     )
     
     lazy var textCard = ActionCardView(
-        title: Constants.Strings.textCardTitle,
-        subtitle: Constants.Strings.textCardSubtitle,
+        title: L10n.Home.CreateFromText.title,
+        subtitle: L10n.Home.CreateFromText.subtitle,
         iconName: "text.document",
         gradientColors: [
             UIColor(red: 173/255, green: 70/255, blue: 255/255, alpha: 1),

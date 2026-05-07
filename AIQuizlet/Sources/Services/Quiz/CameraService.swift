@@ -129,7 +129,7 @@ private extension CameraService {
 extension CameraService: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let error = error {
+        if error != nil {
             return
         }
         

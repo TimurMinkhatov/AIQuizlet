@@ -29,4 +29,8 @@ enum AppColors {
     static let border = UIColor(named: "Border")!
     static let questionButtonInactive = UIColor(named: "QuestionButtonInactive")!
     static let explanationBackground = UIColor(named: "ExplanationBackground")!
+    static let historyCard = UIColor(named: "HistoryCard")!
+    static let questionInResult = UIColor(named: "QuestionInResult")!
+    static let borderResult = UIColor(named: "BorderResult")!
+    static let detailedQuestion = UIColor(named: "DetailedQuestion")!
 }

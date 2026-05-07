@@ -49,10 +49,9 @@ final class HistoryView: UITableViewCell {
     
     // MARK: - UI Elements
     
-    
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = AppColors.historyCard
         view.layer.cornerRadius = Constants.containerCornerRadius
         return view
     }()
@@ -60,7 +59,7 @@ final class HistoryView: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = Constants.Fonts.title
-        label.textColor = .black
+        label.textColor = .label
         label.numberOfLines = 2
         return label
     }()
@@ -82,7 +81,7 @@ final class HistoryView: UITableViewCell {
         let label = UILabel()
         label.font = Constants.Fonts.score
         label.textAlignment = .right
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -104,15 +103,13 @@ final class HistoryView: UITableViewCell {
         titleLabel.text = result.quiz.title
         
         let dateString = result.date.formattedForHistory()
-        subtitleLabel.text = "\(dateString) • \(result.totalQuestions) вопросов"
+        subtitleLabel.text = L10n.History.Item.info(dateString, result.totalQuestions)
         
         let percentage = result.percentage
         scoreLabel.text = "\(Int(percentage))%"
         
         updateStatusColor(percentage: percentage)
     }
-    
-    
     
     // MARK: - Private Methods
     
