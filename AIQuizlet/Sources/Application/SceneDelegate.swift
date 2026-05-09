@@ -53,7 +53,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 // MARK: - Private Methods
 
 private extension SceneDelegate {
-
+    
     func createModelContainer() -> ModelContainer {
         let schema = Schema([
             QuizRecord.self,
@@ -67,7 +67,7 @@ private extension SceneDelegate {
             fatalError("Failed to create ModelContainer: \(error)")
         }
     }
-
+    
     func restartApp() {
         guard let window else { return }
         let container = createModelContainer()
@@ -78,10 +78,11 @@ private extension SceneDelegate {
             window: window,
             servicesAssembly: assembly
         )
-
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve) {
-                self.appCoordinator?.start()
+                window.rootViewController = navigationController
+                self.appCoordinator?.restartWithoutSplash()
             }
         }
     }

@@ -46,6 +46,14 @@ final class AppCoordinator: Coordinator {
             self?.tryTransition()
         }
     }
+    
+    func restartWithoutSplash() {
+        if servicesAssembly.authService.currentUser != nil {
+            showMainFlow()
+        } else {
+            showAuth()
+        }
+    }
 
     func showAuth() {
         children.removeAll()
