@@ -77,6 +77,9 @@ final class AppCoordinator: Coordinator {
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
         tabBarCoordinator.start()
+
+        window?.rootViewController = navigationController  
+        window?.makeKeyAndVisible()
     }
 }
 
