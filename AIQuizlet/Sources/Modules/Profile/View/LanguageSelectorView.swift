@@ -2,9 +2,6 @@
 //  LanguageSelectorView.swift
 //  AIQuizlet
 //
-//  Created by Timur Minkhatov on 29/04/2026.
-//  Copyright © 2026 t-bank-practice-team. All rights reserved.
-//
 
 import UIKit
 import SnapKit
@@ -20,32 +17,43 @@ final class LanguageSelectorView: UIView {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Язык"
+        label.text = L10n.Profile.Language.title
         label.textColor = .label
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
+        label.font = .systemFont(ofSize: Constants.titleFontSize, weight: .semibold)
         return label
     }()
-    
+
     private lazy var buttonStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [russianButton, englishButton])
         stack.axis = .horizontal
-        stack.spacing = 8
+        stack.spacing = Constants.buttonSpacing
         stack.distribution = .fillEqually
         return stack
     }()
-    
-    private lazy var russianButton = makeLanguageButton(title: "Русский")
-    private lazy var englishButton = makeLanguageButton(title: "English")
+
+    private lazy var russianButton = makeLanguageButton(title: L10n.Profile.Language.russian)
+    private lazy var englishButton = makeLanguageButton(title: L10n.Profile.Language.english)
 
     // MARK: - Init
 
     init() {
         super.init(frame: .zero)
-        backgroundColor = .secondarySystemGroupedBackground
-        layer.cornerRadius = 16
+        layer.cornerRadius = Constants.cornerRadius
+        backgroundColor = AppColors.cardBackground
         setupLayout()
         setupActions()
-        selectButton(russianButton)
+        let currentLanguage = LocalizationService.shared.currentLanguage
+        selectButton(currentLanguage == "en" ? englishButton : russianButton)
+
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard notification.object is UIUserInterfaceStyle else { return }
+            self?.backgroundColor = AppColors.cardBackground
+            self?.refreshInactiveButtons()
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -62,10 +70,10 @@ private extension LanguageSelectorView {
         config.title = title
         config.image = UIImage(systemName: "globe")
         config.imagePlacement = .leading
-        config.imagePadding = 8
+        config.imagePadding = Constants.buttonImagePadding
         config.baseForegroundColor = .label
-        config.background.cornerRadius = 10
-        config.background.backgroundColor = .systemGray5
+        config.background.cornerRadius = Constants.buttonCornerRadius
+        config.background.backgroundColor = AppColors.inactiveButton
         return UIButton(configuration: config)
     }
 
@@ -73,7 +81,7 @@ private extension LanguageSelectorView {
         [russianButton, englishButton].forEach {
             var config = $0.configuration
             config?.baseForegroundColor = .label
-            config?.background.backgroundColor = .systemGray5
+            config?.background.backgroundColor = AppColors.inactiveButton
             $0.configuration = config
         }
         var config = button.configuration
@@ -83,19 +91,29 @@ private extension LanguageSelectorView {
         selectedButton = button
     }
 
-    func setupLayout() {
+    func refreshInactiveButtons() {
+        [russianButton, englishButton].forEach {
+            guard $0 != selectedButton else { return }
+            var config = $0.configuration
+            config?.background.backgroundColor = AppColors.inactiveButton
+            $0.configuration = config
+        }
+    }
 
+    func setupLayout() {
         addSubview(titleLabel)
         addSubview(buttonStack)
 
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalToSuperview().offset(Constants.contentInset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.contentInset)
         }
 
         buttonStack.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(12)
-            $0.leading.trailing.bottom.equalToSuperview().inset(16)
-            $0.height.equalTo(44)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(Constants.titleToButtonSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.contentInset)
+            $0.bottom.equalToSuperview().inset(Constants.contentInset)
+            $0.height.equalTo(Constants.buttonStackHeight)
         }
     }
 
@@ -112,5 +130,20 @@ private extension LanguageSelectorView {
     @objc func englishTapped() {
         selectButton(englishButton)
         onLanguageSelected?("en")
+    }
+}
+
+// MARK: - Constants
+
+private extension LanguageSelectorView {
+    enum Constants {
+        static let cornerRadius: CGFloat = 16
+        static let contentInset: CGFloat = 20
+        static let titleFontSize: CGFloat = 17
+        static let titleToButtonSpacing: CGFloat = 12
+        static let buttonStackHeight: CGFloat = 44
+        static let buttonSpacing: CGFloat = 8
+        static let buttonCornerRadius: CGFloat = 10
+        static let buttonImagePadding: CGFloat = 8
     }
 }

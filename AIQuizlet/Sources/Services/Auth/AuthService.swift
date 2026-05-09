@@ -75,7 +75,7 @@ final class AuthService {
     }
     
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] authData ,error in
+        Auth.auth().signIn(withEmail: email, password: password) { authData ,error in
             if let error = error {
                 completion(.failure(error))
                 return
@@ -88,7 +88,7 @@ final class AuthService {
         let firebaseAuth = Auth.auth()
         do {
             try firebaseAuth.signOut()
-        } catch let signOutError as NSError {
+        } catch _ as NSError {
         }
     }
 }

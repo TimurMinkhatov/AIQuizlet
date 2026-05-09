@@ -37,13 +37,6 @@ final class HistoryEmptyStateView: UIView {
             static let iconTint = UIColor.systemGray2
             static let subtitleText = UIColor.systemGray
         }
-        
-        enum Strings {
-            static let title = "У вас пока нет тестов"
-            static let subtitle = "Создайте первый через\nглавный экран!"
-            static let buttonTitle = "На главную"
-            static let iconName = "book"
-        }
     }
     
     // MARK: - Properties
@@ -54,7 +47,7 @@ final class HistoryEmptyStateView: UIView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = AppColors.historyCard
         view.layer.cornerRadius = Constants.containerCornerRadius
         return view
     }()
@@ -67,7 +60,7 @@ final class HistoryEmptyStateView: UIView {
     }()
     
     private lazy var iconImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: Constants.Strings.iconName))
+        let iv = UIImageView(image: UIImage(systemName: "book"))
         iv.tintColor = Constants.Colors.iconTint
         iv.contentMode = .scaleAspectFit
         return iv
@@ -75,7 +68,7 @@ final class HistoryEmptyStateView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.Strings.title
+        label.text = L10n.History.Search.no
         label.font = .systemFont(ofSize: 20, weight: .bold)
         label.textAlignment = .center
         return label
@@ -83,7 +76,7 @@ final class HistoryEmptyStateView: UIView {
     
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.Strings.subtitle
+        label.text = L10n.History.Create.first
         label.font = .systemFont(ofSize: 15)
         label.textColor = Constants.Colors.subtitleText
         label.textAlignment = .center
@@ -93,7 +86,7 @@ final class HistoryEmptyStateView: UIView {
     
     private lazy var homeButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = Constants.Strings.buttonTitle
+        config.title = L10n.History.toHome
         config.baseBackgroundColor = Constants.Colors.buttonBackground
         config.baseForegroundColor = .white
         config.cornerStyle = .large

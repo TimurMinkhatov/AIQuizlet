@@ -34,12 +34,10 @@ final class AuthViewController: UIViewController {
 
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0.5, y: 0)
-        layer.endPoint = CGPoint(x: 0.5, y: 1)
+        view.applyGradient(colors: [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+        ], startPoint: CGPoint(x: 0.5, y: 0), endPoint: CGPoint(x: 0.5, y: 1), cornerRadius: 10)
         return layer
     }()
 
@@ -81,22 +79,22 @@ final class AuthViewController: UIViewController {
     }()
 
     private lazy var emailField = FormFieldView(
-        labelText: Constants.Strings.emailLabel,
-        placeholder: Constants.Strings.emailPlaceholder,
+        labelText: L10n.Auth.Email.label,
+        placeholder: L10n.Auth.Email.placeholder,
         keyboardType: .emailAddress,
         iconName: "envelope"
     )
 
     private lazy var passwordField = FormFieldView(
-        labelText: Constants.Strings.passwordLabel,
-        placeholder: Constants.Strings.loginPasswordPlaceholder,
+        labelText: L10n.Auth.Password.label,
+        placeholder: L10n.Auth.Password.placeholder,
         isSecure: true,
         iconName: "lock"
     )
 
     private lazy var confirmPasswordField = FormFieldView(
-        labelText: Constants.Strings.confirmPasswordLabel,
-        placeholder: Constants.Strings.confirmPasswordPlaceholder,
+        labelText: L10n.Auth.ConfirmPassword.label,
+        placeholder: L10n.Auth.ConfirmPassword.placeholder,
         isSecure: true,
         iconName: "lock"
     )
@@ -156,11 +154,11 @@ private extension AuthViewController {
         viewModel.onError = { [weak self] error in
             guard let self else { return }
             let alert = UIAlertController(
-                title: Constants.Strings.errorTitle,
+                title: L10n.Common.Error.title,
                 message: error,
                 preferredStyle: .alert
             )
-            alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
+            alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
             present(alert, animated: true)
         }
     }
@@ -253,20 +251,20 @@ private extension AuthViewController {
     func updateUI() {
         switch state {
         case .login:
-            titleLabel.text = Constants.Strings.loginTitle
-            subtitleLabel.text = Constants.Strings.loginSubtitle
-            passwordField.setPlaceholder(Constants.Strings.loginPasswordPlaceholder)
+            titleLabel.text = L10n.Auth.Login.title
+            subtitleLabel.text = L10n.Auth.Login.subtitle
+            passwordField.setPlaceholder(L10n.Auth.Password.placeholder)
             confirmPasswordField.isHidden = true
-            actionButton.setTitle(Constants.Strings.loginAction, for: .normal)
-            switchButton.setTitle(Constants.Strings.loginSwitch, for: .normal)
+            actionButton.setTitle(L10n.Auth.Login.button, for: .normal)
+            switchButton.setTitle(L10n.Auth.switchToRegister, for: .normal)
 
         case .register:
-            titleLabel.text = Constants.Strings.registerTitle
-            subtitleLabel.text = Constants.Strings.registerSubtitle
-            passwordField.setPlaceholder(Constants.Strings.registerPasswordPlaceholder)
+            titleLabel.text = L10n.Auth.Register.title
+            subtitleLabel.text = L10n.Auth.Register.subtitle
+            passwordField.setPlaceholder(L10n.Auth.Password.registerPlaceholder)
             confirmPasswordField.isHidden = false
-            actionButton.setTitle(Constants.Strings.registerAction, for: .normal)
-            switchButton.setTitle(Constants.Strings.registerSwitch, for: .normal)
+            actionButton.setTitle(L10n.Auth.Register.button, for: .normal)
+            switchButton.setTitle(L10n.Auth.switchToLogin, for: .normal)
         }
     }
 
@@ -300,27 +298,5 @@ private extension AuthViewController {
         static let iconSize: CGFloat = 80
         static let iconImageSize: CGFloat = 40
         static let buttonHeight: CGFloat = 50
-
-        enum Strings {
-            static let loginTitle = "Добро пожаловать!"
-            static let loginSubtitle = "Войдите в свой аккаунт"
-            static let loginPasswordPlaceholder = "······"
-            static let loginAction = "Войти"
-            static let loginSwitch = "Нет аккаунта? Зарегистрироваться"
-
-            static let registerTitle = "Создать аккаунт"
-            static let registerSubtitle = "Зарегистрируйтесь для начала работы"
-            static let registerPasswordPlaceholder = "Минимум 6 символов"
-            static let registerAction = "Зарегистрироваться"
-            static let registerSwitch = "Уже есть аккаунт? Войти"
-
-            static let emailLabel = "Email"
-            static let emailPlaceholder = "example@email.com"
-            static let passwordLabel = "Пароль"
-            static let confirmPasswordLabel = "Подтвердите пароль"
-            static let confirmPasswordPlaceholder = "Повторите пароль"
-            static let errorTitle = "Ошибка"
-            static let errorAction = "OK"
-        }
     }
 }

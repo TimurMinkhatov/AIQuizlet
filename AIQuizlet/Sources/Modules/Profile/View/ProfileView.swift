@@ -15,7 +15,7 @@ final class ProfileView: UIView {
 
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Профиль"
+        label.text = L10n.Profile.title
         label.font = .systemFont(ofSize: Constants.nameFontSize, weight: .bold)
         return label
     }()
@@ -62,7 +62,6 @@ final class ProfileView: UIView {
 
     private lazy var profileCardView: UIView = {
         let view = UIView()
-        view.backgroundColor = .secondarySystemGroupedBackground
         view.layer.cornerRadius = Constants.cardCornerRadius
         return view
     }()
@@ -72,6 +71,15 @@ final class ProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
+
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let style = notification.object as? UIUserInterfaceStyle else { return }
+            self?.updateGradient(for: style)
+        }
     }
 
     required init?(coder: NSCoder) {
@@ -88,19 +96,19 @@ final class ProfileView: UIView {
 // MARK: - Lifecycle
 
 extension ProfileView {
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         profileContainerView.layoutIfNeeded()
         avatarGradientLayer.frame = profileContainerView.bounds
         avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
+        profileCardView.backgroundColor = AppColors.cardBackground
     }
 }
 
 // MARK: - Private Methods
 
 private extension ProfileView {
-
     func setupLayout() {
         addSubview(profileCardView)
         profileCardView.addSubview(profileContainerView)
@@ -130,6 +138,12 @@ private extension ProfileView {
         profileCardView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+    
+    private func updateGradient(for style: UIUserInterfaceStyle) {
+        avatarGradientLayer.isHidden = style == .dark
+        profileContainerView.backgroundColor = style == .dark ? .systemGray3 : .clear
+        profileCardView.backgroundColor = AppColors.cardBackground
     }
 }
 

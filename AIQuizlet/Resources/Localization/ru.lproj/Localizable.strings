@@ -1,0 +1,113 @@
+// MARK: - Auth
+"auth.login.title" = "Добро пожаловать!";
+"auth.login.subtitle" = "Войдите в свой аккаунт";
+"auth.register.title" = "Создать аккаунт";
+"auth.register.subtitle" = "Зарегистрируйтесь для начала работы";
+"auth.email.label" = "Email";
+"auth.email.placeholder" = "example@email.com";
+"auth.password.label" = "Пароль";
+"auth.password.placeholder" = "······";
+"auth.password.registerPlaceholder" = "Минимум 6 символов";
+"auth.confirmPassword.label" = "Подтвердите пароль";
+"auth.confirmPassword.placeholder" = "Повторите пароль";
+"auth.login.button" = "Войти";
+"auth.register.button" = "Зарегистрироваться";
+"auth.switchToRegister" = "Нет аккаунта? Зарегистрироваться";
+"auth.switchToLogin" = "Уже есть аккаунт? Войти";
+"auth.error.invalidEmail" = "Неверный формат email";
+"auth.error.weakPassword" = "Пароль должен содержать минимум 6 символов";
+"auth.error.passwordMismatch" = "Пароли не совпадают";
+
+// MARK: - Home
+"home.greeting" = "Привет!";
+"home.createFromPhoto.title" = "Создать тест по конспекту";
+"home.createFromPhoto.subtitle" = "Сфотографируйте конспект и получите готовый тест";
+"home.createFromText.title" = "Создать из текста";
+"home.createFromText.subtitle" = "Вставьте или введите текст-лекции";
+"home.recentQuizzes.title" = "Недавние тесты";
+"home.empty.title" = "У вас пока нет тестов";
+"home.empty.subtitle" = "Создайте первый тест!";
+"home.quiz.watch" = "Смотреть все";
+
+// MARK: - Quiz
+"quiz.textInput.title" = "Введите текст";
+"quiz.textInput.placeholder" = "Вставьте текст лекции, заметки или учебник...";
+"quiz.textInput.minLength" = "Минимальная рекомендуемая длина — 50 символов";
+"quiz.textInput.questionCount" = "Количество вопросов";
+"quiz.textInput.characterCount" = "%d / %d символов";
+"quiz.textInput.paste.button" = "Вставить";
+"quiz.textInput.generate.button" = "Сгенерировать тест";
+"quiz.question.counter" = "Вопрос %d из %d";
+"quiz.explanation.title" = "Объяснение: ";
+"quiz.next.button" = "Далее";
+"quiz.finish.button" = "Завершить тест";
+"quiz.result.correct" = "Верно!";
+"quiz.result.incorrect" = "Неверно";
+"quiz.question.title" = "Вопрос %d: %@";
+"quiz.answer.option" = "Вариант %@ — %@";
+"quiz.explanation.default" = "Правильный ответ на основе предоставленного текста.";
+"quiz.textInput.generating" = "Генерация...";
+"quiz.question.continue" = "Продолжить";
+"quiz.question.count.title" = "Количество вопросов";
+"quiz.photo.retake.button" = "Переснять";
+"quiz.question" = "Вопрос";
+
+// MARK: - Result
+"result.tryAgain.button" = "Пройти заново";
+"result.home.button" = "На главную";
+"result.breakdown.title" = "Разбор вопросов";
+"result.correctCount" = "%d из %d правильных ответов";
+"result.end" = "Тест завершен: %d из %d";
+"result.perfect" = "Идеально";
+"result.great" = "Отлично";
+"result.good" = "Хорошо";
+"result.notBad" = "Можно лучше";
+
+// MARK: - History
+"history.title" = "История тестов";
+"history.search.placeholder" = "Поиск по названию...";
+"history.questions.count" = "%d questions";
+"history.search.no" = "У вас пока нет тестов";
+"history.create.first" = "Создайте первый через\nглавный экран!";
+"history.toHome" = "На главную";
+"history.item.info" = "%@ • %d вопросов";
+
+// MARK: - Profile
+"profile.title" = "Профиль";
+"profile.stats.totalQuizzes" = "Всего тестов";
+"profile.stats.averageScore" = "Средний балл";
+"profile.stats.bestScore" = "Лучший результат";
+"profile.stats.totalCompleted" = "Вопросов решено";
+"profile.settings.title" = "Настройки";
+"profile.theme.title" = "Тема оформления";
+"profile.theme.light" = "Светлая";
+"profile.theme.dark" = "Тёмная";
+"profile.theme.system" = "Системная";
+"profile.language.title" = "Язык";
+"profile.language.russian" = "Русский";
+"profile.language.english" = "English";
+"profile.deleteData.button" = "Очистить все данные";
+"profile.logout.button" = "Выйти из аккаунта";
+"profile.version" = "Версия %@";
+"profile.deleteData.title" = "Удалить все данные?";
+"profile.deleteData.message" = "Это действие удалит все созданные тесты и результаты. Восстановить данные будет невозможно.";
+"profile.deleteData.confirmButton" = "Удалить";
+"profile.deleteData.cancel" = "Отмена";
+"profile.logout.title" = "Вы уверены, что хотите выйти?";
+"profile.logout.message" = "Вы сможете войти снова в любое время.";
+"profile.logout.confirmButton" = "Выйти из аккаунта";
+"profile.logout.cancel" = "Отмена";
+
+// MARK: - Common
+"common.error.title" = "Ошибка";
+"common.error.noInternet" = "Нет подключения к интернету";
+"common.error.serverError" = "Ошибка сервера. Попробуйте ещё раз";
+"common.loading" = "Загрузка...";
+"common.ok" = "ОК";
+"common.cancel" = "Отмена";
+
+// MARK: - TabBar
+
+"tabBar.home" = "Главная";
+"tabBar.history" = "История тестов";
+"tabBar.profile" = "Профиль";

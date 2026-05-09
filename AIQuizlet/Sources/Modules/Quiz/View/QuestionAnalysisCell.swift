@@ -40,21 +40,10 @@ final class QuestionAnalysisCell: UITableViewCell {
         }
         
         enum Colors {
-            static let border = UIColor.systemGray5.cgColor
             static let chevron = UIColor.systemGray3
             static let divider = UIColor.systemGray6
-            static let explanationBg = UIColor(red: 235/255, green: 243/255, blue: 255/255, alpha: 1)
-            static let explanationBorder = UIColor(red: 215/255, green: 230/255, blue: 250/255, alpha: 1).cgColor
+            static let explanationBorder = UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 0.3).cgColor
             static let explanationText = UIColor(red: 45/255, green: 65/255, blue: 85/255, alpha: 1)
-        }
-        
-        enum Strings {
-            static let questionPrefix = "Вопрос"
-            static let explanationPrefix = "Объяснение: "
-            static let checkmarkIcon = "checkmark.circle"
-            static let xmarkIcon = "xmark.circle"
-            static let chevronIcon = "chevron.down"
-            static let fatalErrorInit = "init(coder:) has not been implemented"
         }
     }
     
@@ -62,10 +51,10 @@ final class QuestionAnalysisCell: UITableViewCell {
     
     private let mainContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = AppColors.historyCard
         view.layer.cornerRadius = Constants.Layout.cornerRadius
         view.layer.borderWidth = Constants.Layout.borderWidth
-        view.layer.borderColor = Constants.Colors.border
+        view.layer.borderColor = AppColors.borderResult.cgColor
         view.clipsToBounds = true
         return view
     }()
@@ -83,7 +72,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     private let questionTitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -95,7 +84,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     }()
     
     private let chevronIcon: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: Constants.Strings.chevronIcon))
+        let iv = UIImageView(image: UIImage(systemName: "chevron.down"))
         iv.tintColor = Constants.Colors.chevron
         iv.contentMode = .scaleAspectFit
         return iv
@@ -120,7 +109,7 @@ final class QuestionAnalysisCell: UITableViewCell {
         let label = UILabel()
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 15, weight: .medium)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -133,7 +122,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     
     private let explanationContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = Constants.Colors.explanationBg
+        view.backgroundColor = AppColors.explanationBackground
         view.layer.cornerRadius = Constants.Layout.cornerRadius
         view.layer.borderWidth = Constants.Layout.borderWidth
         view.layer.borderColor = Constants.Colors.explanationBorder
@@ -143,7 +132,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     private let explanationLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.textColor = Constants.Colors.explanationText
+        label.textColor = .label
         return label
     }()
     
@@ -155,7 +144,7 @@ final class QuestionAnalysisCell: UITableViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError(Constants.Strings.fatalErrorInit)
+        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Configuration
@@ -178,8 +167,9 @@ final class QuestionAnalysisCell: UITableViewCell {
 private extension QuestionAnalysisCell {
     
     func configureHeader(index: Int, isCorrect: Bool, isExpanded: Bool) {
-        questionTitleLabel.text = "\(Constants.Strings.questionPrefix) \(index + 1)"
-        statusIcon.image = UIImage(systemName: isCorrect ? Constants.Strings.checkmarkIcon : Constants.Strings.xmarkIcon)
+        mainContainer.backgroundColor = isExpanded ? AppColors.detailedQuestion : AppColors.questionInResult
+        questionTitleLabel.text = "\(L10n.Quiz.question) \(index + 1)"
+        statusIcon.image = UIImage(systemName: isCorrect ? "checkmark.circle" : "xmark.circle")
         statusIcon.tintColor = isCorrect ? .systemGreen : .systemRed
         
         UIView.animate(withDuration: Constants.Animation.duration) {
@@ -191,7 +181,7 @@ private extension QuestionAnalysisCell {
     }
     
     func configureDetails(question: QuestionRecord, userAnswerIndex: Int, index: Int) {
-        fullQuestionLabel.text = "\(Constants.Strings.questionPrefix) \(index + 1): \(question.text)"
+        fullQuestionLabel.text = "\(L10n.Quiz.question) \(index + 1): \(question.text)"
         optionsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         question.answers.enumerated().forEach { answerIndex, text in
@@ -218,7 +208,7 @@ private extension QuestionAnalysisCell {
         if let explanation = explanation, !explanation.isEmpty {
             explanationContainer.isHidden = false
             
-            let attributedString = NSMutableAttributedString(string: Constants.Strings.explanationPrefix, attributes: [
+            let attributedString = NSMutableAttributedString(string: L10n.Quiz.Explanation.title, attributes: [
                 .font: UIFont.systemFont(ofSize: 14, weight: .bold)
             ])
             attributedString.append(NSAttributedString(string: explanation, attributes: [

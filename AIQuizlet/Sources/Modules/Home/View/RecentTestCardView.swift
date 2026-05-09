@@ -76,6 +76,13 @@ final class RecentTestCardView: UIView {
         super.init(frame: .zero)
         setupView(test: test)
         setupGesture()
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.backgroundColor = AppColors.cardBackground
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -109,7 +116,7 @@ private extension RecentTestCardView {
     }
     
     func setupView(test: RecentTest) {
-        backgroundColor = .white
+        backgroundColor = AppColors.cardBackground
         layer.cornerRadius = Constants.cornerRadius
         
         titleLabel.text = test.title

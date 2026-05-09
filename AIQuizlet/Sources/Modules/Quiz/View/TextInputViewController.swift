@@ -13,12 +13,10 @@ import SnapKit
 
 private extension TextInputViewController {
     enum Constants {
-        // Числовые параметры логики
         static let maxCharacters: Int = 5000
         static let minCharacters: Int = 50
         static let questionCounts: [Int] = [5, 10, 15, 20]
-        
-        // Параметры верстки (Layout)
+
         enum Layout {
             static let textViewCornerRadius: CGFloat = 12
             static let buttonCornerRadius: CGFloat = 12
@@ -26,7 +24,6 @@ private extension TextInputViewController {
             static let textViewHeight: CGFloat = 220
             static let bottomButtonHeight: CGFloat = 50
             static let questionButtonHeight: CGFloat = 44
-            
             static let standardInset: CGFloat = 16
             static let elementSpacing: CGFloat = 24
             static let smallSpacing: CGFloat = 12
@@ -35,36 +32,20 @@ private extension TextInputViewController {
             static let placeholderSideInset: CGFloat = 8
             static let borderWidth: CGFloat = 1.5
         }
-        
-        // Цвета
+
         enum Colors {
             static let gradient = [
                 UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
                 UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
             ]
-            static let border = UIColor.systemBlue
+            static let border = AppColors.border
             static let background = UIColor.systemGroupedBackground
             static let inactiveButton = UIColor.systemGray3
         }
-        
-        // Системные иконки
+
         enum Images {
             static let sparkles = UIImage(systemName: "sparkles")
             static let clipboard = UIImage(systemName: "clipboard")
-        }
-
-        // Строки
-        enum Strings {
-            static let title = "Ввод текста"
-            static let textViewPlaceholder = "Напишите текст конспекта..."
-            static let textViewSubPlaceholder = "Минимальная длина конспекта 50 символов"
-            static let questionCountTitle = "Количество вопросов"
-            static let pasteButton = "Вставить"
-            static let generateButton = "Сгенерировать тест"
-            static let generating = "Генерация..."
-            static let errorTitle = "Ошибка"
-            static let errorAction = "OK"
-            static let characterCount = "%d / %d символов"
         }
     }
 }
@@ -89,7 +70,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var textContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .secondarySystemGroupedBackground
         view.layer.cornerRadius = Constants.Layout.textViewCornerRadius
         view.layer.borderWidth = Constants.Layout.borderWidth
         view.layer.borderColor = Constants.Colors.border.cgColor
@@ -100,7 +81,7 @@ final class TextInputViewController: UIViewController {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15)
         textView.textColor = .label
-        textView.backgroundColor = .clear
+        textView.backgroundColor = .systemBackground
         textView.delegate = self
         return textView
     }()
@@ -114,7 +95,7 @@ final class TextInputViewController: UIViewController {
         paragraph.lineSpacing = 6
 
         let attributed = NSMutableAttributedString(
-            string: Constants.Strings.textViewPlaceholder + "\n",
+            string: L10n.Quiz.TextInput.placeholder + "\n",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 15),
                 .foregroundColor: UIColor.placeholderText,
@@ -122,7 +103,7 @@ final class TextInputViewController: UIViewController {
             ]
         )
         attributed.append(NSAttributedString(
-            string: Constants.Strings.textViewSubPlaceholder,
+            string: L10n.Quiz.TextInput.minLength,
             attributes: [
                 .font: UIFont.systemFont(ofSize: 13),
                 .foregroundColor: UIColor.placeholderText,
@@ -135,7 +116,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var questionCountTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.Strings.questionCountTitle
+        label.text = L10n.Quiz.TextInput.questionCount
         label.font = .systemFont(ofSize: 16, weight: .medium)
         return label
     }()
@@ -150,7 +131,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var characterCountLabel: UILabel = {
         let label = UILabel()
-        label.text = String(format: Constants.Strings.characterCount, 0, Constants.maxCharacters)
+        label.text = L10n.Quiz.TextInput.characterCount(0, Constants.maxCharacters)
         label.font = .systemFont(ofSize: 13)
         label.textColor = .secondaryLabel
         return label
@@ -158,7 +139,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var pasteButton: UIButton = {
         var config = UIButton.Configuration.bordered()
-        config.title = Constants.Strings.pasteButton
+        config.title = L10n.Quiz.TextInput.Paste.button
         config.image = Constants.Images.clipboard
         config.imagePadding = 8
         config.baseForegroundColor = .label
@@ -171,7 +152,7 @@ final class TextInputViewController: UIViewController {
 
     private lazy var generateButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = Constants.Strings.generateButton
+        config.title = L10n.Quiz.TextInput.Generate.button
         config.image = Constants.Images.sparkles
         config.imagePadding = 8
         config.baseForegroundColor = .white
@@ -203,9 +184,21 @@ final class TextInputViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         setupQuestionButtons()
+        DispatchQueue.main.async {
+            self.updateGradients()
+        }
         setupActions()
         bindViewModel()
         hideKeyboardWhenTappedAround()
+
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.textContainerView.layer.borderColor = Constants.Colors.border.cgColor
+            self?.updateGradients()
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -225,7 +218,7 @@ extension TextInputViewController: UITextViewDelegate {
 private extension TextInputViewController {
     @objc func questionCountTapped(_ sender: UIButton) {
         questionButtons.forEach {
-            $0.backgroundColor = .white
+            $0.backgroundColor = AppColors.cardBackground
             $0.setTitleColor(.label, for: .normal)
         }
         viewModel.update(questionCount: sender.tag)
@@ -248,7 +241,7 @@ private extension TextInputViewController {
 // MARK: - Setup Logic
 private extension TextInputViewController {
     func setupLayout() {
-        title = Constants.Strings.title
+        title = L10n.Quiz.TextInput.title
         view.backgroundColor = Constants.Colors.background
         navigationController?.navigationBar.tintColor = .black
 
@@ -325,7 +318,7 @@ private extension TextInputViewController {
                 button.backgroundColor = .systemIndigo
                 button.setTitleColor(.white, for: .normal)
             } else {
-                button.backgroundColor = .white
+                button.backgroundColor = .secondarySystemGroupedBackground
                 button.setTitleColor(.label, for: .normal)
             }
 
@@ -350,16 +343,16 @@ private extension TextInputViewController {
                 case .loading:
                     self.generateButton.isEnabled = false
                     self.generateButton.configuration?.showsActivityIndicator = true
-                    self.generateButton.configuration?.title = Constants.Strings.generating
+                    self.generateButton.configuration?.title = L10n.Quiz.TextInput.generating
                 case .idle:
                     self.generateButton.isEnabled = false
                     self.generateButton.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
                     self.generateButton.configuration?.showsActivityIndicator = false
-                    self.generateButton.configuration?.title = Constants.Strings.generateButton
+                    self.generateButton.configuration?.title = L10n.Quiz.TextInput.Generate.button
                 case .error(let message):
                     self.generateButton.isEnabled = true
                     self.generateButton.configuration?.showsActivityIndicator = false
-                    self.generateButton.configuration?.title = Constants.Strings.generateButton
+                    self.generateButton.configuration?.title = L10n.Quiz.TextInput.Generate.button
                     self.showError(message: message)
                 }
             }
@@ -374,15 +367,15 @@ private extension TextInputViewController {
             generateButton.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
             generateButton.configuration?.background.backgroundColor = Constants.Colors.inactiveButton
         }
-        
+
         questionButtons.forEach { button in
             button.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
-            
+
             if button.tag == viewModel.questionCount {
                 button.applyGradient(colors: Constants.Colors.gradient, cornerRadius: Constants.Layout.questionButtonCornerRadius)
                 button.setTitleColor(.white, for: .normal)
             } else {
-                button.backgroundColor = .white
+                button.backgroundColor = AppColors.questionButtonInactive
                 button.setTitleColor(.label, for: .normal)
             }
         }
@@ -391,7 +384,7 @@ private extension TextInputViewController {
     func updateTextInput(with text: String) {
         let count = text.count
         placeholderLabel.isHidden = !text.isEmpty
-        characterCountLabel.text = String(format: Constants.Strings.characterCount, count, Constants.maxCharacters)
+        characterCountLabel.text = L10n.Quiz.TextInput.characterCount(count, Constants.maxCharacters)
         generateButton.isEnabled = count >= Constants.minCharacters && count <= Constants.maxCharacters
         view.setNeedsLayout()
         view.layoutIfNeeded()
@@ -400,11 +393,15 @@ private extension TextInputViewController {
         }
         viewModel.update(text: textView.text)
     }
-    
+
     func showError(message: String) {
         guard presentedViewController == nil else { return }
-        let alert = UIAlertController(title: Constants.Strings.errorTitle, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
+        let alert = UIAlertController(
+            title: L10n.Common.Error.title,
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
         present(alert, animated: true)
     }
 }

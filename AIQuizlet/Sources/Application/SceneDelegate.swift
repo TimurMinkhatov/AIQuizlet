@@ -33,6 +33,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appCoordinator?.start()
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+
+        NotificationCenter.default.addObserver(
+            forName: .languageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.restartApp()
+        }
     }
 }
 
@@ -51,6 +59,24 @@ private extension SceneDelegate {
             return try ModelContainer(for: schema, configurations: [configuration])
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
+        }
+    }
+
+    func restartApp() {
+        guard let window else { return }
+        let container = createModelContainer()
+        let assembly = ServicesAssembly(modelContainer: container)
+        let navigationController = UINavigationController()
+        appCoordinator = AppCoordinator(
+            navigationController: navigationController,
+            window: window,
+            servicesAssembly: assembly
+        )
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve) {
+                self.appCoordinator?.start()
+            }
         }
     }
 }
