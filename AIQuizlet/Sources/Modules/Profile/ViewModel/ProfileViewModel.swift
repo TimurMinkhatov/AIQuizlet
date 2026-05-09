@@ -8,6 +8,13 @@
 
 import Foundation
 
+struct ProfileStats {
+    let totalQuizzes: Int
+    let avgScore: Double
+    let bestScore: Double
+    let totalQuestions: Int
+}
+
 final class ProfileViewModel {
     
     // MARK: - Properties
@@ -39,22 +46,33 @@ final class ProfileViewModel {
         authService.signOut()
         coordinator?.didLogout()
     }
-
     
-    func fetchStats() async throws -> (totalQuizzes: Int, avgScore: Double, bestScores: Double, totalQuestions: Int) {
+    func fetchStats() async throws -> ProfileStats {
         if let user = try await firestoreService.fetchUser() {
-            return (user.stats.totalQuizzes, user.stats.averageScore, user.stats.bestScore, user.stats.totalCompleted)
+            return ProfileStats(
+                totalQuizzes: user.stats.totalQuizzes,
+                avgScore: user.stats.averageScore,
+                bestScore: user.stats.bestScore,
+                totalQuestions: user.stats.totalCompleted
+            )
         }
         
         guard let userId = authService.currentUser?.uid, !userId.isEmpty else {
-            return (0, 0, 0, 0)
+            return ProfileStats(totalQuizzes: 0, avgScore: 0, bestScore: 0, totalQuestions: 0)
         }
+        
         let results = try storageService.fetchResults().filter { $0.userId == userId }
         let totalQuizzes = results.count
         let avgScore = results.isEmpty ? 0.0 : results.map { $0.percentage }.reduce(0.0, +) / Double(totalQuizzes)
-        let bestScores = results.map(\.percentage).max() ?? 0.0
-        let totalQuestions = results.map { $0.totalQuestions }.reduce(0,+)
-        return (totalQuizzes, avgScore, bestScores, totalQuestions)
+        let bestScore = results.map(\.percentage).max() ?? 0.0
+        let totalQuestions = results.map { $0.totalQuestions }.reduce(0, +)
+        
+        return ProfileStats(
+            totalQuizzes: totalQuizzes,
+            avgScore: avgScore,
+            bestScore: bestScore,
+            totalQuestions: totalQuestions
+        )
     }
     
     func clearData() {
@@ -62,7 +80,7 @@ final class ProfileViewModel {
             try storageService.deleteAll()
             Task {
                 try? await firestoreService.deleteAllData()
-            }
+        }
         } catch {
             onError?(error.localizedDescription)
         }

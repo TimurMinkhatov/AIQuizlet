@@ -214,7 +214,7 @@ final class QuizResultView: UIView {
         haloLayer.fillColor = UIColor.white.withAlphaComponent(Constants.Colors.haloAlpha).cgColor
         progressContainer.layer.addSublayer(haloLayer)
 
-        let p = CGFloat(percentage / Constants.Logic.maxPercentage)
+        let perc = CGFloat(percentage / Constants.Logic.maxPercentage)
         
         let addSegment = { (start: CGFloat, end: CGFloat, color: CGColor) in
             let angleOffset = (Constants.Layout.borderWidth / 2) / dynamicCircularRadius
@@ -239,16 +239,16 @@ final class QuizResultView: UIView {
             self.progressContainer.layer.addSublayer(colorLayer)
         }
 
-        if p <= 0.0 {
+        if perc <= 0.0 {
             addSegment(0, 2 * .pi, Constants.Colors.redProgress.cgColor)
-        } else if p >= 1.0 {
+        } else if perc >= 1.0 {
             addSegment(0, 2 * .pi, Constants.Colors.greenProgress.cgColor)
         } else {
             let greenStart = Constants.Layout.startAngle + (Constants.Layout.progressGap / 2)
-            let greenEnd = Constants.Layout.startAngle + (2 * .pi * p) - (Constants.Layout.progressGap / 2)
+            let greenEnd = Constants.Layout.startAngle + (2 * .pi * perc) - (Constants.Layout.progressGap / 2)
             addSegment(greenStart, greenEnd, Constants.Colors.greenProgress.cgColor)
             
-            let redStart = Constants.Layout.startAngle + (2 * .pi * p) + (Constants.Layout.progressGap / 2)
+            let redStart = Constants.Layout.startAngle + (2 * .pi * perc) + (Constants.Layout.progressGap / 2)
             let redEnd = Constants.Layout.startAngle + 2 * .pi - (Constants.Layout.progressGap / 2)
             addSegment(redStart, redEnd, Constants.Colors.redProgress.cgColor)
         }

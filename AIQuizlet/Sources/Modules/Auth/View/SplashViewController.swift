@@ -62,6 +62,7 @@ extension SplashViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1)
         setupUI()
     }
 
