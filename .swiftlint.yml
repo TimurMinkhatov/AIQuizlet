@@ -1,13 +1,11 @@
-included: # Что проверять
+included:
   - AIQuizlet/Sources
-
-excluded: # Что ИГНОРИРОВАТЬ (Критически важно!)
-  - Geko
+excluded:
   - Pods
   - AIQuizlet/DerivedData
   - AIQuizletTests
-
-disabled_rules: # Правила, которые мы отключаем
+  - Tuist
+disabled_rules:
   - line_length
   - trailing_whitespace
   - force_cast
