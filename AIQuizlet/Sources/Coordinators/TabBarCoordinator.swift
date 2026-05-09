@@ -8,27 +8,53 @@
 import UIKit
 import SwiftData
 final class TabBarCoordinator: Coordinator {
+    
+    // MARK: - Properties
+    
     var navigationController: UINavigationController
     var children = [Coordinator]()
     var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
     let assembly: ServicesAssembly
+    
+    // MARK: - Init
+    
     init(navigationController: UINavigationController, assembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
         self.assembly = assembly
+
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.setupAppearance()
+        }
     }
+    
     func start() {
         let pages = TabBarPage.allCases.sorted { $0.rawValue < $1.rawValue }
         let controllers = pages.map { createNavViewController(for: $0) }
         prepareTabBarController(with: controllers)
         pages.forEach { launchCoordinator(for: $0) }
     }
+    
     func showProfileTab() {
         tabBarController.selectedIndex = TabBarPage.profile.rawValue
     }
+    
     func showHistoryTab() {
         tabBarController.selectedIndex = TabBarPage.history.rawValue
+    }
+    
+    func setupAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = AppColors.background
+        tabBarController.tabBar.isTranslucent = false
+        tabBarController.tabBar.standardAppearance = appearance
+        tabBarController.tabBar.scrollEdgeAppearance = appearance
     }
 }
 // MARK: - Private Methods
@@ -70,12 +96,5 @@ private extension TabBarCoordinator {
         navigationController.viewControllers = [tabBarController]
         navigationController.setNavigationBarHidden(true, animated: false)
         setupAppearance()
-    }
-    func setupAppearance() {
-        let appearance = UITabBarAppearance()
-        appearance.backgroundColor = AppColors.tabBar
-        tabBarController.tabBar.backgroundColor = AppColors.tabBar
-        tabBarController.tabBar.standardAppearance = appearance
-        tabBarController.tabBar.scrollEdgeAppearance = appearance
     }
 }

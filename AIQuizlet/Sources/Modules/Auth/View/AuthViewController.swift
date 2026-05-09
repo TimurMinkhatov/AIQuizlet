@@ -20,7 +20,7 @@ final class AuthViewController: UIViewController {
     private var state: AuthState = .login {
         didSet { updateUI() }
     }
-
+    
     // MARK: - UI Components
 
     private lazy var scrollView: UIScrollView = {
@@ -65,14 +65,14 @@ final class AuthViewController: UIViewController {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 28)
+        label.font = .boldSystemFont(ofSize: Constants.titleFontSize)
         label.textAlignment = .center
         return label
     }()
 
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: Constants.subtitleFontSize)
         label.textColor = .gray
         label.textAlignment = .center
         return label
@@ -104,14 +104,14 @@ final class AuthViewController: UIViewController {
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.titleLabel?.font = .systemFont(ofSize: Constants.buttonFontSize, weight: .semibold)
         return button
     }()
 
     private lazy var switchButton: UIButton = {
         let button = UIButton()
         button.setTitleColor(.systemBlue, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.titleLabel?.font = .systemFont(ofSize: Constants.switchButtonFontSize)
         return button
     }()
 
@@ -138,6 +138,25 @@ extension AuthViewController {
         setupActions()
         bindViewModel()
         updateUI()
+        
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            self?.scrollView.contentInset.bottom = keyboardFrame.height
+            self?.scrollView.verticalScrollIndicatorInsets.bottom = keyboardFrame.height
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.scrollView.contentInset.bottom = 0
+            self?.scrollView.verticalScrollIndicatorInsets.bottom = 0
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -189,13 +208,12 @@ private extension AuthViewController {
 
         cardView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
-            $0.centerY.equalToSuperview()
             $0.top.greaterThanOrEqualToSuperview().offset(Constants.cardVerticalInset)
             $0.bottom.lessThanOrEqualToSuperview().inset(Constants.cardVerticalInset)
         }
 
         iconContainerView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(24)
+            $0.top.equalToSuperview().offset(Constants.iconTopOffset)
             $0.centerX.equalToSuperview()
             $0.width.height.equalTo(Constants.iconSize)
         }
@@ -206,40 +224,40 @@ private extension AuthViewController {
         }
 
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(iconContainerView.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(iconContainerView.snp.bottom).offset(Constants.titleTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         subtitleLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(Constants.subtitleTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         emailField.snp.makeConstraints {
-            $0.top.equalTo(subtitleLabel.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(subtitleLabel.snp.bottom).offset(Constants.emailTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         passwordField.snp.makeConstraints {
-            $0.top.equalTo(emailField.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(emailField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         confirmPasswordField.snp.makeConstraints {
-            $0.top.equalTo(passwordField.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(passwordField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         actionButton.snp.makeConstraints {
-            $0.top.equalTo(confirmPasswordField.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(confirmPasswordField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
             $0.height.equalTo(Constants.buttonHeight)
         }
 
         switchButton.snp.makeConstraints {
-            $0.top.equalTo(actionButton.snp.bottom).offset(16)
+            $0.top.equalTo(actionButton.snp.bottom).offset(Constants.fieldSpacing)
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(24)
+            $0.bottom.equalToSuperview().inset(Constants.switchButtonBottomInset)
         }
     }
 
@@ -257,6 +275,17 @@ private extension AuthViewController {
             confirmPasswordField.isHidden = true
             actionButton.setTitle(L10n.Auth.Login.button, for: .normal)
             switchButton.setTitle(L10n.Auth.switchToRegister, for: .normal)
+            actionButton.snp.remakeConstraints {
+                $0.top.equalTo(passwordField.snp.bottom).offset(Constants.fieldSpacing)
+                $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
+                $0.height.equalTo(Constants.buttonHeight)
+            }
+            cardView.snp.remakeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
+                $0.top.greaterThanOrEqualToSuperview().offset(Constants.loginCardTopInset)
+                $0.bottom.lessThanOrEqualToSuperview().inset(Constants.loginCardBottomInset)
+                $0.centerY.equalToSuperview().offset(Constants.loginCardCenterOffset)
+            }
 
         case .register:
             titleLabel.text = L10n.Auth.Register.title
@@ -265,6 +294,17 @@ private extension AuthViewController {
             confirmPasswordField.isHidden = false
             actionButton.setTitle(L10n.Auth.Register.button, for: .normal)
             switchButton.setTitle(L10n.Auth.switchToLogin, for: .normal)
+            actionButton.snp.remakeConstraints {
+                $0.top.equalTo(confirmPasswordField.snp.bottom).offset(Constants.fieldSpacing)
+                $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
+                $0.height.equalTo(Constants.buttonHeight)
+            }
+            cardView.snp.remakeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
+                $0.top.greaterThanOrEqualToSuperview().offset(Constants.registerCardTopInset)
+                $0.bottom.lessThanOrEqualToSuperview().inset(Constants.registerCardBottomInset)
+                $0.centerY.equalToSuperview().offset(Constants.registerCardCenterOffset)
+            }
         }
     }
 
@@ -291,12 +331,35 @@ private extension AuthViewController {
 private extension AuthViewController {
     enum Constants {
         static let cardCornerRadius: CGFloat = 20
-        static let iconCornerRadius: CGFloat = 40
-        static let buttonCornerRadius: CGFloat = 12
         static let cardHorizontalInset: CGFloat = 20
         static let cardVerticalInset: CGFloat = 60
+
+        static let loginCardTopInset: CGFloat = 150
+        static let loginCardBottomInset: CGFloat = 180
+        static let loginCardCenterOffset: CGFloat = -153
+
+        static let registerCardTopInset: CGFloat = 106
+        static let registerCardBottomInset: CGFloat = 135
+        static let registerCardCenterOffset: CGFloat = -106
+
+        static let iconCornerRadius: CGFloat = 40
         static let iconSize: CGFloat = 80
         static let iconImageSize: CGFloat = 40
+        static let iconTopOffset: CGFloat = 24
+
+        static let titleFontSize: CGFloat = 28
+        static let subtitleFontSize: CGFloat = 14
+        static let titleTopOffset: CGFloat = 16
+        static let subtitleTopOffset: CGFloat = 8
+
+        static let fieldHorizontalInset: CGFloat = 20
+        static let fieldSpacing: CGFloat = 16
+        static let emailTopOffset: CGFloat = 24
+
+        static let buttonCornerRadius: CGFloat = 12
         static let buttonHeight: CGFloat = 50
+        static let buttonFontSize: CGFloat = 16
+        static let switchButtonFontSize: CGFloat = 14
+        static let switchButtonBottomInset: CGFloat = 24
     }
 }

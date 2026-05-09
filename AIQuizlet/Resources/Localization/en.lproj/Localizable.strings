@@ -1,4 +1,6 @@
 // MARK: - Auth
+"splash.title" = "Neural network\n tutor";
+"splash.subtitle" = "Create tests from your notes";
 "auth.login.title" = "Welcome Back!";
 "auth.login.subtitle" = "Sign in to your account";
 "auth.register.title" = "Create Account";

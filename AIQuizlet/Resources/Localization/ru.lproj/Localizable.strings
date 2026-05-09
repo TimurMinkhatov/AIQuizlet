@@ -1,4 +1,6 @@
 // MARK: - Auth
+"splash.title" = "Нейросетевой\n репетитор";
+"splash.subtitle" = "Создавайте тесты из ваших конспектов";
 "auth.login.title" = "Добро пожаловать!";
 "auth.login.subtitle" = "Войдите в свой аккаунт";
 "auth.register.title" = "Создать аккаунт";
