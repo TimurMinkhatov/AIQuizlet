@@ -23,16 +23,22 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let container = createModelContainer()
         let servicesAssembly = ServicesAssembly(modelContainer: container)
 
+        let splashVC = SplashViewController()
+        let navigationController = UINavigationController(rootViewController: splashVC)
+        navigationController.navigationBar.isHidden = true
+        navigationController.view.backgroundColor = UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1)
+
         window = UIWindow(windowScene: windowScene)
-        let navigationController = UINavigationController()
+        window?.backgroundColor = UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1)
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
+
         appCoordinator = AppCoordinator(
             navigationController: navigationController,
             window: window,
             servicesAssembly: servicesAssembly
         )
         appCoordinator?.start()
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
 
         NotificationCenter.default.addObserver(
             forName: .languageDidChange,

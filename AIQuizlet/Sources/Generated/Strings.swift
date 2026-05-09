@@ -300,6 +300,13 @@ public enum L10n {
       public static var button: String { return L10n.tr("Localizable", "result.tryAgain.button", fallback: "Try Again") }
     }
   }
+  public enum Splash {
+    /// Create tests from your notes
+    public static var subtitle: String { return L10n.tr("Localizable", "splash.subtitle", fallback: "Create tests from your notes") }
+    /// Neural network
+    ///  tutor
+    public static var title: String { return L10n.tr("Localizable", "splash.title", fallback: "Neural network\n tutor") }
+  }
   public enum TabBar {
     /// History
     public static var history: String { return L10n.tr("Localizable", "tabBar.history", fallback: "History") }

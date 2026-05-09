@@ -33,4 +33,5 @@ enum AppColors {
     static let questionInResult = UIColor(named: "QuestionInResult")!
     static let borderResult = UIColor(named: "BorderResult")!
     static let detailedQuestion = UIColor(named: "DetailedQuestion")!
+    static let book = UIColor(named: "Book")!
 }
