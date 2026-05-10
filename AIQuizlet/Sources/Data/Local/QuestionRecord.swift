@@ -19,7 +19,7 @@ class QuestionRecord {
     var correctAnswer: Int
     var explanation: String?
     
-    init(id: UUID = UUID(), orderIndex: Int , text: String, answers: [String], correctAnswer: Int, explanation: String? = nil) {
+    init(id: UUID = UUID(), orderIndex: Int, text: String, answers: [String], correctAnswer: Int, explanation: String? = nil) {
         self.id = id
         self.orderIndex = orderIndex
         self.text = text

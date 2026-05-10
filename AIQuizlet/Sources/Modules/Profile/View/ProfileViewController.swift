@@ -171,6 +171,11 @@ extension ProfileViewController {
         statsStack.alpha = 0
         updateUI()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateGradient(for: ThemeManager.shared.savedStyle)
+    }
 }
 
 // MARK: - Private Methods

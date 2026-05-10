@@ -5,6 +5,7 @@ excluded:
   - AIQuizlet/DerivedData
   - AIQuizletTests
   - Tuist
+  - AIQuizlet/Sources/Generated
 disabled_rules:
   - line_length
   - trailing_whitespace
@@ -13,3 +14,4 @@ disabled_rules:
   - function_body_length
   - type_body_length
   - file_length
+  - nesting

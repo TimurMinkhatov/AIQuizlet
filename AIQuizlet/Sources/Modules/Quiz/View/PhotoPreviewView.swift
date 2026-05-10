@@ -48,10 +48,10 @@ final class PhotoPreviewView: UIView {
     // MARK: - UI Elements
     
     lazy var imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        return iv
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
     }()
     
     private lazy var glassPanel: UIVisualEffectView = {
@@ -182,7 +182,6 @@ private extension PhotoPreviewView {
         return button
         
     }
-    
     
     func createQuestionButton(with count: Int) -> UIButton {
         let button = UIButton(type: .system)

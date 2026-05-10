@@ -84,10 +84,10 @@ final class QuestionAnalysisCell: UITableViewCell {
     }()
     
     private let chevronIcon: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "chevron.down"))
-        iv.tintColor = Constants.Colors.chevron
-        iv.contentMode = .scaleAspectFit
-        return iv
+        let imageView = UIImageView(image: UIImage(systemName: "chevron.down"))
+        imageView.tintColor = Constants.Colors.chevron
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
     private let dividerView: UIView = {

@@ -109,11 +109,11 @@ private extension CameraView {
     func animateShutterTap() {
         UIView.animate(withDuration: 0.1, animations: {
             self.shutterButton.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        }) { _ in
+        }, completion: { _ in
             UIView.animate(withDuration: 0.1) {
                 self.shutterButton.transform = .identity
             }
-        }
+        })
     }
     
     @objc func shutterTapped() {
@@ -125,4 +125,3 @@ private extension CameraView {
         delegate?.cameraViewDidTapGallery(self)
     }
 }
-

@@ -1,7 +1,7 @@
 //
 //  StorageService.swift
 //  AIQuizlet
-//q
+//
 //  Created by Timur Minkhatov on 22/04/2026.
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
@@ -16,7 +16,6 @@ protocol StorageServiceProtocol {
     func deleteAll() throws
     func saveQuiz(_ quizRecord: QuizRecord) throws
 
-    
     @MainActor
     func checkExists(id: String) throws -> Bool
     

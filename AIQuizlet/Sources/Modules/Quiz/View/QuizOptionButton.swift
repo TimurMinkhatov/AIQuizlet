@@ -38,10 +38,10 @@ final class QuizOptionButton: UIControl {
     }()
 
     private lazy var iconImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        iv.isHidden = true
-        return iv
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.isHidden = true
+        return imageView
     }()
 
     // MARK: - Properties

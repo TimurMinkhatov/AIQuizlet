@@ -39,6 +39,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             servicesAssembly: servicesAssembly
         )
         appCoordinator?.start()
+        ThemeManager.shared.apply(style: ThemeManager.shared.savedStyle)
 
         NotificationCenter.default.addObserver(
             forName: .languageDidChange,
@@ -83,6 +84,7 @@ private extension SceneDelegate {
             UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve) {
                 window.rootViewController = navigationController
                 self.appCoordinator?.restartWithoutSplash()
+                ThemeManager.shared.apply(style: ThemeManager.shared.savedStyle)
             }
         }
     }

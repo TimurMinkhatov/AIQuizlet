@@ -35,13 +35,18 @@ final class ThemeSelectorView: UIView {
         backgroundColor = AppColors.cardBackground
         setupLayout()
         setupActions()
-        selectButton(lightButton)
+        
+        switch ThemeManager.shared.savedStyle {
+        case .dark: selectButton(darkButton)
+        case .light: selectButton(lightButton)
+        default: selectButton(systemButton)
+        }
 
         NotificationCenter.default.addObserver(
             forName: .themeDidChange,
             object: nil,
             queue: .main
-        ) { [weak self] notification in
+        ) { [weak self] _ in
             self?.backgroundColor = AppColors.cardBackground
             self?.refreshInactiveButtons()
         }
