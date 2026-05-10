@@ -1,17 +1,11 @@
 // Generated using Sourcery 2.3.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 import Foundation
-import FirebaseAuth
-import FirebaseFirestore
-import Moya
 @testable import AIQuizlet
-
 
 // MARK: - MockAuthService
 
 final class MockAuthService: AuthServiceProtocol {
-    var currentUser: FirebaseAuth.User? = nil
-
     var requireUserIdThrowableError: Error?
     var requireUserIdCallCount = 0
     var requireUserIdReturnValue: String!
@@ -169,6 +163,21 @@ final class MockFirestoreService: FirestoreServiceProtocol {
     func deleteAllData() async throws {
         deleteAllDataCallCount += 1
         if let error = deleteAllDataThrowableError { throw error }
+    }
+
+}
+
+// MARK: - MockNetworkManager
+
+final class MockNetworkManager: NetworkManagerProtocol {
+    var requestThrowableError: Error?
+    var requestCallCount = 0
+    var requestReturnValue: D!
+
+    func request<T: TargetType, D: Decodable>(target: T) async throws -> D {
+        requestCallCount += 1
+        if let error = requestThrowableError { throw error }
+        return requestReturnValue
     }
 
 }
