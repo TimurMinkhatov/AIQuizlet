@@ -12,7 +12,7 @@ final class AuthCoordinator: Coordinator {
 
     // MARK: - Properties
 
-    var parentCoordinator: Coordinator?
+    weak var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     let servicesAssembly: ServicesAssembly
