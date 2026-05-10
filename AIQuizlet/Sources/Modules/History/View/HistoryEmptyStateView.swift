@@ -60,10 +60,10 @@ final class HistoryEmptyStateView: UIView {
     }()
     
     private lazy var iconImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "book"))
-        iv.tintColor = Constants.Colors.iconTint
-        iv.contentMode = .scaleAspectFit
-        return iv
+        let imageView = UIImageView(image: UIImage(systemName: "book"))
+        imageView.tintColor = Constants.Colors.iconTint
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
     private lazy var titleLabel: UILabel = {

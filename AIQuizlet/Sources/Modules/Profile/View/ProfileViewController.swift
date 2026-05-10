@@ -171,6 +171,11 @@ extension ProfileViewController {
         statsStack.alpha = 0
         updateUI()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateGradient(for: ThemeManager.shared.savedStyle)
+    }
 }
 
 // MARK: - Private Methods
@@ -288,7 +293,7 @@ private extension ProfileViewController {
                 let stats = try await viewModel.fetchStats()
                 totalTestsCard.setValue("\(stats.totalQuizzes)")
                 avgScoreCard.setValue("\(Int(stats.avgScore))%")
-                bestScoreCard.setValue("\(Int(stats.bestScores))%")
+                bestScoreCard.setValue("\(Int(stats.bestScore))%")
                 completedCard.setValue("\(stats.totalQuestions)")
                 
                 UIView.animate(withDuration: 0.3) {

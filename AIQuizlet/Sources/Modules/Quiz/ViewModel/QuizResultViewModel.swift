@@ -57,8 +57,8 @@ final class QuizResultViewModel {
     private var statusText: String {
         let percent = quizResult.percentage
         if percent >= 100 { return L10n.Result.perfect }
-        if percent >= 80  { return L10n.Result.great }
-        if percent >= 50  { return L10n.Result.good }
+        if percent >= 80 { return L10n.Result.great }
+        if percent >= 50 { return L10n.Result.good }
         return L10n.Result.notBad
     }
     

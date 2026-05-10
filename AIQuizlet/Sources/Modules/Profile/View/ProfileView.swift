@@ -103,6 +103,11 @@ extension ProfileView {
         avatarGradientLayer.frame = profileContainerView.bounds
         avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
         profileCardView.backgroundColor = AppColors.cardBackground
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+        updateGradient(for: style)
     }
 }
 

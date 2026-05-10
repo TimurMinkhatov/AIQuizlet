@@ -101,7 +101,7 @@ extension QuizCoordinator {
     func showResult(with result: QuizResult) {
         let viewModel = QuizResultViewModel(
             quizResult: result,
-            onRetry: { [weak self] quizRecord in
+            onRetry: { [weak self] _ in
                 self?.currentQuizViewModel?.restart()
                 self?.navigationController.popViewController(animated: true)
             },

@@ -23,7 +23,6 @@ final class AuthService {
     
     // MARK: - Public Methods
     
-   
     @MainActor
     func requireUserId(timeoutSeconds: TimeInterval = 5) async throws -> String {
         if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty {
@@ -75,7 +74,7 @@ final class AuthService {
     }
     
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { authData ,error in
+        Auth.auth().signIn(withEmail: email, password: password) { _, error in
             if let error = error {
                 completion(.failure(error))
                 return

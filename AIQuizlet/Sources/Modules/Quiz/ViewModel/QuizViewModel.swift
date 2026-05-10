@@ -9,6 +9,15 @@
 import Foundation
 import FirebaseAuth
 
+struct QuizResultData {
+    let resultId: UUID
+    let quizId: String
+    let score: Double
+    let total: Int
+    let correctCount: Int
+    let answers: [FSAnswer]
+}
+
 final class QuizViewModel {
     
     // MARK: - Models
@@ -208,7 +217,7 @@ final class QuizViewModel {
                     quiz: record,
                     userAnswers: answerRecords
                 )
-                await MainActor.run {
+                await MainActor.run { [quizResult] in
                     self.coordinator?.showResult(with: quizResult)
                 }
                 return
@@ -244,12 +253,14 @@ final class QuizViewModel {
             
             do {
                 try await self.saveQuizResultToFirestore(
-                    resultId: resultId,
-                    quizId: quizId,
-                    score: scorePercentage,
-                    total: quiz.questions.count,
-                    correctCount: finalScore,
-                    answers: firestoreAnswers
+                    QuizResultData(
+                        resultId: resultId,
+                        quizId: quizId,
+                        score: scorePercentage,
+                        total: quiz.questions.count,
+                        correctCount: finalScore,
+                        answers: firestoreAnswers
+                    )
                 )
             } catch {
             }
@@ -341,21 +352,21 @@ private extension QuizViewModel {
         return nil
     }
     
-    func saveQuizResultToFirestore(resultId: UUID, quizId: String, score: Double, total: Int, correctCount: Int, answers: [FSAnswer]) async throws {
+    func saveQuizResultToFirestore(_ data: QuizResultData) async throws {
         guard let uid = await waitForUserId(timeoutSeconds: 5) else {
             throw NSError(domain: "QuizViewModel", code: 401, userInfo: [
                 NSLocalizedDescriptionKey: "User is not authenticated"
             ])
         }
         let result = FSQuizResult(
-            quizId: quizId,
-            id: resultId.uuidString,
+            quizId: data.quizId,
+            id: data.resultId.uuidString,
             userId: uid,
-            score: score,
-            correctCount: correctCount,
-            totalQuestions: total,
+            score: data.score,
+            correctCount: data.correctCount,
+            totalQuestions: data.total,
             completedAt: Date(),
-            answers: answers
+            answers: data.answers
         )
         try await firestoreService.saveQuizResult(quizResult: result)
     }

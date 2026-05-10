@@ -22,7 +22,7 @@ final class AppCoordinator: Coordinator {
 
     private var authChecked = false
     private var timerDone = false
-    private var authUser: FirebaseAuth.User? = nil
+    private var authUser: FirebaseAuth.User?
 
     // MARK: - Init
 

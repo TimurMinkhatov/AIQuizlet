@@ -44,12 +44,12 @@ final class AuthCoordinator: Coordinator {
 private extension AuthCoordinator {
 
     func showAuth(state: AuthState = .login) {
-        let vm = AuthViewModel(
+        let authViewModel = AuthViewModel(
             authService: servicesAssembly.authService,
             firestoreService: servicesAssembly.firestoreService
         )
-        vm.coordinator = self
-        let vc = AuthViewController(viewModel: vm)
-        navigationController.setViewControllers([vc], animated: false)
+        authViewModel.coordinator = self
+        let authViewController = AuthViewController(viewModel: authViewModel)
+        navigationController.setViewControllers([authViewController], animated: false)
     }
 }

@@ -117,11 +117,11 @@ final class QuizViewController: UIViewController {
     }()
 
     private lazy var bulbIconImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(systemName: "info.circle")
-        iv.tintColor = .systemBlue
-        iv.contentMode = .scaleAspectFit
-        return iv
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "info.circle")
+        imageView.tintColor = .systemBlue
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
 
     private lazy var nextButton: UIButton = {
@@ -309,9 +309,10 @@ private extension QuizViewController {
                     self.updateProgress(current: data.currentNumber, total: data.total)
                     self.render(question: data.question, number: data.currentNumber)
                     self.showResultUI(with: data)
-                case .finished(_, _):
+                case .finished:
                     break
-                case .idle: break
+                case .idle:
+                    break
                 }
             }
         }

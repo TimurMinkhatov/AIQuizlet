@@ -36,11 +36,11 @@ final class HistoryViewController: UIViewController {
     // MARK: - UI
     
     private lazy var searchField: UITextField = {
-        let tf = UITextField()
-        tf.backgroundColor = AppColors.historyCard
-        tf.placeholder = L10n.History.Search.placeholder
-        tf.layer.cornerRadius = Constants.Layout.searchFieldCornerRadius
-        tf.leftViewMode = .always
+        let textField = UITextField()
+        textField.backgroundColor = AppColors.historyCard
+        textField.placeholder = L10n.History.Search.placeholder
+        textField.layer.cornerRadius = Constants.Layout.searchFieldCornerRadius
+        textField.leftViewMode = .always
         
         let iconView = UIView(frame: CGRect(origin: .zero, size: Constants.Layout.searchIconSize))
         let icon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
@@ -48,9 +48,9 @@ final class HistoryViewController: UIViewController {
         icon.frame = Constants.Layout.searchIconFrame
         iconView.addSubview(icon)
         
-        tf.leftView = iconView
-        tf.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
-        return tf
+        textField.leftView = iconView
+        textField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
+        return textField
     }()
     
     private lazy var tableView: UITableView = {
