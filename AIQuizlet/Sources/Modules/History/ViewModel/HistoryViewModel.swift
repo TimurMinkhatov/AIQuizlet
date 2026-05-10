@@ -39,8 +39,7 @@ final class HistoryViewModel {
         Task { [weak self] in
             guard let self else { return }
             do {
-                let currentUserId = try await self.servicesAssembly.authService.requireUserId()
-                
+                let currentUserId = try await self.servicesAssembly.authService.requireUserId(timeoutSeconds: 5)
                 self.loadLocalData(userId: currentUserId)
                 await self.syncWithFirestore(userId: currentUserId)
                 
@@ -76,7 +75,7 @@ final class HistoryViewModel {
     func cleanupOrphanResults() async {
         let userId: String
         do {
-            userId = try await servicesAssembly.authService.requireUserId()
+            userId = try await servicesAssembly.authService.requireUserId(timeoutSeconds: 5)
         } catch {
             return
         }

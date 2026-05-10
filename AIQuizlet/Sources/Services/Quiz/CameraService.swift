@@ -9,7 +9,19 @@
 import AVFoundation
 import UIKit
 
-final class CameraService: NSObject {
+protocol CameraServiceProtocol: AnyObject {
+    var onPhotoCaptured: ((UIImage) -> Void)? { get set }
+    var onError: ((String) -> Void)? { get set }
+    var previewLayer: AVCaptureVideoPreviewLayer { get }
+    
+    func setupCamera(on view: UIView)
+    func start()
+    func stop()
+    func capturePhoto()
+    func updatePreviewFrame(_ bounds: CGRect)
+}
+
+final class CameraService: NSObject, CameraServiceProtocol {
     
     // MARK: - Properties
     

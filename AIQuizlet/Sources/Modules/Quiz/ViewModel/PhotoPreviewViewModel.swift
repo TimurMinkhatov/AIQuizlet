@@ -15,7 +15,8 @@ final class PhotoPreviewViewModel {
     weak var coordinator: QuizCoordinator?
     let image: UIImage
     private let recognitionService: TextRecognitionService
-    private let quizService: QuizService
+    private let quizService: QuizServiceProtocol
+    private let authService: AuthServiceProtocol
     
     var onLoadingStateChanged: ((Bool) -> Void)?
     var onErrorOccurred: ((String) -> Void)?
@@ -26,11 +27,13 @@ final class PhotoPreviewViewModel {
     init(
         image: UIImage,
         recognitionService: TextRecognitionService = TextRecognitionService(),
-        quizService: QuizService = QuizService(networkManager: NetworkManager())
+        quizService: QuizServiceProtocol = QuizService(networkManager: NetworkManager()),
+        authService: AuthServiceProtocol = AuthService()
     ) {
         self.image = image
         self.recognitionService = recognitionService
         self.quizService = quizService
+        self.authService = authService
     }
     
     // MARK: - Public Methods
@@ -51,7 +54,7 @@ final class PhotoPreviewViewModel {
                     let quiz = try await self.quizService.generateQuiz(for: recognizedText, count: questionsCount)
                     
                     await MainActor.run {
-                        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+                        guard let currentUserId = self.authService.currentUser?.uid, !currentUserId.isEmpty else {
                             self.onLoadingStateChanged?(false)
                             self.handleError("Не удалось определить пользователя. Войдите в аккаунт и попробуйте снова.")
                             return
@@ -89,7 +92,7 @@ private extension PhotoPreviewViewModel {
     }
     
     func handleSuccess(quiz: Quiz) {
-        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+        guard let currentUserId = authService.currentUser?.uid, !currentUserId.isEmpty else {
             handleError("Не удалось определить пользователя. Войдите в аккаунт и попробуйте снова.")
             return
         }

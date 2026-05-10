@@ -1,6 +1,10 @@
 import Foundation
+import FirebaseAuth
+import FirebaseFirestore
+import Moya
 @testable import AIQuizlet
-{% for type in types.protocols where type.name|hasSuffix:"Protocol" and type.name != "CameraServiceProtocol" %}
+
+{% for type in types.protocols where type.name|hasSuffix:"Protocol" and type.name != "CameraServiceProtocol" and type.name != "NetworkManagerProtocol" %}
 
 // MARK: - Mock{{ type.name|replace:"Protocol","" }}
 

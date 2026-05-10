@@ -34,7 +34,7 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+        guard let currentUserId = servicesAssembly.authService.currentUser?.uid, !currentUserId.isEmpty else {
             return
         }
         let questionRecords = quiz.questions.map { question in
