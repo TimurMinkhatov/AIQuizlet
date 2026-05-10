@@ -20,7 +20,7 @@ final class AuthViewController: UIViewController {
     private var state: AuthState = .login {
         didSet { updateUI() }
     }
-
+    
     // MARK: - UI Components
 
     private lazy var scrollView: UIScrollView = {
@@ -34,12 +34,10 @@ final class AuthViewController: UIViewController {
 
     private lazy var gradientLayer: CAGradientLayer = {
         let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 0.2, green: 0.4, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.5, green: 0.2, blue: 0.9, alpha: 1.0).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0.5, y: 0)
-        layer.endPoint = CGPoint(x: 0.5, y: 1)
+        view.applyGradient(colors: [
+            UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
+            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+        ], startPoint: CGPoint(x: 0.5, y: 0), endPoint: CGPoint(x: 0.5, y: 1), cornerRadius: 10)
         return layer
     }()
 
@@ -67,36 +65,36 @@ final class AuthViewController: UIViewController {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 28)
+        label.font = .boldSystemFont(ofSize: Constants.titleFontSize)
         label.textAlignment = .center
         return label
     }()
 
     private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: Constants.subtitleFontSize)
         label.textColor = .gray
         label.textAlignment = .center
         return label
     }()
 
     private lazy var emailField = FormFieldView(
-        labelText: Constants.Strings.emailLabel,
-        placeholder: Constants.Strings.emailPlaceholder,
+        labelText: L10n.Auth.Email.label,
+        placeholder: L10n.Auth.Email.placeholder,
         keyboardType: .emailAddress,
         iconName: "envelope"
     )
 
     private lazy var passwordField = FormFieldView(
-        labelText: Constants.Strings.passwordLabel,
-        placeholder: Constants.Strings.loginPasswordPlaceholder,
+        labelText: L10n.Auth.Password.label,
+        placeholder: L10n.Auth.Password.placeholder,
         isSecure: true,
         iconName: "lock"
     )
 
     private lazy var confirmPasswordField = FormFieldView(
-        labelText: Constants.Strings.confirmPasswordLabel,
-        placeholder: Constants.Strings.confirmPasswordPlaceholder,
+        labelText: L10n.Auth.ConfirmPassword.label,
+        placeholder: L10n.Auth.ConfirmPassword.placeholder,
         isSecure: true,
         iconName: "lock"
     )
@@ -106,14 +104,14 @@ final class AuthViewController: UIViewController {
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = Constants.buttonCornerRadius
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.titleLabel?.font = .systemFont(ofSize: Constants.buttonFontSize, weight: .semibold)
         return button
     }()
 
     private lazy var switchButton: UIButton = {
         let button = UIButton()
         button.setTitleColor(.systemBlue, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.titleLabel?.font = .systemFont(ofSize: Constants.switchButtonFontSize)
         return button
     }()
 
@@ -140,6 +138,25 @@ extension AuthViewController {
         setupActions()
         bindViewModel()
         updateUI()
+        
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            self?.scrollView.contentInset.bottom = keyboardFrame.height
+            self?.scrollView.verticalScrollIndicatorInsets.bottom = keyboardFrame.height
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.scrollView.contentInset.bottom = 0
+            self?.scrollView.verticalScrollIndicatorInsets.bottom = 0
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -156,11 +173,11 @@ private extension AuthViewController {
         viewModel.onError = { [weak self] error in
             guard let self else { return }
             let alert = UIAlertController(
-                title: Constants.Strings.errorTitle,
+                title: L10n.Common.Error.title,
                 message: error,
                 preferredStyle: .alert
             )
-            alert.addAction(UIAlertAction(title: Constants.Strings.errorAction, style: .default))
+            alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default))
             present(alert, animated: true)
         }
     }
@@ -191,13 +208,12 @@ private extension AuthViewController {
 
         cardView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
-            $0.centerY.equalToSuperview()
             $0.top.greaterThanOrEqualToSuperview().offset(Constants.cardVerticalInset)
             $0.bottom.lessThanOrEqualToSuperview().inset(Constants.cardVerticalInset)
         }
 
         iconContainerView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(24)
+            $0.top.equalToSuperview().offset(Constants.iconTopOffset)
             $0.centerX.equalToSuperview()
             $0.width.height.equalTo(Constants.iconSize)
         }
@@ -208,40 +224,40 @@ private extension AuthViewController {
         }
 
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(iconContainerView.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(iconContainerView.snp.bottom).offset(Constants.titleTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         subtitleLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(Constants.subtitleTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         emailField.snp.makeConstraints {
-            $0.top.equalTo(subtitleLabel.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(subtitleLabel.snp.bottom).offset(Constants.emailTopOffset)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         passwordField.snp.makeConstraints {
-            $0.top.equalTo(emailField.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(emailField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         confirmPasswordField.snp.makeConstraints {
-            $0.top.equalTo(passwordField.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(passwordField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
         }
 
         actionButton.snp.makeConstraints {
-            $0.top.equalTo(confirmPasswordField.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(confirmPasswordField.snp.bottom).offset(Constants.fieldSpacing)
+            $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
             $0.height.equalTo(Constants.buttonHeight)
         }
 
         switchButton.snp.makeConstraints {
-            $0.top.equalTo(actionButton.snp.bottom).offset(16)
+            $0.top.equalTo(actionButton.snp.bottom).offset(Constants.fieldSpacing)
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(24)
+            $0.bottom.equalToSuperview().inset(Constants.switchButtonBottomInset)
         }
     }
 
@@ -253,20 +269,42 @@ private extension AuthViewController {
     func updateUI() {
         switch state {
         case .login:
-            titleLabel.text = Constants.Strings.loginTitle
-            subtitleLabel.text = Constants.Strings.loginSubtitle
-            passwordField.setPlaceholder(Constants.Strings.loginPasswordPlaceholder)
+            titleLabel.text = L10n.Auth.Login.title
+            subtitleLabel.text = L10n.Auth.Login.subtitle
+            passwordField.setPlaceholder(L10n.Auth.Password.placeholder)
             confirmPasswordField.isHidden = true
-            actionButton.setTitle(Constants.Strings.loginAction, for: .normal)
-            switchButton.setTitle(Constants.Strings.loginSwitch, for: .normal)
+            actionButton.setTitle(L10n.Auth.Login.button, for: .normal)
+            switchButton.setTitle(L10n.Auth.switchToRegister, for: .normal)
+            actionButton.snp.remakeConstraints {
+                $0.top.equalTo(passwordField.snp.bottom).offset(Constants.fieldSpacing)
+                $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
+                $0.height.equalTo(Constants.buttonHeight)
+            }
+            cardView.snp.remakeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
+                $0.top.greaterThanOrEqualToSuperview().offset(Constants.loginCardTopInset)
+                $0.bottom.lessThanOrEqualToSuperview().inset(Constants.loginCardBottomInset)
+                $0.centerY.equalToSuperview().offset(Constants.loginCardCenterOffset)
+            }
 
         case .register:
-            titleLabel.text = Constants.Strings.registerTitle
-            subtitleLabel.text = Constants.Strings.registerSubtitle
-            passwordField.setPlaceholder(Constants.Strings.registerPasswordPlaceholder)
+            titleLabel.text = L10n.Auth.Register.title
+            subtitleLabel.text = L10n.Auth.Register.subtitle
+            passwordField.setPlaceholder(L10n.Auth.Password.registerPlaceholder)
             confirmPasswordField.isHidden = false
-            actionButton.setTitle(Constants.Strings.registerAction, for: .normal)
-            switchButton.setTitle(Constants.Strings.registerSwitch, for: .normal)
+            actionButton.setTitle(L10n.Auth.Register.button, for: .normal)
+            switchButton.setTitle(L10n.Auth.switchToLogin, for: .normal)
+            actionButton.snp.remakeConstraints {
+                $0.top.equalTo(confirmPasswordField.snp.bottom).offset(Constants.fieldSpacing)
+                $0.leading.trailing.equalToSuperview().inset(Constants.fieldHorizontalInset)
+                $0.height.equalTo(Constants.buttonHeight)
+            }
+            cardView.snp.remakeConstraints {
+                $0.leading.trailing.equalToSuperview().inset(Constants.cardHorizontalInset)
+                $0.top.greaterThanOrEqualToSuperview().offset(Constants.registerCardTopInset)
+                $0.bottom.lessThanOrEqualToSuperview().inset(Constants.registerCardBottomInset)
+                $0.centerY.equalToSuperview().offset(Constants.registerCardCenterOffset)
+            }
         }
     }
 
@@ -293,34 +331,35 @@ private extension AuthViewController {
 private extension AuthViewController {
     enum Constants {
         static let cardCornerRadius: CGFloat = 20
-        static let iconCornerRadius: CGFloat = 40
-        static let buttonCornerRadius: CGFloat = 12
         static let cardHorizontalInset: CGFloat = 20
         static let cardVerticalInset: CGFloat = 60
+
+        static let loginCardTopInset: CGFloat = 150
+        static let loginCardBottomInset: CGFloat = 180
+        static let loginCardCenterOffset: CGFloat = -153
+
+        static let registerCardTopInset: CGFloat = 106
+        static let registerCardBottomInset: CGFloat = 135
+        static let registerCardCenterOffset: CGFloat = -106
+
+        static let iconCornerRadius: CGFloat = 40
         static let iconSize: CGFloat = 80
         static let iconImageSize: CGFloat = 40
+        static let iconTopOffset: CGFloat = 24
+
+        static let titleFontSize: CGFloat = 28
+        static let subtitleFontSize: CGFloat = 14
+        static let titleTopOffset: CGFloat = 16
+        static let subtitleTopOffset: CGFloat = 8
+
+        static let fieldHorizontalInset: CGFloat = 20
+        static let fieldSpacing: CGFloat = 16
+        static let emailTopOffset: CGFloat = 24
+
+        static let buttonCornerRadius: CGFloat = 12
         static let buttonHeight: CGFloat = 50
-
-        enum Strings {
-            static let loginTitle = "Добро пожаловать!"
-            static let loginSubtitle = "Войдите в свой аккаунт"
-            static let loginPasswordPlaceholder = "······"
-            static let loginAction = "Войти"
-            static let loginSwitch = "Нет аккаунта? Зарегистрироваться"
-
-            static let registerTitle = "Создать аккаунт"
-            static let registerSubtitle = "Зарегистрируйтесь для начала работы"
-            static let registerPasswordPlaceholder = "Минимум 6 символов"
-            static let registerAction = "Зарегистрироваться"
-            static let registerSwitch = "Уже есть аккаунт? Войти"
-
-            static let emailLabel = "Email"
-            static let emailPlaceholder = "example@email.com"
-            static let passwordLabel = "Пароль"
-            static let confirmPasswordLabel = "Подтвердите пароль"
-            static let confirmPasswordPlaceholder = "Повторите пароль"
-            static let errorTitle = "Ошибка"
-            static let errorAction = "OK"
-        }
+        static let buttonFontSize: CGFloat = 16
+        static let switchButtonFontSize: CGFloat = 14
+        static let switchButtonBottomInset: CGFloat = 24
     }
 }

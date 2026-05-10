@@ -21,14 +21,6 @@ final class PhotoPreviewView: UIView {
             UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
         ]
         
-        enum Strings {
-            static let questionCountTitle = "Количество вопросов"
-            static let retakeButtonTitle = "Переснять"
-            static let continueButtonTitle = "Продолжить"
-            static let retakeIcon = "arrow.counterclockwise"
-            static let continueIcon = "checkmark"
-        }
-        
         enum Layout {
             static let glassPanelBottom: CGFloat = 16
             static let glassPanelHeight: CGFloat = 230
@@ -56,10 +48,10 @@ final class PhotoPreviewView: UIView {
     // MARK: - UI Elements
     
     lazy var imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        return iv
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
     }()
     
     private lazy var glassPanel: UIVisualEffectView = {
@@ -72,7 +64,7 @@ final class PhotoPreviewView: UIView {
 
     private lazy var questionCountTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = Constants.Strings.questionCountTitle
+        label.text = L10n.Quiz.TextInput.questionCount
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .white
         return label
@@ -87,15 +79,15 @@ final class PhotoPreviewView: UIView {
     }()
     
     lazy var retakeButton = makeButton(
-        title: Constants.Strings.retakeButtonTitle,
-        systemImage: Constants.Strings.retakeIcon,
+        title: L10n.Quiz.Photo.Retake.button,
+        systemImage: "arrow.counterclockwise",
         backgroundColor: .white.withAlphaComponent(0.1),
         hasBorder: true
     )
     
     lazy var continueButton = makeButton(
-        title: Constants.Strings.continueButtonTitle,
-        systemImage: Constants.Strings.continueIcon,
+        title: L10n.Quiz.Question.continue,
+        systemImage: "checkmark",
         backgroundColor: .clear
     )
     
@@ -143,7 +135,7 @@ final class PhotoPreviewView: UIView {
             .forEach { $0.opacity = isLoading ? 0 : 1 }
         continueButton.backgroundColor = isLoading ? .white.withAlphaComponent(0.1) : .clear
         
-        continueButton.configuration?.title = isLoading ? "" : "Продолжить"
+        continueButton.configuration?.title = isLoading ? "" : L10n.Quiz.Question.continue
             continueButton.configuration?.image = isLoading ? nil : UIImage(systemName: "checkmark")
     }
 }
@@ -190,7 +182,6 @@ private extension PhotoPreviewView {
         return button
         
     }
-    
     
     func createQuestionButton(with count: Int) -> UIButton {
         let button = UIButton(type: .system)

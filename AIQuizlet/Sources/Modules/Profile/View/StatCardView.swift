@@ -45,12 +45,20 @@ final class StatCardView: UIView {
 
     init(title: String, systemImage: String, tintColor: UIColor = .systemIndigo) {
         super.init(frame: .zero)
-        backgroundColor = .secondarySystemGroupedBackground
+        backgroundColor = AppColors.cardBackground
         layer.cornerRadius = 16
         iconImageView.image = UIImage(systemName: systemImage)
         iconImageView.tintColor = tintColor
         titleLabel.text = title
         setupLayout()
+
+        NotificationCenter.default.addObserver(
+            forName: .themeDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.backgroundColor = AppColors.cardBackground
+        }
     }
 
     required init?(coder: NSCoder) {

@@ -1,0 +1,10 @@
+strings:
+  inputs:
+    - AIQuizlet/Resources/Localization/en.lproj/Localizable.strings
+  outputs:
+    - templateName: structured-swift5
+      output: AIQuizlet/Sources/Generated/Strings.swift
+      params:
+        enumName: L10n
+        publicAccess: true
+        lookupFunction: "LocalizationService.localizedString(key:table:fallbackValue:)"

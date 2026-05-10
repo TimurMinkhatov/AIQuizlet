@@ -4,7 +4,7 @@ let project = Project(
     name: "AIQuizlet",
     organizationName: "t-bank-practice-team",
     targets: [
-        Target(
+        .target(
             name: "AIQuizlet",
             destinations: .iOS,
             product: .app,
@@ -38,31 +38,47 @@ let project = Project(
                     script: """
                     if test -f /usr/local/bin/swiftlint; then
                         /usr/local/bin/swiftlint
+                    elif test -f /opt/homebrew/bin/swiftlint; then
+                        /opt/homebrew/bin/swiftlint
                     else
                         echo "SwiftLint not installed"
                     fi
                     """,
                     name: "SwiftLint",
                     basedOnDependencyAnalysis: false
+                ),
+                .pre(
+                    script: """
+                    if test -f /opt/homebrew/bin/swiftgen; then
+                        /opt/homebrew/bin/swiftgen config run --config "${SRCROOT}/swiftgen.yml"
+                    else
+                        echo "warning: SwiftGen not installed"
+                    fi
+                    """,
+                    name: "SwiftGen",
+                    basedOnDependencyAnalysis: false
                 )
             ],
             dependencies: [
                 .external(name: "Moya"),
-                .external(name: "SnapKit")
+                .external(name: "SnapKit"),
+                .external(name: "FirebaseAuth"),
+                .external(name: "FirebaseFirestore"),
             ],
             settings: .settings(
                 base: [
                     "VALIDATE_WORKSPACE": "NO",
-		    "CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER": "NO",
-		    "GCC_WARN_INHIBIT_ALL_WARNINGS": "YES"
+                    "CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER": "NO",
+                    "GCC_WARN_INHIBIT_ALL_WARNINGS": "YES",
+                    "OTHER_LDFLAGS": "$(inherited) -ObjC",
                 ]
             )
         ),
-        Target(
+        .target(
             name: "AIQuizletTests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "timaza.aiquizlet.app.tests",
+            bundleId: "com.aiquizlet.app.tests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["AIQuizletTests/**"],

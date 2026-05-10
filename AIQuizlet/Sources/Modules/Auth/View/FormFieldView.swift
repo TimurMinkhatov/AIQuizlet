@@ -48,7 +48,7 @@ final class FormFieldView: UIView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("Инициализатор не реализован")
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

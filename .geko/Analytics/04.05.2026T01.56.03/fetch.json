@@ -1,0 +1,1 @@
+{"swift_version":"6.3","machine_hardware_name":"arm64","geko_version":"1.0.8","client_id":"51d978df88769dab773f3f83056b7f9c","is_error":true,"duration_in_ms":1020,"command_arguments":["fetch"],"params":{},"os":"macOS","is_ci":false,"name":"fetch","os_version":"26.4.1"}

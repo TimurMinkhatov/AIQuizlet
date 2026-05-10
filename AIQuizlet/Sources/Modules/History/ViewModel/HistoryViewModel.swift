@@ -85,7 +85,6 @@ final class HistoryViewModel {
             let cloudResults = try await servicesAssembly.firestoreService.fetchUserResults(userId: userId)
             let cloudQuizzes = try await servicesAssembly.firestoreService.fetchUserQuizzes(userId: userId)
             
-
             guard !cloudQuizzes.isEmpty else {
                 return
             }
@@ -93,11 +92,9 @@ final class HistoryViewModel {
             let validQuizIds = Set(cloudQuizzes.map { $0.id })
             
             var deletedCount = 0
-            for result in cloudResults {
-                if !validQuizIds.contains(result.quizId) {
-                    try await servicesAssembly.firestoreService.deleteQuizResult(resultId: result.id)
-                    deletedCount += 1
-                }
+            for result in cloudResults where !validQuizIds.contains(result.quizId) {
+                try await servicesAssembly.firestoreService.deleteQuizResult(resultId: result.id)
+                deletedCount += 1
             }
         } catch {
         }
@@ -130,7 +127,6 @@ final class HistoryViewModel {
                 syncedQuizIds.insert(fsQuiz.id)
             }
             
-            
             let cloudResults = try await servicesAssembly.firestoreService.fetchUserResults(userId: userId)
             
             var syncedResultsCount = 0
@@ -148,7 +144,6 @@ final class HistoryViewModel {
                 }
             }
             
-
             await MainActor.run {
                 self.loadLocalData(userId: userId)
             }

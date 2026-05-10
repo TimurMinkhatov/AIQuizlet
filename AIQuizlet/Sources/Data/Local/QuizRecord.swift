@@ -18,7 +18,7 @@ class QuizRecord {
     var date: Date
     @Relationship(deleteRule: .cascade) var questions: [QuestionRecord]
     
-    init(userId: String,id: UUID = UUID(), title: String, date: Date = Date(), questions: [QuestionRecord]) {
+    init(userId: String, id: UUID = UUID(), title: String, date: Date = Date(), questions: [QuestionRecord]) {
         self.userId = userId
         self.id = id
         self.title = title

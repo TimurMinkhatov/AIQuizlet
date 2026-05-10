@@ -47,10 +47,10 @@ final class QuizCoordinator: Coordinator {
             )
         }
         let record = QuizRecord(
-                userId: currentUserId,
-                title: quiz.title,
-                questions: questionRecords
-            )
+            userId: currentUserId,
+            title: quiz.title,
+            questions: questionRecords
+        )
         DispatchQueue.main.async { [weak self] in
             self?.showQuiz(quiz: quiz, record: record)
         }
@@ -101,7 +101,7 @@ extension QuizCoordinator {
     func showResult(with result: QuizResult) {
         let viewModel = QuizResultViewModel(
             quizResult: result,
-            onRetry: { [weak self] quizRecord in
+            onRetry: { [weak self] _ in
                 self?.currentQuizViewModel?.restart()
                 self?.navigationController.popViewController(animated: true)
             },

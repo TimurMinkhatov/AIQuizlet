@@ -8,17 +8,15 @@ xcuserdata/
 DerivedData/
 build/
 
-# Geko generated
+# Tuist generated
 AIQuizlet.xcodeproj
 AIQuizlet.xcworkspace
 Derived/
-.geko/
-Geko/Dependencies/
 
 # SPM
 .build/
 .swiftpm/
-Package.resolved
+Tuist/.build/
 
 # macOS
 .DS_Store
@@ -27,4 +25,3 @@ Package.resolved
 GoogleService-Info.plist
 **/Secrets.swift
 Secrets.swift
-

@@ -20,8 +20,12 @@ final class AppCoordinator: Coordinator {
     private var window: UIWindow?
     private let servicesAssembly: ServicesAssembly
 
+    private var authChecked = false
+    private var timerDone = false
+    private var authUser: FirebaseAuth.User?
+
     // MARK: - Init
-    
+
     init(navigationController: UINavigationController, window: UIWindow?, servicesAssembly: ServicesAssembly) {
         self.navigationController = navigationController
         self.window = window
@@ -29,36 +33,68 @@ final class AppCoordinator: Coordinator {
     }
 
     // MARK: - Public Methods
-    
+
     func start() {
-        if Auth.auth().currentUser != nil {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.timerDone = true
+            self?.tryTransition()
+        }
+
+        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            self?.authUser = user
+            self?.authChecked = true
+            self?.tryTransition()
+        }
+    }
+    
+    func restartWithoutSplash() {
+        if servicesAssembly.authService.currentUser != nil {
             showMainFlow()
         } else {
             showAuth()
         }
     }
-    
+
     func showAuth() {
         children.removeAll()
-        
-        let authCoordinator = AuthCoordinator(navigationController: navigationController, servicesAssembly: servicesAssembly)
+
+        let authCoordinator = AuthCoordinator(
+            navigationController: navigationController,
+            servicesAssembly: servicesAssembly
+        )
         authCoordinator.parentCoordinator = self
         children.append(authCoordinator)
         authCoordinator.start()
-        
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
     }
-    
+
     func showMainFlow() {
         children.removeAll()
-        
+
         let tabBarCoordinator = TabBarCoordinator(
             navigationController: navigationController,
-            servicesAssembly: servicesAssembly
+            assembly: servicesAssembly
         )
         tabBarCoordinator.parentCoordinator = self
         children.append(tabBarCoordinator)
         tabBarCoordinator.start()
+
+        window?.rootViewController = navigationController  
+        window?.makeKeyAndVisible()
+    }
+}
+
+// MARK: - Private Methods
+
+private extension AppCoordinator {
+
+    func tryTransition() {
+        guard authChecked && timerDone else { return }
+        DispatchQueue.main.async { [weak self] in
+            if self?.authUser != nil {
+                self?.showMainFlow()
+            } else {
+                self?.showAuth()
+            }
+        }
     }
 }

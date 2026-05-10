@@ -56,14 +56,15 @@ final class QuizResultViewModel {
     
     private var statusText: String {
         let percent = quizResult.percentage
-        if percent >= 100 { return "Идеально" }
-        if percent >= 80  { return "Отлично" }
-        if percent >= 50  { return "Хорошо" }
-        return "Можно лучше"
+        if percent >= 100 { return L10n.Result.perfect }
+        if percent >= 80 { return L10n.Result.great }
+        if percent >= 50 { return L10n.Result.good }
+        return L10n.Result.notBad
     }
     
     private var resultDescription: String {
-        "\(quizResult.score) из \(quizResult.totalQuestions) правильных ответов"
+        L10n.Result.correctCount(quizResult.score, quizResult.totalQuestions)
+
     }
     
     private var numberOfQuestions: Int {
