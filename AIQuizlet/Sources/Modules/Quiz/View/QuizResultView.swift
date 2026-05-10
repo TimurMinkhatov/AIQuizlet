@@ -175,20 +175,31 @@ final class QuizResultView: UIView {
     // MARK: - Lifecycle
 
     override func layoutSubviews() {
-            super.layoutSubviews()
+        super.layoutSubviews()
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+        
+        if style == .dark {
+            layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            backgroundColor = AppColors.background
+        } else {
             applyGradient(
                 colors: Constants.Colors.gradientColors,
                 startPoint: CGPoint(x: 0.5, y: 0),
                 endPoint: CGPoint(x: 0.5, y: 1)
             )
-            homeButton.layoutIfNeeded()
-            homeButton.applyGradient(
-                colors: Constants.Colors.homeGradient,
-                startPoint: CGPoint(x: 0, y: 0.5),
-                endPoint: CGPoint(x: 1, y: 0.5),
-                cornerRadius: Constants.Layout.buttonCornerRadius
-            )
         }
+        
+        homeButton.layoutIfNeeded()
+        homeButton.applyGradient(
+            colors: Constants.Colors.homeGradient,
+            startPoint: CGPoint(x: 0, y: 0.5),
+            endPoint: CGPoint(x: 1, y: 0.5),
+            cornerRadius: Constants.Layout.buttonCornerRadius
+        )
+    }
 
     // MARK: - Public Methods
     
