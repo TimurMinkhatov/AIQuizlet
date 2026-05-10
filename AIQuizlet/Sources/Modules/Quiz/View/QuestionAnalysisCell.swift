@@ -6,14 +6,6 @@
 //  Copyright © 2026 t-bank-practice-team. All rights reserved.
 //
 
-//
-//  QuestionAnalysisCell.swift
-//  AIQuizlet
-//
-//  Created by Azamat Zakirov on 02.05.2026.
-//  Copyright © 2026 t-bank-practice-team. All rights reserved.
-//
-
 import UIKit
 import SnapKit
 

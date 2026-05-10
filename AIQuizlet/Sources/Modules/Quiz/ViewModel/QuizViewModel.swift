@@ -162,7 +162,8 @@ final class QuizViewModel {
     }
     
     func loadFromRecord(_ record: QuizRecord) {
-        let questions = record.questions.map { questionRecord in
+        let sortedRecordQuestions = record.questions.sorted { $0.orderIndex < $1.orderIndex }
+        let questions = sortedRecordQuestions.map { questionRecord in
             Question(
                 text: questionRecord.text,
                 answers: questionRecord.answers,
@@ -194,64 +195,54 @@ final class QuizViewModel {
     
     private func finishQuiz() {
         guard let quiz = quiz, let record = currentQuizRecord else { return }
+        
+        let localQuiz = quiz
+        let localRecord = record
 
         Task { [weak self] in
             guard let self else { return }
             
-            guard let uid = await self.waitForUserId(timeoutSeconds: 5) else {
-                let finalScore = self.calculateFinalScore(for: quiz)
-                let answerRecords = self.createAnswerRecords(for: quiz)
-                let quizResult = QuizResult(
-                    userId: "",
-                    score: finalScore,
-                    totalQuestions: quiz.questions.count,
-                    quiz: record,
-                    userAnswers: answerRecords
-                )
-                await MainActor.run {
-                    self.coordinator?.showResult(with: quizResult)
-                }
-                return
-            }
-            
-            let finalScore = self.calculateFinalScore(for: quiz)
-            let answerRecords = self.createAnswerRecords(for: quiz)
-            let firestoreAnswers = self.createFirestoreAnswers(for: quiz)
-            
-            let resultId = UUID()
-            let quizResult = QuizResult(
-                userId: uid,
-                id: resultId,
-                score: finalScore,
-                totalQuestions: quiz.questions.count,
-                quiz: record,
-                userAnswers: answerRecords
-            )
-            
-            if let storageService = self.storageService {
-                do {
-                    try storageService.saveQuizResult(quizResult)
-                } catch {
-                }
-            }
+            let uid = await self.waitForUserId(timeoutSeconds: 5)
             
             await MainActor.run {
-                self.coordinator?.showResult(with: quizResult)
-            }
-            
-            let scorePercentage = Double(finalScore) / Double(quiz.questions.count) * 100
-            let quizId = record.id.uuidString
-            
-            do {
-                try await self.saveQuizResultToFirestore(
-                    resultId: resultId,
-                    quizId: quizId,
-                    score: scorePercentage,
-                    total: quiz.questions.count,
-                    correctCount: finalScore,
-                    answers: firestoreAnswers
+                let finalScore = self.calculateFinalScore(for: localQuiz)
+                let answerRecords = self.createAnswerRecords(for: localQuiz)
+                let resultId = UUID()
+                let quizResult = QuizResult(
+                    userId: uid ?? "",
+                    id: resultId,
+                    score: finalScore,
+                    totalQuestions: localQuiz.questions.count,
+                    quiz: localRecord,
+                    userAnswers: answerRecords
                 )
-            } catch {
+                
+                if let storageService = self.storageService {
+                    do {
+                        try storageService.saveQuizResult(quizResult)
+                    } catch {}
+                }
+                
+                self.coordinator?.showResult(with: quizResult)
+                
+                if let validUid = uid, !validUid.isEmpty {
+                    let firestoreAnswers = self.createFirestoreAnswers(for: localQuiz)
+                    let scorePercentage = Double(finalScore) / Double(localQuiz.questions.count) * 100
+                    let quizId = localRecord.id.uuidString
+                    
+                    Task {
+                        do {
+                            try await self.saveQuizResultToFirestore(
+                                resultId: resultId,
+                                quizId: quizId,
+                                score: scorePercentage,
+                                total: localQuiz.questions.count,
+                                correctCount: finalScore,
+                                answers: firestoreAnswers
+                            )
+                        } catch {}
+                    }
+                }
             }
         }
     }
@@ -295,11 +286,13 @@ final class QuizViewModel {
     
     private func createAnswerRecords(for quiz: Quiz) -> [AnswerRecord] {
         var records: [AnswerRecord] = []
+        let originalSorted = currentQuizRecord?.questions.sorted { $0.orderIndex < $1.orderIndex }
         for (index, question) in quiz.questions.enumerated() {
             if let selectedIndex = userAnswers[index] {
                 let isCorrect = (selectedIndex == question.correctAnswer)
+                let exactOrderIndex = originalSorted?[index].orderIndex ?? index
                 records.append(AnswerRecord(
-                    questionIndex: index,
+                    questionIndex: exactOrderIndex,
                     selectedAnswer: selectedIndex,
                     isCorrect: isCorrect
                 ))
@@ -310,11 +303,13 @@ final class QuizViewModel {
     
     private func createFirestoreAnswers(for quiz: Quiz) -> [FSAnswer] {
         var answers: [FSAnswer] = []
+        let originalSorted = currentQuizRecord?.questions.sorted { $0.orderIndex < $1.orderIndex }
         for (index, question) in quiz.questions.enumerated() {
             if let selectedIndex = userAnswers[index] {
                 let isCorrect = (selectedIndex == question.correctAnswer)
+                let exactOrderIndex = originalSorted?[index].orderIndex ?? index
                 answers.append(FSAnswer(
-                    questionIndex: index,
+                    questionIndex: exactOrderIndex,
                     selectedAnswer: selectedIndex,
                     isCorrect: isCorrect
                 ))
@@ -421,3 +416,4 @@ private extension QuizViewModel {
         }
     }
 }
+

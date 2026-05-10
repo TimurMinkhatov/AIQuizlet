@@ -83,7 +83,7 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
         let userAnswerIndex = viewModel.getUserAnswer(at: indexPath.row)
         let isExpanded = viewModel.expandedIndexSet.contains(indexPath.row)
         
-        cell.contentView.backgroundColor = .white
+        cell.backgroundColor = .white
         cell.configure(with: question, userAnswerIndex: userAnswerIndex, index: indexPath.row, isExpanded: isExpanded)
         return cell
     }
@@ -98,7 +98,9 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return createSectionHeader(title: Constants.Strings.headerTitle)
+        let headerView = createSectionHeader(title: Constants.Strings.headerTitle)
+        headerView.backgroundColor = .white
+        return headerView
     }
 }
 
@@ -129,6 +131,16 @@ private extension QuizResultViewController {
     
     func setupNavigation() {
         navigationItem.hidesBackButton = !viewModel.isFromHistory
+        if let viewControllers = navigationController?.viewControllers, viewControllers.count > 1 {
+            let previousVC = viewControllers[viewControllers.count - 2]
+            previousVC.navigationItem.backButtonDisplayMode = .minimal
+        }
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.tintColor = .white
     }
     
     func setupTargets() {
@@ -149,7 +161,9 @@ private extension QuizResultViewController {
     // MARK: - Actions
     
     @objc func retryTapped() {
+        print("Кнопка 'Заново' нажата в контроллере")
         viewModel.retryQuiz()
+        
     }
     
     @objc func homeTapped() {

@@ -368,7 +368,9 @@ private extension QuizViewController {
             button.tag = index
             button.addTarget(self, action: #selector(optionTapped(_:)), for: .touchUpInside)
             optionsStack.addArrangedSubview(button)
-            button.snp.makeConstraints { make in make.height.equalTo(Constants.Layout.optionButtonHeight) }
+            button.label.numberOfLines = 0
+            button.label.lineBreakMode = .byWordWrapping
+            button.snp.makeConstraints { $0.height.greaterThanOrEqualTo(Constants.Layout.optionButtonHeight) }
         }
         cardScrollView.setContentOffset(.zero, animated: false)
     }
@@ -378,7 +380,14 @@ private extension QuizViewController {
         optionsStack.arrangedSubviews.enumerated().forEach { index, view in
             guard let button = view as? QuizOptionButton else { return }
             button.isUserInteractionEnabled = false
-            let resultState: QuizOptionButton.State = (index == data.correctIndex) ? .correct : .wrong
+            let resultState: QuizOptionButton.State
+            if index == data.correctIndex {
+                resultState = .correct
+            } else if index == data.selectedIndex {
+                resultState = .wrong
+            } else {
+                resultState = .normal
+            }
             button.updateState(resultState)
             
             if index == selectedOptionIndex {

@@ -81,7 +81,8 @@ final class QuizResultViewModel {
     }
     
     func getUserAnswer(at index: Int) -> Int {
-        return quizResult.userAnswers.first(where: { $0.questionIndex == index })?.selectedAnswer ?? -1
+        let targetQuestion = sortedQuestions[index]
+        return quizResult.userAnswers.first(where: { $0.questionIndex == targetQuestion.orderIndex })?.selectedAnswer ?? -1
     }
     
     func retryQuiz() {
