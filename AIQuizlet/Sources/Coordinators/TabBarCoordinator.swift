@@ -13,9 +13,10 @@ final class TabBarCoordinator: Coordinator {
     
     var navigationController: UINavigationController
     var children = [Coordinator]()
-    var parentCoordinator: Coordinator?
+    weak var parentCoordinator: Coordinator?
     var tabBarController: UITabBarController
     let assembly: ServicesAssembly
+    private var themeObserver: NSObjectProtocol?
     
     // MARK: - Init
     
@@ -23,14 +24,21 @@ final class TabBarCoordinator: Coordinator {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
         self.assembly = assembly
-
-        NotificationCenter.default.addObserver(
-            forName: .themeDidChange,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.setupAppearance()
-        }
+        
+        themeObserver = NotificationCenter.default.addObserver(forName: .themeDidChange,
+                                                               object: nil,
+                                                               queue: .main
+                                                           ) { [weak self] _ in
+                                                               self?.setupAppearance()
+                                                            }
+    }
+    
+    // MARK: - Deinit
+    
+    deinit {
+          if let themeObserver {
+              NotificationCenter.default.removeObserver(themeObserver)
+          }
     }
     
     func start() {
