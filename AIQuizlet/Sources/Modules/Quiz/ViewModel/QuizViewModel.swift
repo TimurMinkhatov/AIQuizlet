@@ -56,7 +56,7 @@ final class QuizViewModel {
     
     weak var coordinator: QuizCoordinator?
     private let quizService: QuizServiceProtocol
-    private let firestoreService: FirestoreService
+    private let firestoreService: FirestoreServiceProtocol
     private let storageService: StorageServiceProtocol?
     
     private var quiz: Quiz?
@@ -83,7 +83,7 @@ final class QuizViewModel {
     
     init(
         quizService: QuizServiceProtocol,
-        firestoreService: FirestoreService,
+        firestoreService: FirestoreServiceProtocol,
         storageService: StorageServiceProtocol? = nil
     ) {
         self.quizService = quizService

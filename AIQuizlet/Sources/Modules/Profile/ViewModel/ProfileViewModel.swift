@@ -20,9 +20,9 @@ final class ProfileViewModel {
     // MARK: - Properties
     
     weak var coordinator: ProfileCoordinator?
-    private let firestoreService: FirestoreService
-    private let storageService: StorageService
-    private let authService: AuthService
+    private let firestoreService: FirestoreServiceProtocol
+    private let storageService: StorageServiceProtocol
+    private let authService: AuthServiceProtocol
     var onError: ((String) -> Void)?
     var email: String {
         return authService.currentUser?.email ?? "Unknown"
@@ -31,9 +31,9 @@ final class ProfileViewModel {
     // MARK: - Init
     
     init(
-        firestoreService: FirestoreService,
-        storageService: StorageService,
-        authService: AuthService
+        firestoreService: FirestoreServiceProtocol,
+        storageService: StorageServiceProtocol,
+        authService: AuthServiceProtocol
     ) {
         self.firestoreService = firestoreService
         self.storageService = storageService

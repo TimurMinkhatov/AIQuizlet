@@ -14,8 +14,7 @@ final class CameraViewModel {
     // MARK: - Properties
     
     weak var coordinator: QuizCoordinator?
-    private let cameraService: CameraService
-    
+    private let cameraService: CameraServiceProtocol
     var onErrorMessage: ((String) -> Void)?
     
     var previewLayer: CALayer {
@@ -24,7 +23,7 @@ final class CameraViewModel {
 
     // MARK: - Init
     
-    init(cameraService: CameraService) {
+    init(cameraService: CameraServiceProtocol) {
         self.cameraService = cameraService
         setupBindings()
     }

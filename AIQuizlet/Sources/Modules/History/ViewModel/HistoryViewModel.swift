@@ -12,9 +12,11 @@ import Foundation
 final class HistoryViewModel {
     
     // MARK: - Properties
-    
+
     weak var coordinator: HistoryCoordinator?
-    private let servicesAssembly: ServicesAssembly
+    private let authService: AuthServiceProtocol
+    private let storageService: StorageServiceProtocol
+    private let firestoreService: FirestoreServiceProtocol
     
     private var allResults: [QuizResult] = []
     
@@ -28,8 +30,14 @@ final class HistoryViewModel {
     
     // MARK: - Init
     
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
+    init(
+        authService: AuthServiceProtocol,
+        storageService: StorageServiceProtocol,
+        firestoreService: FirestoreServiceProtocol
+    ) {
+        self.authService = authService
+        self.storageService = storageService
+        self.firestoreService = firestoreService
     }
     
     // MARK: - Public Methods
@@ -39,8 +47,7 @@ final class HistoryViewModel {
         Task { [weak self] in
             guard let self else { return }
             do {
-                let currentUserId = try await self.servicesAssembly.authService.requireUserId()
-                
+                let currentUserId = try await self.authService.requireUserId(timeoutSeconds: 5)
                 self.loadLocalData(userId: currentUserId)
                 await self.syncWithFirestore(userId: currentUserId)
                 
@@ -76,14 +83,14 @@ final class HistoryViewModel {
     func cleanupOrphanResults() async {
         let userId: String
         do {
-            userId = try await servicesAssembly.authService.requireUserId()
+            userId = try await authService.requireUserId(timeoutSeconds: 5)
         } catch {
             return
         }
         
         do {
-            let cloudResults = try await servicesAssembly.firestoreService.fetchUserResults(userId: userId)
-            let cloudQuizzes = try await servicesAssembly.firestoreService.fetchUserQuizzes(userId: userId)
+            let cloudResults = try await firestoreService.fetchUserResults(userId: userId)
+            let cloudQuizzes = try await firestoreService.fetchUserQuizzes(userId: userId)
             
             guard !cloudQuizzes.isEmpty else {
                 return
@@ -93,7 +100,7 @@ final class HistoryViewModel {
             
             var deletedCount = 0
             for result in cloudResults where !validQuizIds.contains(result.quizId) {
-                try await servicesAssembly.firestoreService.deleteQuizResult(resultId: result.id)
+                try await firestoreService.deleteQuizResult(resultId: result.id)
                 deletedCount += 1
             }
         } catch {
@@ -104,7 +111,7 @@ final class HistoryViewModel {
     
     private func loadLocalData(userId: String) {
         do {
-            let results = try servicesAssembly.storageService.fetchResults()
+            let results = try storageService.fetchResults()
             self.allResults = results
                 .filter { $0.userId == userId }
                 .sorted(by: { $0.date > $1.date })
@@ -116,27 +123,27 @@ final class HistoryViewModel {
     
     private func syncWithFirestore(userId: String) async {
         do {
-            let cloudQuizzes = try await servicesAssembly.firestoreService.fetchUserQuizzes(userId: userId)
+            let cloudQuizzes = try await firestoreService.fetchUserQuizzes(userId: userId)
             var syncedQuizIds = Set<String>()
             
             for fsQuiz in cloudQuizzes {
-                let exists = try servicesAssembly.storageService.checkExists(id: fsQuiz.id)
+                let exists = try storageService.checkExists(id: fsQuiz.id)
                 if !exists {
-                    try servicesAssembly.storageService.saveCloudQuiz(fsQuiz, userId: userId)
+                    try storageService.saveCloudQuiz(fsQuiz, userId: userId)
                 }
                 syncedQuizIds.insert(fsQuiz.id)
             }
             
-            let cloudResults = try await servicesAssembly.firestoreService.fetchUserResults(userId: userId)
+            let cloudResults = try await firestoreService.fetchUserResults(userId: userId)
             
             var syncedResultsCount = 0
             var orphanResultsCount = 0
             
             for fsResult in cloudResults {
                 if syncedQuizIds.contains(fsResult.quizId) {
-                    let resultExists = try servicesAssembly.storageService.checkResultExists(id: fsResult.id)
+                    let resultExists = try storageService.checkResultExists(id: fsResult.id)
                     if !resultExists {
-                        try servicesAssembly.storageService.saveCloudResult(fsResult, userId: userId)
+                        try storageService.saveCloudResult(fsResult, userId: userId)
                         syncedResultsCount += 1
                     }
                 } else {

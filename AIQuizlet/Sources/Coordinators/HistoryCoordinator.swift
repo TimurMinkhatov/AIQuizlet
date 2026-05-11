@@ -28,7 +28,11 @@ final class HistoryCoordinator: Coordinator {
     
     func start() {
         Task { @MainActor in
-            let viewModel = HistoryViewModel(servicesAssembly: servicesAssembly)
+            let viewModel = HistoryViewModel(
+                authService: servicesAssembly.authService,
+                storageService: servicesAssembly.storageService,
+                firestoreService: servicesAssembly.firestoreService
+            )
             viewModel.coordinator = self
             let viewController = HistoryViewController(viewModel: viewModel)
             navigationController.pushViewController(viewController, animated: false)
