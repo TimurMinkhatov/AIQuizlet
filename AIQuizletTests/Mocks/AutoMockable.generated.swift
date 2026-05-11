@@ -10,6 +10,7 @@ import Moya
 // MARK: - MockAuthService
 
 final class MockAuthService: AuthServiceProtocol {
+
     var currentUser: FirebaseAuth.User? = nil
 
     var currentUserId: String? = nil
@@ -47,6 +48,7 @@ final class MockAuthService: AuthServiceProtocol {
 // MARK: - MockFirestoreService
 
 final class MockFirestoreService: FirestoreServiceProtocol {
+
     var createUserThrowableError: Error?
     var createUserCallCount = 0
 
@@ -178,6 +180,7 @@ final class MockFirestoreService: FirestoreServiceProtocol {
 // MARK: - MockQuizService
 
 final class MockQuizService: QuizServiceProtocol {
+
     var generateQuizThrowableError: Error?
     var generateQuizCallCount = 0
     var generateQuizReturnValue: Quiz!
@@ -203,6 +206,7 @@ final class MockQuizService: QuizServiceProtocol {
 // MARK: - MockStorageService
 
 final class MockStorageService: StorageServiceProtocol {
+
     var saveQuizResultThrowableError: Error?
     var saveQuizResultCallCount = 0
 
