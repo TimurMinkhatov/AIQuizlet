@@ -16,7 +16,7 @@ final class Mock{{ type.name|replace:"Protocol","" }}: {{ type.name }} {
 {% for method in type.methods %}
     {% if method.throws %}var {{ method.callName }}ThrowableError: Error?{% endif %}
     var {{ method.callName }}CallCount = 0
-    {% if not method.returnTypeName.isVoid %}var {{ method.callName }}ReturnValue: {{ method.returnTypeName }}!{% endif %}
+    {% if not method.returnTypeName.isVoid %}{% if method.returnTypeName.isOptional %}var {{ method.callName }}ReturnValue: {{ method.returnTypeName }} = nil{% else %}var {{ method.callName }}ReturnValue: {{ method.returnTypeName }}!{% endif %}{% endif %}
 
     func {{ method.name }}{% if method.isAsync %} async{% endif %}{% if method.throws %} throws{% endif %}{% if not method.returnTypeName.isVoid %} -> {{ method.returnTypeName }}{% endif %} {
         {{ method.callName }}CallCount += 1

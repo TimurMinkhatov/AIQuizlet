@@ -12,6 +12,8 @@ import Moya
 final class MockAuthService: AuthServiceProtocol {
     var currentUser: FirebaseAuth.User? = nil
 
+    var currentUserId: String? = nil
+
     var requireUserIdThrowableError: Error?
     var requireUserIdCallCount = 0
     var requireUserIdReturnValue: String!
@@ -91,7 +93,7 @@ final class MockFirestoreService: FirestoreServiceProtocol {
 
     var fetchUserThrowableError: Error?
     var fetchUserCallCount = 0
-    var fetchUserReturnValue: FSUser?!
+    var fetchUserReturnValue: FSUser? = nil
 
     func fetchUser() async throws -> FSUser? {
         fetchUserCallCount += 1
@@ -101,7 +103,7 @@ final class MockFirestoreService: FirestoreServiceProtocol {
 
     var fetchUserStatsThrowableError: Error?
     var fetchUserStatsCallCount = 0
-    var fetchUserStatsReturnValue: UserStats?!
+    var fetchUserStatsReturnValue: UserStats? = nil
 
     func fetchUserStats() async throws -> UserStats? {
         fetchUserStatsCallCount += 1
@@ -110,7 +112,7 @@ final class MockFirestoreService: FirestoreServiceProtocol {
     }
 
     var listenToUserStatsCallCount = 0
-    var listenToUserStatsReturnValue: ListenerRegistration?!
+    var listenToUserStatsReturnValue: ListenerRegistration? = nil
 
     func listenToUserStats(completion: @escaping (UserStats?) -> Void) -> ListenerRegistration? {
         listenToUserStatsCallCount += 1

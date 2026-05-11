@@ -19,28 +19,33 @@ final class HomeViewModel {
     // MARK: - Properties
 
     weak var coordinator: HomeCoordinator?
-    private let servicesAssembly: ServicesAssembly
+    private let authService: AuthServiceProtocol
+    private let storageService: StorageServiceProtocol
     private var fullResults: [QuizResult] = []
     var recentTests: [RecentTest] = []
     var onDataUpdated: (() -> Void)?
 
     // MARK: - Init
     
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
+    init(
+        authService: AuthServiceProtocol,
+        storageService: StorageServiceProtocol
+    ) {
+        self.authService = authService
+        self.storageService = storageService
     }
 
     // MARK: - Public Methods
     
     func fetchRecentTests() {
-        guard let userId = servicesAssembly.authService.currentUser?.uid, !userId.isEmpty else {
+        guard let userId = authService.currentUserId, !userId.isEmpty else {
             self.fullResults = []
             self.recentTests = []
             onDataUpdated?()
             return
         }
         do {
-            let results = try servicesAssembly.storageService.fetchResults()
+            let results = try storageService.fetchResults()
                 .filter { $0.userId == userId }
             let sortedResults = results.sorted(by: { $0.date > $1.date })
             let topThree = Array(sortedResults.prefix(3))

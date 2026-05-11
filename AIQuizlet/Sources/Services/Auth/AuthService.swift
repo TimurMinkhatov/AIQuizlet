@@ -10,6 +10,7 @@ import FirebaseAuth
 
 protocol AuthServiceProtocol {
     var currentUser: FirebaseAuth.User? { get }
+    var currentUserId: String? { get }
     func requireUserId(timeoutSeconds: TimeInterval) async throws -> String
     func register(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void)
     func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void)
@@ -22,6 +23,10 @@ final class AuthService: AuthServiceProtocol {
     
     var currentUser: FirebaseAuth.User? {
         Auth.auth().currentUser
+    }
+    
+    var currentUserId: String? {
+        Auth.auth().currentUser?.uid
     }
     
     // MARK: - Init
