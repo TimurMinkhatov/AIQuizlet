@@ -1,9 +1,0 @@
-https://cdn.cocoapods.org/:
-  pods:
-    RecaptchaInterop:
-      hash: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-      version: 100.0.0
-    SnapKit:
-      hash: d612e99e678a2d3b95bf60b0705ed0a35c03484a
-      version: 5.7.1
-  type: cdn
