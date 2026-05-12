@@ -172,7 +172,6 @@ final class QuizViewModel {
     }
     
     func loadFromRecord(_ record: QuizRecord) {
-        // Твой фикс: обязательная сортировка при загрузке из базы
         let sortedRecordQuestions = record.questions.sorted { $0.orderIndex < $1.orderIndex }
         let questions = sortedRecordQuestions.map { questionRecord in
             Question(
@@ -237,7 +236,6 @@ final class QuizViewModel {
                 
                 self.coordinator?.showResult(with: quizResult)
                 
-                // Сохранение в Firestore (из main)
                 if let validUid = uid, !validUid.isEmpty {
                     let firestoreAnswers = self.createFirestoreAnswers(for: localQuiz)
                     let scorePercentage = Double(finalScore) / Double(localQuiz.questions.count) * 100
@@ -264,6 +262,9 @@ final class QuizViewModel {
     
     private func restoreCurrentQuestionState() {
         guard let quiz = quiz else { return }
+        guard currentQuestionIndex >= 0 && currentQuestionIndex < quiz.questions.count else {
+            return
+        }
         let question = quiz.questions[currentQuestionIndex]
         
         if let userAnswer = userAnswers[currentQuestionIndex] {

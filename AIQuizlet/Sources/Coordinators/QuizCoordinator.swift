@@ -126,6 +126,7 @@ extension QuizCoordinator {
             storageService: servicesAssembly.storageService
         )
         viewModel.coordinator = self
+        currentQuizViewModel = viewModel
         let viewController = QuizViewController(viewModel: viewModel)
         viewController.hidesBottomBarWhenPushed = true
         viewModel.loadFromRecord(record)

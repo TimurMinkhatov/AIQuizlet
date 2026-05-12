@@ -27,17 +27,6 @@ final class ProfileViewController: UIViewController {
 
     private lazy var profileView = ProfileView()
 
-    private lazy var gradientLayer: CAGradientLayer = {
-        let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 1, y: 1)
-        return layer
-    }()
-
     private lazy var totalTestsCard = StatCardView(
         title: L10n.Profile.Stats.totalQuizzes,
         systemImage: "book",
@@ -148,7 +137,9 @@ extension ProfileViewController {
         bindViewModel()
         profileView.configure(with: viewModel)
         updateUI()
-        updateGradient(for: traitCollection.userInterfaceStyle)
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified ? traitCollection.userInterfaceStyle : ThemeManager.shared.savedStyle
+        updateGradient(for: style)
 
         NotificationCenter.default.addObserver(
             forName: .themeDidChange,
@@ -162,7 +153,8 @@ extension ProfileViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        gradientLayer.frame = view.bounds
+        let style = ThemeManager.shared.savedStyle == .unspecified ? traitCollection.userInterfaceStyle : ThemeManager.shared.savedStyle
+        updateGradient(for: style)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -171,11 +163,6 @@ extension ProfileViewController {
         statsStack.alpha = 0
         updateUI()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        updateGradient(for: ThemeManager.shared.savedStyle)
-    }
 }
 
 // MARK: - Private Methods
@@ -183,8 +170,6 @@ extension ProfileViewController {
 private extension ProfileViewController {
 
     func setupLayout() {
-        view.layer.insertSublayer(gradientLayer, at: 0)
-
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(profileView, statsStack, themeSelectorView, languageSelectorView, actionsCardView, versionLabel)
@@ -320,8 +305,21 @@ private extension ProfileViewController {
     }
 
     func updateGradient(for style: UIUserInterfaceStyle) {
-        gradientLayer.isHidden = style == .dark
-        view.backgroundColor = style == .dark ? AppColors.background : .clear
+        if style == .dark {
+            view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            view.backgroundColor = AppColors.background
+        } else {
+            view.backgroundColor = .clear
+            view.applyGradient(
+                colors: [
+                    UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
+                    UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+                ],
+                startPoint: CGPoint(x: 0.5, y: 0),
+                endPoint: CGPoint(x: 0.5, y: 1)
+            )
+        }
+        
         versionLabel.textColor = style == .dark ? .secondaryLabel : .white
         actionsCardView.backgroundColor = AppColors.cardBackground
         updateButtonColors(for: style)

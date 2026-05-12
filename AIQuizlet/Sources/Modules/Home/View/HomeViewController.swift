@@ -49,9 +49,10 @@ final class HomeViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if traitCollection.userInterfaceStyle != .dark {
-            view.applyGradient(colors: AppColors.backgroundGradient)
-        }
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+        updateGradient(for: style)
     }
 }
 
@@ -100,7 +101,12 @@ private extension HomeViewController {
             view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
             view.backgroundColor = AppColors.background
         } else {
-            view.applyGradient(colors: AppColors.backgroundGradient)
+            view.applyGradient(
+                colors: AppColors.backgroundGradient,
+                startPoint: CGPoint(x: 0.5, y: 0),
+                endPoint: CGPoint(x: 0.5, y: 1)
+            )
+            
         }
     }
 }

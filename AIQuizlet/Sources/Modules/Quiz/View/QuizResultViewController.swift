@@ -51,6 +51,13 @@ final class QuizResultViewController: UIViewController {
         bindViewModel()
         setupNavigation()
         setupTargets()
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+        let backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        contentView.tableView.backgroundColor = backgroundColor
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {

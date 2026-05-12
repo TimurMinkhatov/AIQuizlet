@@ -34,6 +34,7 @@ final class QuizResultView: UIView {
             static let progressContainerSize: CGFloat = 180
             static let buttonStackTopOffset: CGFloat = 40
             static let buttonStackHorizontalInset: CGFloat = 24
+            static let topGradientViewHeight: CGFloat = 540
             
             static let trackLineWidth: CGFloat = 12
             static let buttonHeight: CGFloat = 52
@@ -133,7 +134,7 @@ final class QuizResultView: UIView {
     
     private lazy var footerView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Constants.Layout.footerHeight))
-        view.backgroundColor = AppColors.historyCard
+        view.backgroundColor = .clear
         return view
     }()
 
@@ -142,7 +143,7 @@ final class QuizResultView: UIView {
         stack.axis = .horizontal
         stack.spacing = 16
         stack.distribution = .fillEqually
-        stack.backgroundColor = AppColors.historyCard
+        stack.backgroundColor = .clear
         return stack
     }()
 
@@ -302,7 +303,7 @@ private extension QuizResultView {
         headerView.backgroundColor = .clear
         headerView.addSubviews(percentageLabel, statusLabel, scoreDescriptionLabel, progressContainer)
         tableView.tableHeaderView = headerView
-        footerView.backgroundColor = .white
+        footerView.backgroundColor = .clear
         footerView.addSubview(buttonStack)
         buttonStack.addArrangedSubviews(retryButton, homeButton)
         tableView.tableFooterView = footerView
@@ -311,7 +312,7 @@ private extension QuizResultView {
     func setupConstraints() {
         topGradientView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(UIScreen.main.bounds.height * 0.8)
+            $0.height.equalTo(Constants.Layout.topGradientViewHeight)
         }
         
         tableView.snp.makeConstraints {

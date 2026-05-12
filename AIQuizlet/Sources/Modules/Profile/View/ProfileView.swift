@@ -27,17 +27,6 @@ final class ProfileView: UIView {
         return label
     }()
 
-    private lazy var avatarGradientLayer: CAGradientLayer = {
-        let layer = CAGradientLayer()
-        layer.colors = [
-            UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1).cgColor,
-            UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1).cgColor
-        ]
-        layer.startPoint = CGPoint(x: 0, y: 0)
-        layer.endPoint = CGPoint(x: 1, y: 1)
-        return layer
-    }()
-
     private lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -100,8 +89,6 @@ extension ProfileView {
     override func layoutSubviews() {
         super.layoutSubviews()
         profileContainerView.layoutIfNeeded()
-        avatarGradientLayer.frame = profileContainerView.bounds
-        avatarGradientLayer.cornerRadius = profileContainerView.layer.cornerRadius
         profileCardView.backgroundColor = AppColors.cardBackground
         
         let style = ThemeManager.shared.savedStyle == .unspecified
@@ -117,7 +104,6 @@ private extension ProfileView {
     func setupLayout() {
         addSubview(profileCardView)
         profileCardView.addSubview(profileContainerView)
-        profileContainerView.layer.insertSublayer(avatarGradientLayer, at: 0)
         profileContainerView.addSubview(profileImageView)
         profileCardView.addSubview(infoStack)
         infoStack.addArrangedSubview(nameLabel)
@@ -146,8 +132,21 @@ private extension ProfileView {
     }
     
     private func updateGradient(for style: UIUserInterfaceStyle) {
-        avatarGradientLayer.isHidden = style == .dark
-        profileContainerView.backgroundColor = style == .dark ? .systemGray3 : .clear
+        if style == .dark {
+            profileContainerView.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            profileContainerView.backgroundColor = .systemGray3
+        } else {
+            profileContainerView.backgroundColor = .clear
+            profileContainerView.applyGradient(
+                colors: [
+                    UIColor(red: 43/255, green: 127/255, blue: 255/255, alpha: 1),
+                    UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
+                ],
+                startPoint: CGPoint(x: 0, y: 0),
+                endPoint: CGPoint(x: 1, y: 1),
+                cornerRadius: Constants.avatarCornerRadius
+            )
+        }
         profileCardView.backgroundColor = AppColors.cardBackground
     }
 }
