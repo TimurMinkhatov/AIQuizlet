@@ -32,9 +32,6 @@ final class HistoryEmptyStateView: UIView {
         }
         
         enum Colors {
-            static let iconBackground = UIColor(red: 236/255, green: 238/255, blue: 242/255, alpha: 1)
-            static let buttonBackground = UIColor(red: 108/255, green: 71/255, blue: 255/255, alpha: 1)
-            static let iconTint = UIColor.systemGray2
             static let subtitleText = UIColor.systemGray
         }
     }
@@ -54,14 +51,15 @@ final class HistoryEmptyStateView: UIView {
     
     private lazy var iconContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = Constants.Colors.iconBackground
+        view.backgroundColor = .systemGray5
         view.layer.cornerRadius = Constants.iconContainerCornerRadius
+        view.clipsToBounds = true
         return view
     }()
     
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "book"))
-        imageView.tintColor = Constants.Colors.iconTint
+        imageView.tintColor = .systemGray
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -87,7 +85,7 @@ final class HistoryEmptyStateView: UIView {
     private lazy var homeButton: UIButton = {
         var config = UIButton.Configuration.filled()
         config.title = L10n.History.toHome
-        config.baseBackgroundColor = Constants.Colors.buttonBackground
+        config.baseBackgroundColor = .clear
         config.baseForegroundColor = .white
         config.cornerStyle = .large
         let button = UIButton(configuration: config)
@@ -108,6 +106,19 @@ final class HistoryEmptyStateView: UIView {
     
     @objc private func homeAction() {
         onHomeTapped?()
+    }
+    
+    // MARK: - Lifecycle
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        homeButton.layoutIfNeeded()
+        homeButton.applyGradient(
+            colors: AppColors.buttonGradient,
+            startPoint: CGPoint(x: 0, y: 0.5),
+            endPoint: CGPoint(x: 1, y: 0.5),
+            cornerRadius: 16
+        )
     }
     
     // MARK: - Setup UI

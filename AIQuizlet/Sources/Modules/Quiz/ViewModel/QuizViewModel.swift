@@ -9,6 +9,7 @@
 import Foundation
 import FirebaseAuth
 
+// MARK: - Helper Models
 struct QuizResultData {
     let resultId: UUID
     let quizId: String
@@ -171,7 +172,8 @@ final class QuizViewModel {
     }
     
     func loadFromRecord(_ record: QuizRecord) {
-        let questions = record.questions.map { questionRecord in
+        let sortedRecordQuestions = record.questions.sorted { $0.orderIndex < $1.orderIndex }
+        let questions = sortedRecordQuestions.map { questionRecord in
             Question(
                 text: questionRecord.text,
                 answers: questionRecord.answers,
@@ -203,72 +205,66 @@ final class QuizViewModel {
     
     private func finishQuiz() {
         guard let quiz = quiz, let record = currentQuizRecord else { return }
+        
+        let localQuiz = quiz
+        let localRecord = record
 
         Task { [weak self] in
             guard let self else { return }
             
-            guard let uid = await self.waitForUserId(timeoutSeconds: 5) else {
-                let finalScore = self.calculateFinalScore(for: quiz)
-                let answerRecords = self.createAnswerRecords(for: quiz)
-                let quizResult = QuizResult(
-                    userId: "",
-                    score: finalScore,
-                    totalQuestions: quiz.questions.count,
-                    quiz: record,
-                    userAnswers: answerRecords
-                )
-                await MainActor.run { [quizResult] in
-                    self.coordinator?.showResult(with: quizResult)
-                }
-                return
-            }
-            
-            let finalScore = self.calculateFinalScore(for: quiz)
-            let answerRecords = self.createAnswerRecords(for: quiz)
-            let firestoreAnswers = self.createFirestoreAnswers(for: quiz)
-            
-            let resultId = UUID()
-            let quizResult = QuizResult(
-                userId: uid,
-                id: resultId,
-                score: finalScore,
-                totalQuestions: quiz.questions.count,
-                quiz: record,
-                userAnswers: answerRecords
-            )
-            
-            if let storageService = self.storageService {
-                do {
-                    try storageService.saveQuizResult(quizResult)
-                } catch {
-                }
-            }
+            let uid = await self.waitForUserId(timeoutSeconds: 5)
             
             await MainActor.run {
+                let finalScore = self.calculateFinalScore(for: localQuiz)
+                let answerRecords = self.createAnswerRecords(for: localQuiz)
+                let resultId = UUID()
+                
+                let quizResult = QuizResult(
+                    userId: uid ?? "",
+                    id: resultId,
+                    score: finalScore,
+                    totalQuestions: localQuiz.questions.count,
+                    quiz: localRecord,
+                    userAnswers: answerRecords
+                )
+                
+                if let storageService = self.storageService {
+                    do {
+                        try storageService.saveQuizResult(quizResult)
+                    } catch {}
+                }
+                
                 self.coordinator?.showResult(with: quizResult)
-            }
-            
-            let scorePercentage = Double(finalScore) / Double(quiz.questions.count) * 100
-            let quizId = record.id.uuidString
-            
-            do {
-                try await self.saveQuizResultToFirestore(
-                    QuizResultData(
+                
+                if let validUid = uid, !validUid.isEmpty {
+                    let firestoreAnswers = self.createFirestoreAnswers(for: localQuiz)
+                    let scorePercentage = Double(finalScore) / Double(localQuiz.questions.count) * 100
+                    let quizId = localRecord.id.uuidString
+                    
+                    let resultData = QuizResultData(
                         resultId: resultId,
                         quizId: quizId,
                         score: scorePercentage,
-                        total: quiz.questions.count,
+                        total: localQuiz.questions.count,
                         correctCount: finalScore,
                         answers: firestoreAnswers
                     )
-                )
-            } catch {
+                    
+                    Task {
+                        do {
+                            try await self.saveQuizResultToFirestore(resultData)
+                        } catch {}
+                    }
+                }
             }
         }
     }
     
     private func restoreCurrentQuestionState() {
         guard let quiz = quiz else { return }
+        guard currentQuestionIndex >= 0 && currentQuestionIndex < quiz.questions.count else {
+            return
+        }
         let question = quiz.questions[currentQuestionIndex]
         
         if let userAnswer = userAnswers[currentQuestionIndex] {
@@ -306,11 +302,13 @@ final class QuizViewModel {
     
     private func createAnswerRecords(for quiz: Quiz) -> [AnswerRecord] {
         var records: [AnswerRecord] = []
+        let originalSorted = currentQuizRecord?.questions.sorted { $0.orderIndex < $1.orderIndex }
         for (index, question) in quiz.questions.enumerated() {
             if let selectedIndex = userAnswers[index] {
                 let isCorrect = (selectedIndex == question.correctAnswer)
+                let exactOrderIndex = originalSorted?[index].orderIndex ?? index
                 records.append(AnswerRecord(
-                    questionIndex: index,
+                    questionIndex: exactOrderIndex,
                     selectedAnswer: selectedIndex,
                     isCorrect: isCorrect
                 ))
@@ -321,11 +319,13 @@ final class QuizViewModel {
     
     private func createFirestoreAnswers(for quiz: Quiz) -> [FSAnswer] {
         var answers: [FSAnswer] = []
+        let originalSorted = currentQuizRecord?.questions.sorted { $0.orderIndex < $1.orderIndex }
         for (index, question) in quiz.questions.enumerated() {
             if let selectedIndex = userAnswers[index] {
                 let isCorrect = (selectedIndex == question.correctAnswer)
+                let exactOrderIndex = originalSorted?[index].orderIndex ?? index
                 answers.append(FSAnswer(
-                    questionIndex: index,
+                    questionIndex: exactOrderIndex,
                     selectedAnswer: selectedIndex,
                     isCorrect: isCorrect
                 ))
@@ -348,15 +348,12 @@ private extension QuizViewModel {
             try? await Task.sleep(nanoseconds: 250_000_000) // 250ms
         }
         
-        if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty { return uid }
-        return nil
+        return Auth.auth().currentUser?.uid
     }
     
     func saveQuizResultToFirestore(_ data: QuizResultData) async throws {
-        guard let uid = await waitForUserId(timeoutSeconds: 5) else {
-            throw NSError(domain: "QuizViewModel", code: 401, userInfo: [
-                NSLocalizedDescriptionKey: "User is not authenticated"
-            ])
+        guard let uid = Auth.auth().currentUser?.uid else {
+            throw NSError(domain: "QuizViewModel", code: 401, userInfo: [NSLocalizedDescriptionKey: "User is not authenticated"])
         }
         let result = FSQuizResult(
             quizId: data.quizId,
@@ -372,9 +369,7 @@ private extension QuizViewModel {
     }
     
     func createAndSaveNewQuiz(_ quiz: Quiz) async {
-        guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else {
-            return
-        }
+        guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else { return }
         
         let quizId = UUID()
         let questionRecords = quiz.questions.enumerated().map { index, question in
@@ -395,21 +390,18 @@ private extension QuizViewModel {
             questions: questionRecords
         )
         
-        if let storageService = storageService {
-            do {
-                try storageService.saveQuiz(quizRecord)
-            } catch {
+        await MainActor.run {
+            if let storageService = storageService {
+                try? storageService.saveQuiz(quizRecord)
             }
+            self.currentQuizRecord = quizRecord
         }
         
-        self.currentQuizRecord = quizRecord
         await ensureQuizSavedToFirestore(quiz: quiz, record: quizRecord)
     }
     
     func ensureQuizSavedToFirestore(quiz: Quiz, record: QuizRecord) async {
-        guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else {
-            return
-        }
+        guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else { return }
         
         let fsQuiz = FSQuiz(
             id: record.id.uuidString,
@@ -426,9 +418,6 @@ private extension QuizViewModel {
             }
         )
         
-        do {
-            try await firestoreService.saveQuiz(quiz: fsQuiz)
-        } catch {
-        }
+        try? await firestoreService.saveQuiz(quiz: fsQuiz)
     }
 }

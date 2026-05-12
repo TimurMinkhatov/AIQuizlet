@@ -51,6 +51,13 @@ final class QuizResultViewController: UIViewController {
         bindViewModel()
         setupNavigation()
         setupTargets()
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+        let backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        contentView.tableView.backgroundColor = backgroundColor
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -77,7 +84,12 @@ extension QuizResultViewController: UITableViewDataSource, UITableViewDelegate {
         let userAnswerIndex = viewModel.getUserAnswer(at: indexPath.row)
         let isExpanded = viewModel.expandedIndexSet.contains(indexPath.row)
         
-        cell.contentView.backgroundColor = AppColors.historyCard
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+            
+        cell.contentView.backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        
         cell.configure(with: question, userAnswerIndex: userAnswerIndex, index: indexPath.row, isExpanded: isExpanded)
         return cell
     }
@@ -102,7 +114,13 @@ private extension QuizResultViewController {
     
     func createSectionHeader(title: String) -> UIView {
         let headerView = UIView()
-        headerView.backgroundColor = AppColors.historyCard
+        
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+            
+        headerView.backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        
         headerView.layer.cornerRadius = Constants.Layout.headerCornerRadius
         headerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         
@@ -123,6 +141,17 @@ private extension QuizResultViewController {
     
     func setupNavigation() {
         navigationItem.hidesBackButton = !viewModel.isFromHistory
+        if let viewControllers = navigationController?.viewControllers, viewControllers.count > 1 {
+            let previousVC = viewControllers[viewControllers.count - 2]
+            previousVC.navigationItem.backButtonDisplayMode = .minimal
+        }
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.tintColor = .white
     }
     
     func setupTargets() {

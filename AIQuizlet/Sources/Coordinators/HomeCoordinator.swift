@@ -97,8 +97,7 @@ extension HomeCoordinator {
     }
     
     private func startRetryQuiz(with quiz: QuizRecord) {
-        guard !children.contains(where: { $0 is QuizCoordinator }) else { return }
-        
+        children.removeAll(where: { $0 is QuizCoordinator })
         let quizCoordinator = QuizCoordinator(
             navigationController: navigationController,
             servicesAssembly: servicesAssembly

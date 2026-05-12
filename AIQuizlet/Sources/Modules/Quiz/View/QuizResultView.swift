@@ -32,8 +32,9 @@ final class QuizResultView: UIView {
             static let scoreDescriptionTopOffset: CGFloat = 4
             static let progressContainerTopOffset: CGFloat = 30
             static let progressContainerSize: CGFloat = 180
-            static let buttonStackTopOffset: CGFloat = 16
+            static let buttonStackTopOffset: CGFloat = 40
             static let buttonStackHorizontalInset: CGFloat = 24
+            static let topGradientViewHeight: CGFloat = 540
             
             static let trackLineWidth: CGFloat = 12
             static let buttonHeight: CGFloat = 52
@@ -54,23 +55,19 @@ final class QuizResultView: UIView {
         }
         
         enum Colors {
-            static let retryButtonBg = [
-                UIColor(red: 52/255, green: 64/255, blue: 84/255, alpha: 1)
-                ]
+            static let retryButtonBg = [UIColor(red: 52/255, green: 64/255, blue: 84/255, alpha: 1)]
+            
             static let gradientColors = [
                 UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
                 UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1),
                 UIColor(red: 130/255, green: 0/255, blue: 219/255, alpha: 1)
             ]
-            static let homeGradient = [
-                UIColor(red: 21/255, green: 93/255, blue: 252/255, alpha: 1),
-                UIColor(red: 152/255, green: 16/255, blue: 250/255, alpha: 1)
-            ]
-            static let redProgress = UIColor(red: 235/255, green: 77/255, blue: 75/255, alpha: 1)
-            static let greenProgress = UIColor(red: 46/255, green: 204/255, blue: 113/255, alpha: 1)
+            static let redProgress = UIColor(red: 252/255, green: 33/255, blue: 37/255, alpha: 1)
+            static let greenProgress = UIColor(red: 63/255, green: 198/255, blue: 87/255, alpha: 1)
             
             static let haloAlpha: CGFloat = 0.08
             static let descriptionAlpha: CGFloat = 0.8
+            static let buttonText = UIColor(red: 24/255, green: 33/255, blue: 52/255, alpha: 1)
         }
         
         enum Logic {
@@ -80,10 +77,15 @@ final class QuizResultView: UIView {
     }
     
     // MARK: - UI Elements
+    
+    private lazy var topGradientView: UIView = {
+        let view = UIView()
+        return view
+    }()
         
     lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
-        table.backgroundColor = .clear
+        table.backgroundColor = .white
         table.separatorStyle = .none
         table.showsVerticalScrollIndicator = false
         table.sectionFooterHeight = .leastNormalMagnitude
@@ -132,16 +134,16 @@ final class QuizResultView: UIView {
     
     private lazy var footerView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: Constants.Layout.footerHeight))
-        view.backgroundColor = AppColors.historyCard
+        view.backgroundColor = .clear
         return view
     }()
 
     private lazy var buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = Constants.Layout.buttonStackTopOffset
+        stack.spacing = 16
         stack.distribution = .fillEqually
-        stack.backgroundColor = AppColors.historyCard
+        stack.backgroundColor = .clear
         return stack
     }()
 
@@ -157,7 +159,7 @@ final class QuizResultView: UIView {
         makeButton(
             title: L10n.Result.Home.button,
             systemImage: "house",
-            backgroundColor: Constants.Colors.homeGradient
+            backgroundColor: AppColors.buttonGradient
         )
     }()
     
@@ -165,7 +167,6 @@ final class QuizResultView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .clear
         setupUI()
         setupConstraints()
     }
@@ -182,19 +183,22 @@ final class QuizResultView: UIView {
             : ThemeManager.shared.savedStyle
         
         if style == .dark {
-            layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+            topGradientView.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
             backgroundColor = AppColors.background
+            tableView.backgroundColor = AppColors.background
         } else {
-            applyGradient(
+            topGradientView.applyGradient(
                 colors: Constants.Colors.gradientColors,
                 startPoint: CGPoint(x: 0.5, y: 0),
                 endPoint: CGPoint(x: 0.5, y: 1)
             )
+            backgroundColor = .white
+            tableView.backgroundColor = .clear
         }
         
         homeButton.layoutIfNeeded()
         homeButton.applyGradient(
-            colors: Constants.Colors.homeGradient,
+            colors: AppColors.buttonGradient,
             startPoint: CGPoint(x: 0, y: 0.5),
             endPoint: CGPoint(x: 1, y: 0.5),
             cornerRadius: Constants.Layout.buttonCornerRadius
@@ -271,33 +275,46 @@ final class QuizResultView: UIView {
 private extension QuizResultView {
     
     func makeButton(title: String, systemImage: String, backgroundColor: [UIColor]) -> UIButton {
-            var config = UIButton.Configuration.filled()
-            var container = AttributeContainer()
-            container.font = .systemFont(ofSize: Constants.Layout.buttonFontSize, weight: .semibold)
-            config.attributedTitle = AttributedString(title, attributes: container)
-            config.image = UIImage(systemName: systemImage)
-            config.imagePadding = Constants.Layout.buttonImagePadding
-            if backgroundColor.count > 1 {
-                config.baseBackgroundColor = .clear
-            } else {
-                config.baseBackgroundColor = backgroundColor.first ?? .clear
-            }
-            
-            config.baseForegroundColor = .white
-            config.background.cornerRadius = Constants.Layout.buttonCornerRadius
-            return UIButton(configuration: config)
+        var config = UIButton.Configuration.filled()
+        var container = AttributeContainer()
+        container.font = .systemFont(ofSize: Constants.Layout.buttonFontSize, weight: .semibold)
+        config.attributedTitle = AttributedString(title, attributes: container)
+        config.image = UIImage(systemName: systemImage)
+        config.imagePadding = Constants.Layout.buttonImagePadding
+        
+        if backgroundColor.count > 1 {
+            config.baseBackgroundColor = .clear
+        } else {
+            config.baseBackgroundColor = backgroundColor.first ?? .clear
         }
+        
+        config.baseForegroundColor = .white
+        config.background.cornerRadius = Constants.Layout.buttonCornerRadius
+        config.background.strokeColor = UIColor.white.withAlphaComponent(0.7)
+        config.background.strokeWidth = 1
+        
+        return UIButton(configuration: config)
+    }
     
     func setupUI() {
+        addSubview(topGradientView)
+        tableView.backgroundColor = .clear
         addSubview(tableView)
+        headerView.backgroundColor = .clear
         headerView.addSubviews(percentageLabel, statusLabel, scoreDescriptionLabel, progressContainer)
         tableView.tableHeaderView = headerView
+        footerView.backgroundColor = .clear
         footerView.addSubview(buttonStack)
         buttonStack.addArrangedSubviews(retryButton, homeButton)
         tableView.tableFooterView = footerView
     }
     
     func setupConstraints() {
+        topGradientView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.height.equalTo(Constants.Layout.topGradientViewHeight)
+        }
+        
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -327,19 +344,6 @@ private extension QuizResultView {
             $0.top.equalToSuperview().offset(Constants.Layout.buttonStackTopOffset)
             $0.leading.trailing.equalToSuperview().inset(Constants.Layout.buttonStackHorizontalInset).priority(999)
             $0.height.equalTo(Constants.Layout.buttonHeight)
-        }
-    }
-    
-    func updateTheme() {
-        if traitCollection.userInterfaceStyle != .dark {
-            applyGradient(
-                colors: Constants.Colors.gradientColors,
-                startPoint: CGPoint(x: 0.5, y: 0),
-                endPoint: CGPoint(x: 0.5, y: 1)
-            )
-        } else {
-            layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
-            backgroundColor = AppColors.background
         }
     }
 }

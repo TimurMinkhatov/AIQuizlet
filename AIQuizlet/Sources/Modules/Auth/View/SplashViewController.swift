@@ -72,7 +72,12 @@ extension SplashViewController {
             view.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
             view.backgroundColor = AppColors.background
         } else {
-            view.applyGradient(colors: AppColors.backgroundGradient)
+            view.applyGradient(
+                colors:
+                    AppColors.backgroundGradient,
+                startPoint: CGPoint(x: 0.5, y: 0),
+                endPoint: CGPoint(x: 0.5, y: 1)
+            )
         }
     }
 }

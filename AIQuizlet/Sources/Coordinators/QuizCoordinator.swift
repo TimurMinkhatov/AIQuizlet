@@ -37,9 +37,9 @@ final class QuizCoordinator: Coordinator {
         guard let currentUserId = servicesAssembly.authService.currentUser?.uid, !currentUserId.isEmpty else {
             return
         }
-        let questionRecords = quiz.questions.map { question in
+        let questionRecords = quiz.questions.enumerated().map { index, question in
             QuestionRecord(
-                orderIndex: 0,
+                orderIndex: index,
                 text: question.text,
                 answers: question.answers,
                 correctAnswer: question.correctAnswer,
@@ -126,6 +126,7 @@ extension QuizCoordinator {
             storageService: servicesAssembly.storageService
         )
         viewModel.coordinator = self
+        currentQuizViewModel = viewModel
         let viewController = QuizViewController(viewModel: viewModel)
         viewController.hidesBottomBarWhenPushed = true
         viewModel.loadFromRecord(record)

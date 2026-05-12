@@ -23,13 +23,14 @@ final class QuizOptionButton: UIControl {
     private enum Constants {
         static let labelLeading = 16
         static let labelTrailing = 8
+        static let labelVerticalInset = 16
         static let iconImageViewTrailing = 16
         static let iconImageViewSize = 20
     }
 
     // MARK: - UI Elements
-
-    private lazy var label: UILabel = {
+    
+    lazy var label: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .label
@@ -83,9 +84,11 @@ final class QuizOptionButton: UIControl {
     func updateState(_ state: State) {
         currentState = state
         iconImageView.isHidden = (state == .normal || state == .selected)
+        
         label.font = (state == .selected)
             ? .systemFont(ofSize: 15, weight: .bold)
             : .systemFont(ofSize: 15, weight: .medium)
+            
         layer.borderWidth = (state == .selected) ? 3 : 1.5
 
         switch state {
@@ -146,7 +149,7 @@ private extension QuizOptionButton {
     func setupConstraints() {
         label.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(Constants.labelLeading)
-            $0.centerY.equalToSuperview()
+            $0.top.bottom.equalToSuperview().inset(Constants.labelVerticalInset)
             $0.trailing.equalTo(iconImageView.snp.leading).offset(-Constants.labelTrailing)
         }
 

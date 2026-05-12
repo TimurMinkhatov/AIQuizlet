@@ -20,6 +20,7 @@ final class HomeView: UIView {
         static let sectionHeaderHeight: CGFloat = 30
         static let mainStackSpacing: CGFloat = 20
         static let scrollViewTopOffset: CGFloat = 80
+        static let headerStackViewOffset: CGFloat = 20
         
         enum Fonts {
             static let welcome = UIFont.systemFont(ofSize: 24, weight: .bold)
@@ -122,6 +123,18 @@ final class HomeView: UIView {
     
     required init?(coder: NSCoder) { fatalError() }
     
+    // MARK: - LifeCycle
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
+            
+        backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        
+        updateForTheme(traitCollection.userInterfaceStyle)
+    }
+    
     // MARK: - Public Methods
     
     func addTestResult(_ cardView: UIView) {
@@ -151,10 +164,11 @@ final class HomeView: UIView {
     
     func updateForTheme(_ style: UIUserInterfaceStyle) {
         let isDark = style == .dark
+        self.backgroundColor = isDark ? AppColors.historyCard : .white
         let labelColor: UIColor = isDark ? .label : .white
         let secondaryColor: UIColor = isDark ? .secondaryLabel : .white.withAlphaComponent(0.7)
         let iconColor: UIColor = isDark ? .label : .white.withAlphaComponent(0.8)
-
+    
         welcomeLabel.textColor = labelColor
         recentTitleLabel.textColor = labelColor
         seeAllTestsButton.setTitleColor(secondaryColor, for: .normal)
@@ -167,19 +181,23 @@ final class HomeView: UIView {
 private extension HomeView {
     
     func setupUI() {
-        backgroundColor = .clear
-        addSubviews(scrollView, headerStackView)
-        scrollView.addSubview(mainStackView)
+        let style = ThemeManager.shared.savedStyle == .unspecified
+            ? traitCollection.userInterfaceStyle
+            : ThemeManager.shared.savedStyle
         
+        backgroundColor = (style == .dark) ? AppColors.historyCard : .white
+        addSubview(scrollView)
         headerStackView.addArrangedSubviews(welcomeLabel, profileButton)
+        scrollView.addSubviews(headerStackView, mainStackView)
+        
         recentTestsHeaderStack.addArrangedSubviews(recentTitleLabel, seeAllTestsButton)
         mainStackView.addArrangedSubviews(photoCard, textCard, recentTestsHeaderStack, emptyStateView)
     }
 
     func setupConstraints() {
         headerStackView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(-5)
-            $0.leading.trailing.equalToSuperview().inset(Constants.mainPadding)
+            $0.top.equalToSuperview().offset(Constants.headerStackViewOffset)
+            $0.leading.trailing.equalTo(self).inset(Constants.mainPadding)
             $0.height.equalTo(Constants.headerHeight)
         }
         
