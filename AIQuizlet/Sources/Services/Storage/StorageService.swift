@@ -16,32 +16,19 @@ protocol StorageServiceProtocol {
     func deleteAll() throws
     func saveQuiz(_ quizRecord: QuizRecord) throws
 
-    @MainActor
-    func checkExists(id: String) throws -> Bool
-    
-    @MainActor
-    func saveCloudQuiz(_ fsQuiz: FSQuiz, userId: String) throws
-    
-    @MainActor
-    func checkResultExists(id: String) throws -> Bool
-    
-    @MainActor
-    func saveCloudResult(_ fsResult: FSQuizResult, userId: String) throws
+    @MainActor func checkExists(id: String) throws -> Bool
+    @MainActor func saveCloudQuiz(_ fsQuiz: FSQuiz, userId: String) throws
+    @MainActor func checkResultExists(id: String) throws -> Bool
+    @MainActor func saveCloudResult(_ fsResult: FSQuizResult, userId: String) throws
 }
 
 final class StorageService: StorageServiceProtocol {
     
-    // MARK: - Properties
-    
     private let modelContext: ModelContext
-    
-    // MARK: - Init
     
     init(modelContainer: ModelContainer) {
         self.modelContext = ModelContext(modelContainer)
     }
-    
-    // MARK: - Public Methods 
     
     func saveQuizResult(_ result: QuizResult) throws {
         modelContext.insert(result)
@@ -49,16 +36,12 @@ final class StorageService: StorageServiceProtocol {
     }
     
     func fetchResults() throws -> [QuizResult] {
-        let descriptor = FetchDescriptor<QuizResult>(
-            sortBy: [SortDescriptor(\.date, order: .reverse)]
-        )
+        let descriptor = FetchDescriptor<QuizResult>(sortBy: [SortDescriptor(\.date, order: .reverse)])
         return try modelContext.fetch(descriptor)
     }
     
     func fetchQuizzes() throws -> [QuizRecord] {
-        let descriptor = FetchDescriptor<QuizRecord>(
-            sortBy: [SortDescriptor(\.date, order: .reverse)]
-        )
+        let descriptor = FetchDescriptor<QuizRecord>(sortBy: [SortDescriptor(\.date, order: .reverse)])
         return try modelContext.fetch(descriptor)
     }
     
@@ -78,21 +61,12 @@ final class StorageService: StorageServiceProtocol {
     
     @MainActor
     func checkExists(id: String) throws -> Bool {
-        guard let uuid = UUID(uuidString: id) else { return false }
-        
-        let fetchDescriptor = FetchDescriptor<QuizRecord>(
-            predicate: #Predicate<QuizRecord> { record in
-                record.id == uuid
-            }
-        )
-        
-        let count = try modelContext.fetchCount(fetchDescriptor)
-        return count > 0
+        let all = try fetchQuizzes()
+        return all.contains(where: { $0.id == id })
     }
     
     @MainActor
     func saveCloudQuiz(_ fsQuiz: FSQuiz, userId: String) throws {
-        guard let uuid = UUID(uuidString: fsQuiz.id) else { return }
         let questionRecords = fsQuiz.questions.enumerated().map { (index, fsQuestion) in
             QuestionRecord(
                 orderIndex: index,
@@ -105,7 +79,7 @@ final class StorageService: StorageServiceProtocol {
         
         let quizRecord = QuizRecord(
             userId: userId,
-            id: uuid,
+            id: fsQuiz.id,
             title: fsQuiz.title,
             date: fsQuiz.createdAt,
             questions: questionRecords
@@ -117,27 +91,14 @@ final class StorageService: StorageServiceProtocol {
     
     @MainActor
     func checkResultExists(id: String) throws -> Bool {
-        guard let uuid = UUID(uuidString: id) else { return false }
-        let descriptor = FetchDescriptor<QuizResult>(
-            predicate: #Predicate { $0.id == uuid }
-        )
-        let count = try modelContext.fetchCount(descriptor)
-        return count > 0
+        let all = try fetchResults()
+        return all.contains(where: { $0.id == id })
     }
 
     @MainActor
     func saveCloudResult(_ fsResult: FSQuizResult, userId: String) throws {
-        guard let resultUUID = UUID(uuidString: fsResult.id),
-              let quizUUID = UUID(uuidString: fsResult.quizId) else { return }
-
-        let targetQuizId = quizUUID
-        let quizDescriptor = FetchDescriptor<QuizRecord>(
-            predicate: #Predicate<QuizRecord> { $0.id == targetQuizId }
-        )
-        
-        let quizRecord = try modelContext.fetch(quizDescriptor).first
-        
-        guard let quizRecord else {
+        let allQuizzes = try fetchQuizzes()
+        guard let quizRecord = allQuizzes.first(where: { $0.id == fsResult.quizId }) else {
             return
         }
 
@@ -151,7 +112,7 @@ final class StorageService: StorageServiceProtocol {
 
         let quizResult = QuizResult(
             userId: userId,
-            id: resultUUID,
+            id: fsResult.id,
             date: fsResult.completedAt,
             score: fsResult.correctCount,
             totalQuestions: fsResult.totalQuestions,

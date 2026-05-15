@@ -13,14 +13,14 @@ import Foundation
 final class QuizResult {
     
     var userId: String
-    var id: UUID
+    var id: String
     var date: Date
     var score: Int
     var totalQuestions: Int
     var quiz: QuizRecord
     @Relationship(deleteRule: .cascade) var userAnswers: [AnswerRecord]
     
-    init(userId: String, id: UUID = UUID(), date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord, userAnswers: [AnswerRecord]) {
+    init(userId: String, id: String = UUID().uuidString, date: Date = Date(), score: Int, totalQuestions: Int, quiz: QuizRecord, userAnswers: [AnswerRecord]) {
         self.userId = userId
         self.id = id
         self.date = date

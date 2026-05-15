@@ -116,10 +116,20 @@ extension FirestoreService {
             .document(userId)
             .collection("quizzes")
             .getDocuments()
+        var quizzes: [FSQuiz] = []
         
-        return try snapshot.documents.compactMap {
-            try Firestore.Decoder().decode(FSQuiz.self, from: $0.data())
+        for doc in snapshot.documents {
+            do {
+                var data = doc.data()
+                
+                if data["id"] == nil {
+                    data["id"] = doc.documentID
+                }
+                let quiz = try Firestore.Decoder().decode(FSQuiz.self, from: data)
+                quizzes.append(quiz)
+            } catch {}
         }
+        return quizzes
     }
     
     func fetchUserResults(userId: String) async throws -> [FSQuizResult] {
@@ -128,9 +138,20 @@ extension FirestoreService {
             .collection("quizResults")
             .getDocuments()
         
-        return try snapshot.documents.compactMap {
-            try Firestore.Decoder().decode(FSQuizResult.self, from: $0.data())
+        var results: [FSQuizResult] = []
+        for doc in snapshot.documents {
+            do {
+                var data = doc.data()
+                                
+                if data["id"] == nil {
+                    data["id"] = doc.documentID
+                }
+                let result = try Firestore.Decoder().decode(FSQuizResult.self, from: data)
+                results.append(result)
+            } catch {}
         }
+        
+        return results
     }
     
     func deleteQuizResult(resultId: String) async throws {

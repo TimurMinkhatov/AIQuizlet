@@ -120,34 +120,31 @@ final class HistoryViewModel {
             var syncedQuizIds = Set<String>()
             
             for fsQuiz in cloudQuizzes {
-                let exists = try servicesAssembly.storageService.checkExists(id: fsQuiz.id)
-                if !exists {
-                    try servicesAssembly.storageService.saveCloudQuiz(fsQuiz, userId: userId)
-                }
-                syncedQuizIds.insert(fsQuiz.id)
+                do {
+                    let exists = try servicesAssembly.storageService.checkExists(id: fsQuiz.id)
+                    if !exists {
+                        try servicesAssembly.storageService.saveCloudQuiz(fsQuiz, userId: userId)
+                    }
+                    syncedQuizIds.insert(fsQuiz.id)
+                } catch {}
             }
             
             let cloudResults = try await servicesAssembly.firestoreService.fetchUserResults(userId: userId)
             
-            var syncedResultsCount = 0
-            var orphanResultsCount = 0
-            
             for fsResult in cloudResults {
-                if syncedQuizIds.contains(fsResult.quizId) {
-                    let resultExists = try servicesAssembly.storageService.checkResultExists(id: fsResult.id)
-                    if !resultExists {
-                        try servicesAssembly.storageService.saveCloudResult(fsResult, userId: userId)
-                        syncedResultsCount += 1
+                do {
+                    if syncedQuizIds.contains(fsResult.quizId) {
+                        let resultExists = try servicesAssembly.storageService.checkResultExists(id: fsResult.id)
+                        if !resultExists {
+                            try servicesAssembly.storageService.saveCloudResult(fsResult, userId: userId)
+                        }
                     }
-                } else {
-                    orphanResultsCount += 1
-                }
+                } catch {}
             }
             
             await MainActor.run {
                 self.loadLocalData(userId: userId)
             }
-        } catch {
-        }
+        } catch {}
     }
 }
