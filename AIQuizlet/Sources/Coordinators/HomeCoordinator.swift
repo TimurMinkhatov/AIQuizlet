@@ -12,7 +12,7 @@ final class HomeCoordinator: Coordinator {
     
     // MARK: - Properties
     
-    var parentCoordinator: Coordinator?
+    weak var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
@@ -27,7 +27,10 @@ final class HomeCoordinator: Coordinator {
     // MARK: - Public Methods
   
     func start() {
-        let viewModel = HomeViewModel(servicesAssembly: servicesAssembly)
+        let viewModel = HomeViewModel(
+            authService: servicesAssembly.authService,
+            storageService: servicesAssembly.storageService
+        )
         viewModel.coordinator = self
         let viewController = HomeViewController(viewModel: viewModel)
         navigationController.setViewControllers([viewController], animated: false)

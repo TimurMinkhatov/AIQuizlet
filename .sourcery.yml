@@ -1,0 +1,6 @@
+sources:
+  - AIQuizlet/Sources
+templates:
+  - Sourcery/Templates
+output:
+  AIQuizletTests/Mocks

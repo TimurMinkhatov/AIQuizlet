@@ -12,7 +12,7 @@ final class QuizCoordinator: Coordinator {
 
     // MARK: - Properties
 
-    var parentCoordinator: Coordinator?
+    weak var parentCoordinator: Coordinator?
     var children: [Coordinator] = []
     var navigationController: UINavigationController
     private let servicesAssembly: ServicesAssembly
@@ -34,7 +34,7 @@ final class QuizCoordinator: Coordinator {
     // MARK: - Public Methods
 
     func didGenerateQuiz(_ quiz: Quiz) {
-        guard let currentUserId = AuthService.shared.currentUser?.uid, !currentUserId.isEmpty else {
+        guard let currentUserId = servicesAssembly.authService.currentUser?.uid, !currentUserId.isEmpty else {
             return
         }
         let questionRecords = quiz.questions.enumerated().map { index, question in

@@ -8,18 +8,30 @@
 
 import FirebaseAuth
 
-final class AuthService {
+protocol AuthServiceProtocol {
+    var currentUser: FirebaseAuth.User? { get }
+    var currentUserId: String? { get }
+    func requireUserId(timeoutSeconds: TimeInterval) async throws -> String
+    func register(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void)
+    func signIn(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void)
+    func signOut()
+}
+
+final class AuthService: AuthServiceProtocol {
     
     // MARK: - Properties
     
-    static let shared = AuthService()
     var currentUser: FirebaseAuth.User? {
         Auth.auth().currentUser
     }
     
+    var currentUserId: String? {
+        Auth.auth().currentUser?.uid
+    }
+    
     // MARK: - Init
     
-    private init() {}
+    init() {}
     
     // MARK: - Public Methods
     

@@ -1,0 +1,30 @@
+import Foundation
+import FirebaseAuth
+import FirebaseFirestore
+import Moya
+@testable import AIQuizlet
+
+{% for type in types.protocols where type.name|hasSuffix:"Protocol" and type.name != "CameraServiceProtocol" and type.name != "NetworkManagerProtocol" %}
+
+// MARK: - Mock{{ type.name|replace:"Protocol","" }}
+
+final class Mock{{ type.name|replace:"Protocol","" }}: {{ type.name }} {
+
+    {% for variable in type.variables %}
+    var {{ variable.name }}: {{ variable.typeName }}{% if variable.isOptional %} = nil{% endif %}
+
+    {% endfor %}
+    {% for method in type.methods %}
+    {% if method.throws %}var {{ method.callName }}ThrowableError: Error?{% endif %}
+    var {{ method.callName }}CallCount = 0
+    {% if not method.returnTypeName.isVoid %}{% if method.returnTypeName.isOptional %}var {{ method.callName }}ReturnValue: {{ method.returnTypeName }} = nil{% else %}var {{ method.callName }}ReturnValue: {{ method.returnTypeName }}!{% endif %}{% endif %}
+
+    func {{ method.name }}{% if method.isAsync %} async{% endif %}{% if method.throws %} throws{% endif %}{% if not method.returnTypeName.isVoid %} -> {{ method.returnTypeName }}{% endif %} {
+        {{ method.callName }}CallCount += 1
+        {% if method.throws %}if let error = {{ method.callName }}ThrowableError { throw error }{% endif %}
+        {% if not method.returnTypeName.isVoid %}return {{ method.callName }}ReturnValue{% endif %}
+    }
+
+    {% endfor %}
+}
+{% endfor %}

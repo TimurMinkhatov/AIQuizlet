@@ -12,17 +12,17 @@ final class ServicesAssembly {
 
     // MARK: - Properties
 
-    let storageService: StorageService
-    let authService: AuthService
-    let quizService: QuizService
-    let cameraService: CameraService
-    let firestoreService: FirestoreService
+    let storageService: StorageServiceProtocol
+    let authService: AuthServiceProtocol
+    let quizService: QuizServiceProtocol
+    let cameraService: CameraServiceProtocol
+    let firestoreService: FirestoreServiceProtocol
 
     // MARK: - Init
 
     init(modelContainer: ModelContainer) {
         self.storageService = StorageService(modelContainer: modelContainer)
-        self.authService = AuthService.shared
+        self.authService = AuthService()
         self.quizService = QuizService(networkManager: NetworkManager())
         self.cameraService = CameraService()
         self.firestoreService = FirestoreService()

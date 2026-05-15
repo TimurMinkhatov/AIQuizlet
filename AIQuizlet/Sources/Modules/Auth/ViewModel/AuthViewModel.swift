@@ -23,12 +23,12 @@ final class AuthViewModel {
     private var email: String = ""
     private var password: String = ""
     private var confirmPassword: String = ""
-    private let authService: AuthService
-    private let firestoreService: FirestoreService
+    private let authService: AuthServiceProtocol
+    private let firestoreService: FirestoreServiceProtocol
     
     // MARK: - Init
-    
-    init(authService: AuthService, firestoreService: FirestoreService) {
+
+    init(authService: AuthServiceProtocol, firestoreService: FirestoreServiceProtocol) {
         self.authService = authService
         self.firestoreService = firestoreService
     }

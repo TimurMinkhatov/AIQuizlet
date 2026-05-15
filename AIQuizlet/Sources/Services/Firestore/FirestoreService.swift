@@ -9,7 +9,25 @@
 import FirebaseFirestore
 import FirebaseAuth
 
-final class FirestoreService {
+protocol FirestoreServiceProtocol {
+    func createUser(email: String) async throws
+    func saveQuiz(quiz: FSQuiz) async throws
+    func saveQuizResult(quizResult: FSQuizResult) async throws
+    func fetchQuizzes() async throws -> [FSQuiz]
+    func syncQuizzes(localQuizzes: [QuizRecord]) async throws -> [FSQuiz]
+    func fetchUser() async throws -> FSUser?
+    func fetchUserStats() async throws -> UserStats?
+    func listenToUserStats(completion: @escaping (UserStats?) -> Void) -> ListenerRegistration?
+    func fetchQuizResults() async throws -> [FSQuizResult]
+    func fetchUserQuizzes(userId: String) async throws -> [FSQuiz]
+    func fetchUserResults(userId: String) async throws -> [FSQuizResult]
+    func deleteQuizResult(resultId: String) async throws
+    func deleteQuiz(quizId: String) async throws
+    func deleteAllData() async throws
+
+}
+
+final class FirestoreService: FirestoreServiceProtocol {
     
     // MARK: Properties
     
