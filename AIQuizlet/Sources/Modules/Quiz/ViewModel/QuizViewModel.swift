@@ -218,10 +218,10 @@ final class QuizViewModel {
                 let finalScore = self.calculateFinalScore(for: localQuiz)
                 let answerRecords = self.createAnswerRecords(for: localQuiz)
                 let resultId = UUID()
-                
+                let quizIdString = localRecord.id
                 let quizResult = QuizResult(
                     userId: uid ?? "",
-                    id: resultId,
+                    id: resultId.uuidString,
                     score: finalScore,
                     totalQuestions: localQuiz.questions.count,
                     quiz: localRecord,
@@ -239,11 +239,9 @@ final class QuizViewModel {
                 if let validUid = uid, !validUid.isEmpty {
                     let firestoreAnswers = self.createFirestoreAnswers(for: localQuiz)
                     let scorePercentage = Double(finalScore) / Double(localQuiz.questions.count) * 100
-                    let quizId = localRecord.id.uuidString
-                    
                     let resultData = QuizResultData(
                         resultId: resultId,
-                        quizId: quizId,
+                        quizId: quizIdString,
                         score: scorePercentage,
                         total: localQuiz.questions.count,
                         correctCount: finalScore,
@@ -345,7 +343,7 @@ private extension QuizViewModel {
         
         while Date() < deadline {
             if let uid = Auth.auth().currentUser?.uid, !uid.isEmpty { return uid }
-            try? await Task.sleep(nanoseconds: 250_000_000) // 250ms
+            try? await Task.sleep(nanoseconds: 250_000_000)
         }
         
         return Auth.auth().currentUser?.uid
@@ -370,8 +368,7 @@ private extension QuizViewModel {
     
     func createAndSaveNewQuiz(_ quiz: Quiz) async {
         guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else { return }
-        
-        let quizId = UUID()
+        let quizId = UUID().uuidString
         let questionRecords = quiz.questions.enumerated().map { index, question in
             QuestionRecord(
                 orderIndex: index,
@@ -404,7 +401,7 @@ private extension QuizViewModel {
         guard let currentUserId = await waitForUserId(timeoutSeconds: 5) else { return }
         
         let fsQuiz = FSQuiz(
-            id: record.id.uuidString,
+            id: record.id,
             userId: currentUserId,
             title: quiz.title,
             createdAt: Date(),
