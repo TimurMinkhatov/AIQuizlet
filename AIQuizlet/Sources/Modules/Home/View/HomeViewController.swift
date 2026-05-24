@@ -26,7 +26,6 @@ final class HomeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        extendedLayoutIncludesOpaqueBars = true
         setupActions()
         bindViewModel()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)

@@ -128,9 +128,9 @@ final class HistoryViewModel {
             
             for fsQuiz in cloudQuizzes {
                 do {
-                    let exists = try servicesAssembly.storageService.checkExists(id: fsQuiz.id)
+                    let exists = try storageService.checkExists(id: fsQuiz.id)
                     if !exists {
-                        try servicesAssembly.storageService.saveCloudQuiz(fsQuiz, userId: userId)
+                        try storageService.saveCloudQuiz(fsQuiz, userId: userId)
                     }
                     syncedQuizIds.insert(fsQuiz.id)
                 } catch {}
@@ -141,9 +141,9 @@ final class HistoryViewModel {
             for fsResult in cloudResults {
                 do {
                     if syncedQuizIds.contains(fsResult.quizId) {
-                        let resultExists = try servicesAssembly.storageService.checkResultExists(id: fsResult.id)
+                        let resultExists = try storageService.checkResultExists(id: fsResult.id)
                         if !resultExists {
-                            try servicesAssembly.storageService.saveCloudResult(fsResult, userId: userId)
+                            try storageService.saveCloudResult(fsResult, userId: userId)
                         }
                     }
                 } catch {}
